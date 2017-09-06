@@ -1,0 +1,4 @@
+﻿  Main.cpp
+Main.obj : error LNK2019: unresolved external symbol glfwInit referenced in function main
+C:\Users\Demok\Desktop\Animation2017\Libraries\libs\glfw3.lib : warning LNK4272: library machine type 'X86' conflicts with target machine type 'x64'
+C:\Users\Demok\Desktop\Animation2017\x64\Debug\Animation2017.exe : fatal error LNK1120: 1 unresolved externals
