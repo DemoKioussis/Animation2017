@@ -1,93 +1,85 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "GLSetup.h"
+#include "WindowManager.h"
+#include "Shader.h"
+#include "Mesh.h"
 #include <iostream>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow *window);
 
+
+/**
+This class right now just sets thigns up, ideally by the end of this it would be a list of settings and nothing else
+*/
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+// to load into vectors
+GLfloat vertices[12] = {
+	0.5f,  0.5f, 0.0f,  // top right
+	0.5f, -0.5f, 0.0f,  // bottom right
+	-0.5f, -0.5f, 0.0f,  // bottom left
+	-0.5f,  0.5f, 0.0f   // top left 
+};
+GLuint indices[6] = {  // note that we start from 0!
+	0, 1, 3,  // first Triangle
+	1, 2, 3   // second Triangle
+};
+
+WindowManager* windowManager;
 int main()
 {
 
+	windowManager = new WindowManager();
+	windowManager->setWindow(GLSetup::makeWindow(SCR_WIDTH, SCR_HEIGHT));
+	windowManager->setBackgroundColor(glm::vec4(0.5, 0.5, 0.5, 1));
+	Shader shaderProg("ShaderSources/vert.vs", "ShaderSources/frag.fs");
 
-	glm::vec3 test(1,2,3);
-	// glfw: initialize and configure
-	// ------------------------------
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	Mesh* mesh = new Mesh();
 
-#ifdef __APPLE__
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // uncomment this statement to fix compilation on OS X
-#endif
 
-														 // glfw window creation
-														 // --------------------
-	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
-	if (window == NULL)
-	{
-		std::cout << "Failed to create GLFW window" << std::endl;
-		glfwTerminate();
-		return -1;
+
+	std::vector<GLfloat> verts(0);
+	std::vector<GLuint> inds(0);
+
+	for (int i = 0; i < 12; i++) {
+		verts.push_back(vertices[i]);
+		std::cout << verts[i] << std::endl;
 	}
-	glfwMakeContextCurrent(window);
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	for (int i = 0; i < 6; i++) {
+		inds.push_back(indices[i]);
+		std::cout << inds[i] << std::endl;
 
-	// glad: load all OpenGL function pointers
-	// ---------------------------------------
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
-		std::cout << "Failed to initialize GLAD" << std::endl;
-		return -1;
 	}
 
-	// render loop
-	// -----------
-	while (!glfwWindowShouldClose(window))
+
+	mesh->setVerticies(&verts);
+	mesh->setIndices(&inds);
+	mesh->setShader(&shaderProg);
+
+
+	while (windowManager->windowHasClosed())
 	{
-		// input
-		// -----
-		processInput(window);
+		//physicsManager->updatePhysics()
+		float timeValue = glfwGetTime();
+		float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
 
-		// render
-		// ------
-		glClearColor(1.0f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		shaderProg.setVec4("ourColor", glm::vec4(0, greenValue, 0, 1));
 
-		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-		// -------------------------------------------------------------------------------
-		glfwSwapBuffers(window);
-		glfwPollEvents();
+		windowManager->clearWindow();
+
+		mesh->draw();
+
+
+		windowManager->swapBuffer();
+		windowManager->pollEvents();
+
 	}
 
-	// glfw: terminate, clearing all previously allocated GLFW resources.
-	// ------------------------------------------------------------------
+
 	glfwTerminate();
+	delete(windowManager);
 	return 0;
 }
 
-// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-// ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow *window)
-{
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
-}
 
-// glfw: whenever the window size changed (by OS or user resize) this callback function executes
-// ---------------------------------------------------------------------------------------------
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-	// make sure the viewport matches the new window dimensions; note that width and 
-	// height will be significantly larger than specified on retina displays.
-	glViewport(0, 0, width, height);
-}
 
-// Test
