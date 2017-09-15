@@ -14,7 +14,7 @@
 // Default camera values
 const float YAW        = -90.0f;
 const float PITCH      =  0.0f;
-const float SPEED      =  0.00005f;
+const float SPEED      =  0.02f;
 const float SENSITIVTY =  0.1f;
 const float ZOOM       =  45.0f;
 
@@ -38,6 +38,7 @@ public:
     float Zoom;
 
     // Constructor with vectors
+	
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVTY), Zoom(ZOOM)
     {
         Position = position;
@@ -65,7 +66,7 @@ public:
     // Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
     void ProcessKeyboard(DIRECTION direction, float deltaTime)
     {
-        float velocity = MovementSpeed * deltaTime;
+        float velocity = -MovementSpeed * deltaTime;
         if (direction == FORWARD)
             Position += Front * velocity;
         if (direction == BACKWARD)
@@ -75,7 +76,6 @@ public:
         if (direction == RIGHT)
             Position += Right * velocity;
 
-		std::cout << "Position: " <<Position.x<<" "<<Position.y<<" "<<Position.z << std::endl;
     }
 
     // Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
@@ -110,7 +110,9 @@ public:
         if (Zoom >= 45.0f)
             Zoom = 45.0f;
     }
-
+	void translate(glm::vec3 p) {
+		Position += p;
+	}
 private:
     // Calculates the front vector from the Camera's (updated) Eular Angles
     void updateCameraVectors()

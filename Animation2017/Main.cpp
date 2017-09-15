@@ -23,16 +23,35 @@ const int framerate = 120;
 // to load into vectors
 
 GLfloat vertices [] = {
-	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-	0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-	0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f
+
+	// front
+	0.5f,  0.5f, -0.50f,  // top right
+	0.5f, -0.5f, -0.50f, // bottom right
+	-0.5f, -0.5f, -0.50f, // bottom left
+	-0.5f,  0.5f, -0.50f, // top left 
+
+	// back
+	0.5f,  0.5f, 0.50f,  // top right
+	0.5f, -0.5f,  0.50f, // bottom right
+	-0.5f, -0.5f,  0.50f, // bottom left
+	-0.5f,  0.5f,  0.50f,// top left 
+
+
+
 };
-GLuint indices[6] = {  // note that we start from 0!
-	0, 1, 3,  // first Triangle
-	1, 2, 3   // second Triangle
+GLuint indices[] = {  // note that we start from 0!
+	0, 1, 3,   // first triangle
+	1, 2, 3,    // second triangle
+
+	0,1,4,
+	1,5,4,
+
+	3,7,6,
+	3,2,6,
+
+	4,5,7,
+	5,6,7
+
 };
 
 
@@ -52,7 +71,7 @@ int main()
 	Mesh* mesh = new Mesh();
 
 	camera = new Camera();
-
+	camera->translate(glm::vec3(0, 0, -5));
 
 	InputManager::setWindow(windowManager);
 	InputManager::setCamera(camera);
@@ -79,21 +98,22 @@ int main()
 	TimeSystem::begin();
 	windowManager->setFramerate(framerate);
 	windowManager->mesh = mesh;
-	glm::mat4 model, view, projection;
+	glm::mat4 model(1.0f), projection;
 	unsigned int viewLoc = glGetUniformLocation(shaderProg.ID, "view");
 	unsigned int modelLoc = glGetUniformLocation(shaderProg.ID, "model");
 	unsigned int projLoc = glGetUniformLocation(shaderProg.ID, "projection");
 
+	projection = glm::perspective(glm::radians(camera->Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
+
 	while (windowManager->windowHasClosed())
 	{
-
-		projection = glm::perspective(glm::radians(camera->Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		
+		glm::mat4 view;
 		view = glm::translate(view, camera->Position);
 
-		model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, 0.00001f, glm::vec3(0.0f, 1.0f, 1.0f));
 
-		//model = glm::mat4x4(0);
-		// get matrix's uniform location and set matrix
+
 		shaderProg.use();
 
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
