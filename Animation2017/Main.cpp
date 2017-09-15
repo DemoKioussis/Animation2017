@@ -23,34 +23,24 @@ const int framerate = 120;
 // to load into vectors
 
 GLfloat vertices [] = {
-
-	// front
-	0.5f,  0.5f, -0.50f,  // top right
-	0.5f, -0.5f, -0.50f, // bottom right
-	-0.5f, -0.5f, -0.50f, // bottom left
-	-0.5f,  0.5f, -0.50f, // top left 
-
-	// back
-	0.5f,  0.5f, 0.50f,  // top right
-	0.5f, -0.5f,  0.50f, // bottom right
-	-0.5f, -0.5f,  0.50f, // bottom left
-	-0.5f,  0.5f,  0.50f,// top left 
-
+	0,0,0
+	,-20.000000,-20.000000,0.000000
+	,20.000000,-20.000000,0.000000
+	,0.001999,0.001999,39.998001
+	,-20.000000,20.000000,0.000000
+	,20.000000,20.000000,0.000000
 
 
 };
 GLuint indices[] = {  // note that we start from 0!
-	0, 1, 3,   // first triangle
-	1, 2, 3,    // second triangle
 
-	0,1,4,
-	1,5,4,
+	1,2,3
+	,4,2,1
+	,1,3,4
+	,2,5,3
+	,5,4,3
+	,5,2,4
 
-	3,7,6,
-	3,2,6,
-
-	4,5,7,
-	5,6,7
 
 };
 
@@ -71,7 +61,7 @@ int main()
 	Mesh* mesh = new Mesh();
 
 	camera = new Camera();
-	camera->translate(glm::vec3(0, 0, -5));
+	camera->translate(glm::vec3(0, 0, -50));
 
 	InputManager::setWindow(windowManager);
 	InputManager::setCamera(camera);
