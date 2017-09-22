@@ -1,4 +1,19 @@
-﻿  Main.cpp
-Main.obj : error LNK2019: unresolved external symbol glfwInit referenced in function main
-C:\Users\Demok\Desktop\Animation2017\Libraries\libs\glfw3.lib : warning LNK4272: library machine type 'X86' conflicts with target machine type 'x64'
-C:\Users\Demok\Desktop\Animation2017\x64\Debug\Animation2017.exe : fatal error LNK1120: 1 unresolved externals
+﻿InputManager.obj : error LNK2019: unresolved external symbol glfwSetWindowShouldClose referenced in function "public: static void __cdecl InputManager::processInput(void)" (?processInput@InputManager@@SAXXZ)
+InputManager.obj : error LNK2019: unresolved external symbol glfwSetFramebufferSizeCallback referenced in function "public: static void __cdecl InputManager::initialize(void)" (?initialize@InputManager@@SAXXZ)
+InputManager.obj : error LNK2019: unresolved external symbol glfwGetKey referenced in function "public: static void __cdecl InputManager::processInput(void)" (?processInput@InputManager@@SAXXZ)
+InputManager.obj : error LNK2019: unresolved external symbol glfwSetCursorPosCallback referenced in function "public: static void __cdecl InputManager::initialize(void)" (?initialize@InputManager@@SAXXZ)
+InputManager.obj : error LNK2019: unresolved external symbol glfwSetScrollCallback referenced in function "public: static void __cdecl InputManager::initialize(void)" (?initialize@InputManager@@SAXXZ)
+InputManager.obj : error LNK2019: unresolved external symbol glfwMakeContextCurrent referenced in function "public: static void __cdecl InputManager::initialize(void)" (?initialize@InputManager@@SAXXZ)
+Main.obj : error LNK2001: unresolved external symbol glfwMakeContextCurrent
+Main.obj : error LNK2019: unresolved external symbol glfwInit referenced in function "private: struct GLFWwindow * __cdecl WindowManager::makeWindow(int,int)" (?makeWindow@WindowManager@@AEAAPEAUGLFWwindow@@HH@Z)
+Main.obj : error LNK2019: unresolved external symbol glfwTerminate referenced in function "private: struct GLFWwindow * __cdecl WindowManager::makeWindow(int,int)" (?makeWindow@WindowManager@@AEAAPEAUGLFWwindow@@HH@Z)
+Main.obj : error LNK2019: unresolved external symbol glfwWindowHint referenced in function "private: struct GLFWwindow * __cdecl WindowManager::makeWindow(int,int)" (?makeWindow@WindowManager@@AEAAPEAUGLFWwindow@@HH@Z)
+Main.obj : error LNK2019: unresolved external symbol glfwCreateWindow referenced in function "private: struct GLFWwindow * __cdecl WindowManager::makeWindow(int,int)" (?makeWindow@WindowManager@@AEAAPEAUGLFWwindow@@HH@Z)
+Main.obj : error LNK2019: unresolved external symbol glfwWindowShouldClose referenced in function "public: bool __cdecl WindowManager::windowHasClosed(void)" (?windowHasClosed@WindowManager@@QEAA_NXZ)
+Main.obj : error LNK2019: unresolved external symbol glfwPollEvents referenced in function "public: void __cdecl WindowManager::pollEvents(void)" (?pollEvents@WindowManager@@QEAAXXZ)
+Main.obj : error LNK2019: unresolved external symbol glfwSwapBuffers referenced in function "public: void __cdecl WindowManager::swapBuffer(void)" (?swapBuffer@WindowManager@@QEAAXXZ)
+Main.obj : error LNK2019: unresolved external symbol glfwGetProcAddress referenced in function "private: struct GLFWwindow * __cdecl WindowManager::makeWindow(int,int)" (?makeWindow@WindowManager@@AEAAPEAUGLFWwindow@@HH@Z)
+TimeSystem.obj : error LNK2019: unresolved external symbol glfwGetTime referenced in function "public: static void __cdecl TimeSystem::begin(void)" (?begin@TimeSystem@@SAXXZ)
+C:\Users\Peter Pantelakos\Source\Repos\Animation2017\\Libraries\libs\glfw3.lib : warning LNK4272: library machine type 'X86' conflicts with target machine type 'x64'
+C:\Users\Peter Pantelakos\Source\Repos\Animation2017\\Libraries\libs\opencl.lib : warning LNK4272: library machine type 'X86' conflicts with target machine type 'x64'
+C:\Users\Peter Pantelakos\Source\Repos\Animation2017\x64\Debug\Animation2017.exe : fatal error LNK1120: 15 unresolved externals
