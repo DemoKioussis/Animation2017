@@ -4,5 +4,7 @@ enum DIRECTION {
 	FORWARD,
 	BACKWARD,
 	LEFT,
-	RIGHT
+	RIGHT,
+	UP,
+	DOWN
 };

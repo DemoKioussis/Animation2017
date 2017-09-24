@@ -46,6 +46,12 @@ GLuint indices[] = {  // note that we start from 0!
 
 
 
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) 
+{
+	//printf("%d %d\n", key, action);
+	InputManager::processInputCallback(key, scancode, action, mods);
+}
+
 
 WindowManager* windowManager;
 Camera* camera;
@@ -60,7 +66,7 @@ int main()
 
 	Mesh* mesh = new Mesh();
 
-	camera = new Camera();
+	camera = new Camera(windowManager);
 	camera->translate(glm::vec3(0, 0, -50));
 
 	InputManager::setWindow(windowManager);
@@ -78,6 +84,7 @@ int main()
 		inds.push_back(indices[i]);
 
 	}
+	glfwSetKeyCallback(windowManager->getWindow(), key_callback);
 
 
 	mesh->setVerticies(&verts);
@@ -99,7 +106,7 @@ int main()
 	{
 		
 		glm::mat4 view;
-		view = glm::translate(view, camera->Position);
+		view = camera->GetViewMatrix(); //glm::translate(view, camera->Position);
 
 		model = glm::rotate(model, 0.00001f, glm::vec3(0.0f, 1.0f, 1.0f));
 

@@ -28,5 +28,5 @@ public:
 
 	static void processInput();
 
-
+	static void processInputCallback(int key, int scancode, int action, int mods);
 };
