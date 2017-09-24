@@ -59,6 +59,9 @@ public:
 		WIDTH = w;
 		HEIGHT = h;
 		backgroundColor = glm::vec4(0, 0, 0, 1);
+
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		glfwSetCursorPos(window, WIDTH / 2, HEIGHT / 2);
 	}
 	~WindowManager() {
 

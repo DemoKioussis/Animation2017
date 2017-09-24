@@ -99,7 +99,7 @@ int main()
 	{
 		
 		glm::mat4 view;
-		view = glm::translate(view, camera->Position);
+		view = camera->GetViewMatrix(); //glm::translate(view, camera->Position);
 
 		model = glm::rotate(model, 0.00001f, glm::vec3(0.0f, 1.0f, 1.0f));
 
@@ -110,7 +110,7 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-
+		glfwSetCursorPos(windowManager->getWindow(), 333, 333);
 
 		TimeSystem::update();
 		InputManager::processInput();
