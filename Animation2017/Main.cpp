@@ -18,7 +18,7 @@ This class right now just sets thigns up, ideally by the end of this it would be
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-const int framerate = 120;
+const int framerate = 60;
 
 // to load into vectors
 
@@ -29,6 +29,8 @@ GLfloat vertices [] = {
 	,0.001999,0.001999,39.998001
 	,-20.000000,20.000000,0.000000
 	,20.000000,20.000000,0.000000
+
+	
 
 
 };
@@ -108,7 +110,7 @@ int main()
 		glm::mat4 view;
 		view = camera->GetViewMatrix(); //glm::translate(view, camera->Position);
 
-		model = glm::rotate(model, 0.00001f, glm::vec3(0.0f, 1.0f, 1.0f));
+		model = glm::rotate(model, 0.001f*TimeSystem::getFrameDeltaTime(), glm::vec3(0.0f, 1.0f, 1.0f));
 
 
 		shaderProg.use();
@@ -124,7 +126,6 @@ int main()
 
 	//	physicsManager->physicsTick();
 		
-
 
 		shaderProg.setVec4("ourColor", glm::vec4(1, 1, 1, 1));
 		windowManager->frameTick();

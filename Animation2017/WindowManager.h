@@ -119,10 +119,7 @@ public:
 	void refreshWindow() {
 	
 		clearWindow();
-
 		drawMeshes();
-
-
 		swapBuffer();
 		pollEvents();
 	}
