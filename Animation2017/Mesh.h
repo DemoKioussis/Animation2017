@@ -24,6 +24,7 @@ public:
 	Mesh();
 	~Mesh();
 
+	void setVerticies(vector<Vertex>* v);
 	void setVerticies(vector<GLfloat>* v);
 	void setVerticies(GLfloat* v);
 

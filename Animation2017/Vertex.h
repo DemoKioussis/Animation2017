@@ -10,40 +10,58 @@
 */
 typedef struct
 {
-	GLfloat x, y, z;
-	GLfloat nx, ny, nz;
-	GLfloat u, v;
+	
+	glm::vec3 position;
+	glm::vec3 color;
+	glm::vec3 normal;
 }
 Vertex;
 
 class VertexBuilder {
 
 public:
-	Vertex genVertex(glm::vec3 pos, glm::vec3 norm, glm::vec2 uv) {
+	static Vertex genVertex(glm::vec3 pos, glm::vec3 norm, glm::vec3 c) {
 		Vertex vert;
 
 		setPos(vert, pos);
 		setNorm(vert, norm);
-		setUV(vert, uv);
+		setColor(vert, c);
 
 		return vert;
 	}
 
-	void setPos(Vertex &vert, glm::vec3 pos) {
-		vert.x = pos.x;
-		vert.y = pos.y;
-		vert.z = pos.z;
+	static std::vector<Vertex>* makeVertexList(std::vector<float> &positions, std::vector<float> normals, std::vector<float> colors) {
+		
+		std::vector<Vertex> vertecies(0);
+
+		for (int i = 0; i < positions.size();i++) {
+			glm::vec3 pos(positions[i]);
+			glm::vec3 norm;
+			glm::vec3 col;
+
+			if (normals.size() < i) {
+				norm = glm::vec3(0, 0, 0);
+			}
+			if (colors.size() < i) {
+				col = glm::vec3(0, 0, 0);
+			}
+			vertecies.push_back(genVertex(pos, norm, col));
+		}
+
+		return &vertecies;
+	}
+private:
+	static void setPos(Vertex &vert, glm::vec3 pos) {
+		vert.position = pos;
 	}
 
-	void setNorm(Vertex &vert, glm::vec3 norm) {
-		vert.nx = norm.x;
-		vert.ny = norm.y;
-		vert.nz = norm.z;
+	static void setNorm(Vertex &vert, glm::vec3 norm) {
+		vert.normal = norm;
 	}
 
-	void setUV(Vertex &vert, glm::vec2 uv) {
-		vert.u = uv.x;
-		vert.v = uv.y;
+	static void setColor(Vertex &vert, glm::vec3 c) {
+		vert.color = c;
+
 	}
 
 };

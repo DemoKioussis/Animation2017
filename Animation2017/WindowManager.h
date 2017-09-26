@@ -47,6 +47,7 @@ private:
 		{
 			std::cout << "Failed to initialize GLAD" << std::endl;
 		}
+		glEnable(GL_DEPTH_TEST);
 		return window;
 
 	}
@@ -97,7 +98,8 @@ public:
 	}
 	void clearWindow() {
 		glClearColor(backgroundColor.x, backgroundColor.y, backgroundColor.z, backgroundColor.a);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+		
 	}
 	void swapBuffer() {
 		glfwSwapBuffers(window);

@@ -23,28 +23,24 @@ const int framerate = 60;
 // to load into vectors
 
 GLfloat vertices [] = {
-	0,0,0
-	,-20.000000,-20.000000,0.000000
-	,20.000000,-20.000000,0.000000
-	,0.001999,0.001999,39.998001
-	,-20.000000,20.000000,0.000000
-	,20.000000,20.000000,0.000000
-
-	
-
-
+	// verticies	//color			//normals
+	-50,-50,0,		1.0,0,0,		-1,-1,0
+	,50,-50,0,		0,1.0,0,		1,-1,0
+	,50,50,0,		0,0,1,			1,1,0
+	,-50,50,0,		1,1,0,			-1,1,0
+	,0,0,100,		0,1,1,			0,0,1
 };
+
+
 GLuint indices[] = {  // note that we start from 0!
-
-	1,2,3
-	,4,2,1
-	,1,3,4
-	,2,5,3
-	,5,4,3
-	,5,2,4
-
-
+	0,1,2
+	,0,3,2
+	,0,4,1
+	,1,4,2
+	,2,4,3
+	,3,4,
 };
+
 
 
 
@@ -76,15 +72,18 @@ int main()
 	InputManager::initialize();
 
 
-	std::vector<GLfloat> verts(0);
+	std::vector<GLfloat> verts(0),positions(0), colors(0), normals(0);
+
 	std::vector<GLuint> inds(0);
 
 	for (int i = 0; i < sizeof(vertices)/sizeof(GLfloat); i++) {
 		verts.push_back(vertices[i]);
 	}
-	for (int i = 0; i < sizeof(indices)/sizeof(GLuint); i++) {
-		inds.push_back(indices[i]);
 
+
+
+	for (int i = 0; i < sizeof(indices)/sizeof(GLuint); i++) {
+	inds.push_back(indices[i]);
 	}
 	glfwSetKeyCallback(windowManager->getWindow(), key_callback);
 
@@ -98,11 +97,18 @@ int main()
 	windowManager->setFramerate(framerate);
 	windowManager->mesh = mesh;
 	glm::mat4 model(1.0f), projection;
+	glm::vec3 lightDir(1, 1, 1);
+	lightDir = glm::normalize(lightDir);
+
 	unsigned int viewLoc = glGetUniformLocation(shaderProg.ID, "view");
 	unsigned int modelLoc = glGetUniformLocation(shaderProg.ID, "model");
 	unsigned int projLoc = glGetUniformLocation(shaderProg.ID, "projection");
+	unsigned int lightLoc = glGetUniformLocation(shaderProg.ID, "lightDirection");
+
 
 	projection = glm::perspective(glm::radians(camera->Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
+	
+	glUniform3fv(lightLoc, 1,  &(lightDir[0]));
 
 	while (windowManager->windowHasClosed())
 	{
@@ -118,6 +124,7 @@ int main()
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
 
 		//glfwSetCursorPos(windowManager->getWindow(), 333, 333);
 

@@ -15,8 +15,12 @@ Mesh::Mesh() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
 	vertices = new std::vector<GLfloat>(0);
 	indices = new std::vector<GLuint>(0);
@@ -26,8 +30,28 @@ Mesh::~Mesh() {
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &EBO);
+
+	delete(vertices);
+	delete(indices);
 }
 
+
+void Mesh::setVerticies(std::vector<Vertex> *v) {
+	std::vector<GLfloat> verts(0);
+	for (int i = 0; i < v->size();i++) {
+		
+		for (int j = 0; j < 3;j++) {
+			verts.push_back(v->at(i).position[j]);
+		}
+		for (int j = 0; j < 3;j++) {
+			verts.push_back(v->at(i).color[j]);
+		}
+		for (int j = 0; j < 3;j++) {
+			verts.push_back(v->at(i).normal[j]);
+		}
+	}
+	setVerticies(&verts);
+}
 void Mesh::setVerticies(std::vector<GLfloat>* v) {
 
 	glBindVertexArray(VAO);
@@ -38,6 +62,7 @@ void Mesh::setVerticies(std::vector<GLfloat>* v) {
 	//	glBindVertexArray(0);
 
 }
+
 
 void Mesh::setIndices(std::vector<GLuint>* i) {
 	glBindVertexArray(VAO);
@@ -81,7 +106,7 @@ void Mesh::draw() {
 	shader->use();
 	glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
 	//glDrawArrays(GL_TRIANGLES, 0, 6);
-	glDrawElements(GL_LINE_LOOP, sizeof(GLuint)*indices->size(), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, sizeof(GLuint)*indices->size(), GL_UNSIGNED_INT, 0);
 
 
 }
