@@ -30,7 +30,7 @@ public:
 		return vert;
 	}
 
-	static std::vector<Vertex>* makeVertexList(std::vector<float> &positions, std::vector<float> normals, std::vector<float> colors) {
+	static std::vector<Vertex> makeVertexList(std::vector<float> &positions, std::vector<float> normals, std::vector<float> colors) {
 		
 		std::vector<Vertex> vertecies(0);
 
@@ -48,7 +48,7 @@ public:
 			vertecies.push_back(genVertex(pos, norm, col));
 		}
 
-		return &vertecies;
+		return vertecies;
 	}
 private:
 	static void setPos(Vertex &vert, glm::vec3 pos) {
