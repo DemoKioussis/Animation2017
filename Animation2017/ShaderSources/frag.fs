@@ -1,8 +1,14 @@
 #version 330 core
 
+
 flat in vec3 sendNorm;
-in vec3 sendColor;
+flat in vec3 sendColor;
+
+//Light
 uniform vec3 lightDirection; 
+uniform vec3 lightColor;
+
+uniform vec3 ambientLight;
 
 out vec4 FragColor;
 
@@ -10,12 +16,17 @@ out vec4 FragColor;
 void main()
 {
 	
-	
 
-	vec3 light = normalize(vec3(1,1,0));
-	float prod = dot(normalize(sendNorm),light);
-	vec3 result = vec3(prod,prod,prod)*0.5;
-   FragColor = vec4((0.5,0.5,0.5)+result,1);
+	vec3 _lightDirection = normalize(lightDirection);
+	float prod = max(dot(normalize(sendNorm),_lightDirection),0);
+	
+	vec3 result = vec3(prod,prod,prod)*0.6;
+	
+	
+	vec3 mainColor = (sendColor*ambientLight)*0.4;
+	
+	
+	FragColor = vec4(mainColor + result,1);
 }   
 
 

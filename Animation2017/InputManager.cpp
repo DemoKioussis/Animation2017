@@ -13,6 +13,8 @@ void InputManager::initialize() {
 		glfwSetFramebufferSizeCallback(windowManager->getWindow(), framebuffer_size_callback);
 		glfwSetCursorPosCallback(windowManager->getWindow(), mouse_callback);
 		glfwSetScrollCallback(windowManager->getWindow(), scroll_callback);
+		glfwSetKeyCallback(windowManager->getWindow(), key_callback);
+
 	}
 
 	else std::cout << "cannot initialize input manager - missing window reference" << std::endl;
@@ -49,7 +51,12 @@ void InputManager::scroll_callback(GLFWwindow* window, double xoffset, double yo
 {
 	camera->ProcessMouseScroll(yoffset);
 }
-
+void InputManager::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_F1) == GLFW_PRESS) {
+		camera->ToggleFpsMode();
+	}
+}
 
 void InputManager::setCamera(Camera* c) {
 	if (windowManager != nullptr) {
@@ -64,39 +71,38 @@ void InputManager::setWindow(WindowManager* wm) {
 	windowManager = wm;
 }
 void InputManager::processInput() {
+	
+	glfwPollEvents();
 	if (windowManager->getWindow() != nullptr) {
+
+
 		if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(windowManager->getWindow(), true);
 
-
-		if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_W) == GLFW_PRESS) {
-			camera->ProcessKeyboard(DIRECTION::FORWARD, TimeSystem::getFrameDeltaTime());
-		}
-		if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_S) == GLFW_PRESS){
-			camera->ProcessKeyboard(DIRECTION::BACKWARD, TimeSystem::getFrameDeltaTime());
-		}
-		if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_A) == GLFW_PRESS){
-			camera->ProcessKeyboard(DIRECTION::LEFT, TimeSystem::getFrameDeltaTime());
-		}
-		if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_D) == GLFW_PRESS){
-			camera->ProcessKeyboard(DIRECTION::RIGHT, TimeSystem::getFrameDeltaTime());
-		}
-		if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS) {
-			camera->ProcessKeyboard(DIRECTION::UP, TimeSystem::getFrameDeltaTime());
-		}
-		if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-			camera->ProcessKeyboard(DIRECTION::DOWN, TimeSystem::getFrameDeltaTime());
-		}
+		processCameraInput();
 	}
 	else
 		std::cout << "Cannot process input - no window" << std::endl;
-
 }
 
-void InputManager::processInputCallback(int key, int scancode, int action, int mods)
-{
-	if (key == GLFW_KEY_F1 && action == GLFW_PRESS)
-	{ 
-		camera->ToggleFpsMode();
+void InputManager::processCameraInput() {
+
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_W) == GLFW_PRESS) {
+		camera->ProcessKeyboard(DIRECTION::FORWARD, TimeSystem::getFrameDeltaTime());
+	}
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_S) == GLFW_PRESS) {
+		camera->ProcessKeyboard(DIRECTION::BACKWARD, TimeSystem::getFrameDeltaTime());
+	}
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_A) == GLFW_PRESS) {
+		camera->ProcessKeyboard(DIRECTION::LEFT, TimeSystem::getFrameDeltaTime());
+	}
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_D) == GLFW_PRESS) {
+		camera->ProcessKeyboard(DIRECTION::RIGHT, TimeSystem::getFrameDeltaTime());
+	}
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS) {
+		camera->ProcessKeyboard(DIRECTION::UP, TimeSystem::getFrameDeltaTime());
+	}
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+		camera->ProcessKeyboard(DIRECTION::DOWN, TimeSystem::getFrameDeltaTime());
 	}
 }

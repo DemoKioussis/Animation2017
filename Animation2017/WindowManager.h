@@ -4,7 +4,7 @@
 #include <glm\glm.hpp>
 #include "Mesh.h"
 #include "TimeSystem.h"
-
+#include "RenderEngine.h"
 
 
 /*
@@ -106,29 +106,25 @@ public:
 	}
 
 	
-	void pollEvents() {
-		glfwPollEvents();
-	}
+
 
 	void frameTick() {
 		if (TimeSystem::frameCheck() >= refreshRate) {
 			refreshWindow();
 			TimeSystem::frameStep();
-
 		}
 	}
 
 	void refreshWindow() {
-	
 		clearWindow();
 		drawMeshes();
 		swapBuffer();
-		pollEvents();
+
 	}
 	// we will extend this funciton to take in multiple inputs
 
 	void drawMeshes() {
-		mesh->draw();
+		RenderEngine::drawRenderTargets();
 	
 	}
 

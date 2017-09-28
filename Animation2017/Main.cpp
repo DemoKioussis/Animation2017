@@ -15,54 +15,30 @@
 This class right now just sets thigns up, ideally by the end of this it would be a list of settings and nothing else
 */
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 1600;
+const unsigned int SCR_HEIGHT = 900;
 
 const int framerate = 60;
-
-// to load into vectors
-
-GLfloat vertices [] = {
-	// verticies	//color			//normals
-	-50,-50,0,		1.0,0,0,		-1,-1,0
-	,50,-50,0,		0,1.0,0,		1,-1,0
-	,50,50,0,		0,0,1,			1,1,0
-	,-50,50,0,		1,1,0,			-1,1,0
-	,0,0,100,		0,1,1,			0,0,1
-};
-
-
-GLuint indices[] = {  // note that we start from 0!
-	0,1,2
-	,0,3,2
-	,0,4,1
-	,1,4,2
-	,2,4,3
-	,3,4,
-};
-
-
-
-
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) 
-{
-	//printf("%d %d\n", key, action);
-	InputManager::processInputCallback(key, scancode, action, mods);
-}
 
 
 WindowManager* windowManager;
 Camera* camera;
+
+void programLoop() {
+
+
+}
+
 int main()
 {
 
-
+#pragma region initRegion
+	TimeSystem::begin();
 
 	windowManager = new WindowManager(SCR_WIDTH, SCR_HEIGHT);
+	windowManager->setFramerate(framerate);
 
 	Shader shaderProg("ShaderSources/vert.vs", "ShaderSources/frag.fs");
-
-	Mesh* mesh = new Mesh();
 
 	camera = new Camera(windowManager);
 	camera->translate(glm::vec3(0, 0, -50));
@@ -70,80 +46,107 @@ int main()
 	InputManager::setWindow(windowManager);
 	InputManager::setCamera(camera);
 	InputManager::initialize();
+#pragma endregion
+
+#pragma region MeshStuff
+
+	// to load into vectors
 
 
-	std::vector<GLfloat> verts(0),positions(0), colors(0), normals(0);
+	GLfloat vertices[] = {
+		// verticies	//color					//normals
+		-50,-50,0,		1.0f, 0.5, 0.3,		-2,-2,-3		//back left
+		,50,-50,0,		1.0f, 0.5, 0.3,		 2,-2,-3		//back right
+		,50,50,0,		1.0f, 0.5, 0.3,		 2, 2,-3		//front right
+		,-50,50,0,		1.0f, 0.5, 0.3,		-2, 2,-3		//front left
+		,0,0,100,		1.0f, 0.5, 0.3,		 0, 0, 1		//top middle
+	};
 
+	GLuint indices[] = {  // note that we start from 0!
+		0,1,2
+		,0,3,2
+		,0,4,1
+		,1,4,2
+		,2,4,3
+		,3,4,0
+	};
+
+	Mesh* mesh = new Mesh();
+	std::vector<GLfloat> positions(0), colors(0), normals(0);
 	std::vector<GLuint> inds(0);
+	for (int i = 0; i < sizeof(vertices) / sizeof(GLfloat); i+=9) {
+		positions.push_back(vertices[i]);
+		positions.push_back(vertices[i+1]);
+		positions.push_back(vertices[i+2]);
 
-	for (int i = 0; i < sizeof(vertices)/sizeof(GLfloat); i++) {
-		verts.push_back(vertices[i]);
+		colors.push_back(vertices[i+3]);
+		colors.push_back(vertices[i+4]);
+		colors.push_back(vertices[i+5]);
+
+		normals.push_back(vertices[i+6]);
+		normals.push_back(vertices[i+7]);
+		normals.push_back(vertices[i+8]);
+	}
+	for (int i = 0; i < sizeof(indices) / sizeof(GLuint); i++) {
+		inds.push_back(indices[i]);
 	}
 
-
-
-	for (int i = 0; i < sizeof(indices)/sizeof(GLuint); i++) {
-	inds.push_back(indices[i]);
-	}
-	glfwSetKeyCallback(windowManager->getWindow(), key_callback);
-
-
-	mesh->setVerticies(&verts);
+	mesh->setVerticies(positions,colors,normals);
 	mesh->setIndices(&inds);
 	mesh->setShader(&shaderProg);
+#pragma endregion
 
+	RenderEngine::addRenderTarget(*mesh);
 
-	TimeSystem::begin();
-	windowManager->setFramerate(framerate);
-	windowManager->mesh = mesh;
 	glm::mat4 model(1.0f), projection;
 	glm::vec3 lightDir(1, 1, 1);
-	lightDir = glm::normalize(lightDir);
 
-	unsigned int viewLoc = glGetUniformLocation(shaderProg.ID, "view");
-	unsigned int modelLoc = glGetUniformLocation(shaderProg.ID, "model");
-	unsigned int projLoc = glGetUniformLocation(shaderProg.ID, "projection");
-	unsigned int lightLoc = glGetUniformLocation(shaderProg.ID, "lightDirection");
+	GLuint projLoc = glGetUniformLocation(shaderProg.ID, "projection");
+	GLuint viewLoc = glGetUniformLocation(shaderProg.ID, "view");
+	GLuint modelLoc = glGetUniformLocation(shaderProg.ID, "model");
 
 
 	projection = glm::perspective(glm::radians(camera->Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
-	
-	glUniform3fv(lightLoc, 1,  &(lightDir[0]));
 
+
+	
+
+
+
+	shaderProg.use();
+
+	shaderProg.setMat4(projLoc, projection);
+	shaderProg.setVec3("lightDirection", glm::vec3(1, 1, 0));
+	shaderProg.setVec3("ambientLight", glm::vec3(0.5f, 1.0f, 1.0f));
+
+#pragma region mainLoop
 	while (windowManager->windowHasClosed())
 	{
-		
-		glm::mat4 view;
-		view = camera->GetViewMatrix(); //glm::translate(view, camera->Position);
 
-		model = glm::rotate(model, 0.001f*TimeSystem::getFrameDeltaTime(), glm::vec3(0.0f, 1.0f, 1.0f));
+		glm::mat4 view = camera->GetViewMatrix();
+		model = glm::rotate(model, 0.001f*TimeSystem::getFrameDeltaTime(), glm::vec3(0.0f, 0.0f, 1));
 
+		shaderProg.setMat4(modelLoc,model);
+		shaderProg.setMat4(viewLoc, view);
 
-		shaderProg.use();
-
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-
-
-		//glfwSetCursorPos(windowManager->getWindow(), 333, 333);
-
+		//programLoop();
+		//for now keep stuff in here so its a bit clearer
 		TimeSystem::update();
 		InputManager::processInput();
 
-	//	physicsManager->physicsTick();
-		
+		//	physicsManager->physicsTick();
 
-		shaderProg.setVec4("ourColor", glm::vec4(1, 1, 1, 1));
 		windowManager->frameTick();
-
 	}
 
+#pragma endregion
 
 	glfwTerminate();
 	delete(windowManager);
 	return 0;
 }
+
+
 
 
 

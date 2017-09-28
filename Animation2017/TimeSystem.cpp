@@ -51,10 +51,6 @@ void TimeSystem::frameStep() {
 	if (elapsedTime - fpsTracker >= 1) {
 		fpsTracker = elapsedTime;
 		std::cout << "frames this second: " << fpsCounter << std::endl;
-		std::cout << "deltaTime: " << TimeSystem::getFrameDeltaTime() << std::endl;
-		std::cout << "Closer this number is to 1 the better: " << TimeSystem::getFrameDeltaTime()*fpsCounter << std::endl;
-
-
 		fpsCounter = 0;
 	}
 };
