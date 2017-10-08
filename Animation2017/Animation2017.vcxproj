@@ -154,16 +154,20 @@
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="PhysicsEngine.cpp" />
     <ClCompile Include="RenderEngine.cpp" />
     <ClCompile Include="TimeSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="Engine.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="GLSetup.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="PhysicsComponent.h" />
+    <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="RenderComponent.h" />
     <ClInclude Include="RenderEngine.h" />
     <ClInclude Include="Shader.h" />

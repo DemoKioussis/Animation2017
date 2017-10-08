@@ -2,7 +2,7 @@
 #include <glm\glm.hpp>
 enum ComponentType
 {
-	COMPONENT,RENDER_COMPONENT
+	COMPONENT,RENDER_COMPONENT,PHYSICS_COMPONENT
 };
 
 class Component {
@@ -22,7 +22,7 @@ public:
 	void enable();
 	void disable();
 	const bool isEnabled();
-	const glm::mat4 & getTransform();
+	glm::mat4 & getTransform();
 
 
 };

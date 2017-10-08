@@ -12,6 +12,9 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "Entity.h"
 #include "RenderComponent.h"
+
+#include "PhysicsEngine.h"
+#include "PhysicsComponent.h"
 /**
 This class right now just sets thigns up, ideally by the end of this it would be a list of settings and nothing else
 */
@@ -94,6 +97,10 @@ int main()
 
 	RenderEngine::Initialize();
 	RenderEngine::getInstance()->setShader(&shaderProg);
+
+	PhysicsEngine::Initialize();
+	PhysicsEngine::getInstance()->setGravity(glm::vec3(0, -1, 0), 0.0000000000981f);
+
 #pragma endregion
 
 	Mesh* mesh = makeMesh();
@@ -104,14 +111,20 @@ int main()
 	render1->setMeshID(0);
 	render2->setMeshID(0);
 
+	PhysicsComponent *physics = new PhysicsComponent();
+
 	Entity* entity1 = new Entity();
-	Entity* entity2 = new Entity();
 	entity1->addComponent(render1);
+	entity1->addComponent(physics);
+
+	Entity* entity2 = new Entity();
 	entity2->addComponent(render2);
+
+	
 
 	RenderEngine::getInstance()->addComponent(render1);
 	RenderEngine::getInstance()->addComponent(render2);
-
+	PhysicsEngine::getInstance()->addComponent(physics);
 	glm::mat4 rotation(1.0f), projection;
 	glm::vec3 lightDir(1, 1, 1);
 
@@ -135,18 +148,15 @@ int main()
 		glm::mat4 view = camera->GetViewMatrix();
 		rotation = glm::rotate(rotation, 0.001f*TimeSystem::getFrameDeltaTime(), glm::vec3(0.0f, 0.0f, 1));
 		glm::mat4 translation = glm::translate(glm::mat4(1.0f), glm::vec3(100, 0, 0));
-		entity1->transform = translation*rotation;
+	//	entity1->transform = translation*rotation;
 		entity2->transform = glm::inverse(translation)*glm::inverse(rotation);
 
 		shaderProg.setMat4(viewLoc, view);
-	//	shaderProg.setMat4(modelLoc, model);
 
-		//programLoop();
-		//for now keep stuff in here so its a bit clearer
 		TimeSystem::update();
 		InputManager::processInput();
 
-		//	physicsManager->physicsTick();
+		PhysicsEngine::getInstance()->step();
 
 		windowManager->frameTick();
 	}

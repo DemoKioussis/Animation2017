@@ -9,6 +9,8 @@
 RenderEngine* RenderEngine::instance = 0;
 
 void RenderEngine::Initialize() {
+	if (instance)
+		return;
 	RenderEngine * engine = new RenderEngine();
 	instance = engine;
 }

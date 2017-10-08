@@ -26,6 +26,6 @@ void Component::disable() {
 const bool Component::isEnabled() {
 	return enabled;
 }
-const glm::mat4 & Component::getTransform() {
+glm::mat4 & Component::getTransform() {
 	return entity->transform;
 }

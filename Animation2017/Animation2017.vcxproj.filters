@@ -75,6 +75,9 @@
     <ClCompile Include="Component.cpp">
       <Filter>Source Files\Entity-Component\Components</Filter>
     </ClCompile>
+    <ClCompile Include="PhysicsEngine.cpp">
+      <Filter>Source Files\Engines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mesh.h">
@@ -115,6 +118,15 @@
     </ClInclude>
     <ClInclude Include="Entity.h">
       <Filter>Header Files\Entity-Component</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsComponent.h">
+      <Filter>Header Files\Entity-Component\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsEngine.h">
+      <Filter>Header Files\Engines</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine.h">
+      <Filter>Header Files\Engines</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
