@@ -1,8 +1,7 @@
 #pragma once
 
-#include "GLSetup.h"
+#include <glad\glad.h>
 #include <glm\glm.hpp>
-#include "Mesh.h"
 #include "TimeSystem.h"
 #include "RenderEngine.h"
 
@@ -67,9 +66,6 @@ public:
 	~WindowManager() {
 
 	}
-	Mesh* mesh; // temporary
-
-
 
 	void setDimensions(GLuint w, GLuint h) {
 		WIDTH = w;
@@ -124,8 +120,7 @@ public:
 	// we will extend this funciton to take in multiple inputs
 
 	void drawMeshes() {
-		RenderEngine::drawRenderTargets();
-	
+		((RenderEngine*)RenderEngine::getInstance())->drawRenderComponents();
 	}
 
 

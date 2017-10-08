@@ -1,5 +1,7 @@
 #include "InputManager.h"
-
+#include "WindowManager.h"
+#include "Camera.h"
+#include "TimeSystem.h"
 
 Camera* InputManager::camera = nullptr;
 WindowManager* InputManager::windowManager = nullptr;

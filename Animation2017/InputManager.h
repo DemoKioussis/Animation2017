@@ -1,9 +1,9 @@
 #pragma once
 
-#include "WindowManager.h"
-#include "Camera.h"
-#include "TimeSystem.h"
-#include "Direction.h"
+#include <glad\glad.h>
+class Camera;
+class WindowManager;
+class GLFWwindow;
 
 class InputManager {
 private:

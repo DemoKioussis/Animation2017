@@ -1,26 +1,40 @@
 #include "RenderEngine.h"
+#include "Renderable.h"
+#include "RenderComponent.h"
+#include "Shader.h"
 
-bool RenderEngine::enabled = true;
-std::vector<Renderable*> RenderEngine::renderingTargets(0);
+//bool RenderEngine::enabled = true;
+//std::vector<Renderable*> RenderEngine::renderReferences(0);
 
-void RenderEngine::enable() {
-	enabled = true;
+RenderEngine* RenderEngine::instance = 0;
+
+void RenderEngine::Initialize() {
+	RenderEngine * engine = new RenderEngine();
+	instance = engine;
 }
-
-void RenderEngine::disable() {
-	enabled = false;
+void RenderEngine::setShader(Shader* _shader) {
+	shader = _shader;
+	projLoc = glGetUniformLocation(shader->ID, "projection");
+	viewLoc = glGetUniformLocation(shader->ID, "view");
+	modelLoc = glGetUniformLocation(shader->ID, "model");
 }
-
-bool RenderEngine::isEnabled() {
-	return enabled;
-}
-
-void RenderEngine::drawRenderTargets() {
-	for (int i = 0; i < renderingTargets.size();i++) {
-		renderingTargets[i]->draw();
+void RenderEngine::drawRenderComponents() {
+	for (int i = 0; i < targetComponents.size();i++) {
+		Component* component = targetComponents[i];
+		int meshID = ((RenderComponent*)component)->getMeshID();
+		shader->setMat4(modelLoc,component->getTransform());
+		renderReferences[meshID]->draw();
 	}
 }
 
-void RenderEngine::addRenderTarget(Renderable &renderable) {
-	renderingTargets.push_back(&renderable);
+void RenderEngine::addRenderReference(Renderable * _renderReference) {
+	renderReferences.push_back(_renderReference);
+}
+
+void RenderEngine::draw(int _renderIndex) {
+	renderReferences[_renderIndex]->draw();
+}
+
+RenderEngine* RenderEngine::getInstance() {
+	return instance;
 }

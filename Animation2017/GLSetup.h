@@ -1,3 +1,4 @@
+/*
 #pragma once
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -8,7 +9,7 @@
 	this class sets up GL things, any other boilerplate code would go here if possible
 */
 
-
+/*
 class GLSetup {
 public:
 	static GLFWwindow* makeWindow(int width, int height) {
@@ -41,3 +42,4 @@ public:
 
 
 };
+*/
