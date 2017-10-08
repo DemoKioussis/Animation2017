@@ -43,6 +43,9 @@
     <Filter Include="Source Files\Entity-Component">
       <UniqueIdentifier>{47c54874-ebc9-4e45-98da-41f99098d97e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Entity-Component\Components">
+      <UniqueIdentifier>{1c85c5ea-b14f-4a7c-a2fb-b4cb7c251370}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Mesh.cpp">
@@ -63,14 +66,14 @@
     <ClCompile Include="glad.c">
       <Filter>Source Files\MainSystem</Filter>
     </ClCompile>
+    <ClCompile Include="RenderEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="Entity.cpp">
       <Filter>Source Files\Entity-Component</Filter>
     </ClCompile>
     <ClCompile Include="Component.cpp">
-      <Filter>Source Files\Entity-Component</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderEngine.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Entity-Component\Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -92,9 +95,6 @@
     <ClInclude Include="RenderEngine.h">
       <Filter>Header Files\Engines</Filter>
     </ClInclude>
-    <ClInclude Include="Renderable.h">
-      <Filter>Header Files\Renderables</Filter>
-    </ClInclude>
     <ClInclude Include="WindowManager.h">
       <Filter>Header Files\MainSystem</Filter>
     </ClInclude>
@@ -104,20 +104,17 @@
     <ClInclude Include="InputManager.h">
       <Filter>Header Files\MainSystem</Filter>
     </ClInclude>
+    <ClInclude Include="RenderEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Component.h">
       <Filter>Header Files\Entity-Component\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity.h">
-      <Filter>Header Files\Entity-Component</Filter>
     </ClInclude>
     <ClInclude Include="RenderComponent.h">
       <Filter>Header Files\Entity-Component\Components</Filter>
     </ClInclude>
-    <ClInclude Include="Engine.h">
-      <Filter>Header Files\Engines</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderEngine.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Entity.h">
+      <Filter>Header Files\Entity-Component</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
