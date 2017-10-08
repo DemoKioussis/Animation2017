@@ -69,6 +69,9 @@
     <ClCompile Include="Component.cpp">
       <Filter>Source Files\Entity-Component</Filter>
     </ClCompile>
+    <ClCompile Include="RenderEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mesh.h">
@@ -112,6 +115,9 @@
     </ClInclude>
     <ClInclude Include="Engine.h">
       <Filter>Header Files\Engines</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderEngine.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
