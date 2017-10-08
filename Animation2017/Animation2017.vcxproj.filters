@@ -13,36 +13,66 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\MeshThings">
-      <UniqueIdentifier>{5911457b-24fa-4e86-9524-eb930cb102ce}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Boilerplate">
       <UniqueIdentifier>{082a7439-0d4f-4dc3-a50a-9f9cd0a78491}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Shaders">
       <UniqueIdentifier>{661bd74a-ab34-4b45-a864-883996674a12}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Engines">
+      <UniqueIdentifier>{6a979d30-5657-49f1-a1cf-e9a18f7d06dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MainSystem">
+      <UniqueIdentifier>{472b1243-1283-4d27-b24c-bf442eaabc60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\MainSystem">
+      <UniqueIdentifier>{f6ea4661-49e4-44f2-bc54-71e8432e0b19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engines">
+      <UniqueIdentifier>{a5515e97-5253-41ec-be79-4c0e107ce4c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Renderables">
+      <UniqueIdentifier>{5911457b-24fa-4e86-9524-eb930cb102ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Entity-Component">
+      <UniqueIdentifier>{0d186f81-7e5e-4f0f-a282-f2b9b3149f83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Entity-Component\Components">
+      <UniqueIdentifier>{c481c57a-d11c-417e-b4e1-e1180c3c220b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity-Component">
+      <UniqueIdentifier>{47c54874-ebc9-4e45-98da-41f99098d97e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="glad.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TimeSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="InputManager.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\MainSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Source Files\MainSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeSystem.cpp">
+      <Filter>Source Files\MainSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderEngine.cpp">
+      <Filter>Source Files\Engines</Filter>
+    </ClCompile>
+    <ClCompile Include="glad.c">
+      <Filter>Source Files\MainSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity.cpp">
+      <Filter>Source Files\Entity-Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.cpp">
+      <Filter>Source Files\Entity-Component</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mesh.h">
-      <Filter>Header Files\MeshThings</Filter>
+      <Filter>Header Files\Renderables</Filter>
     </ClInclude>
     <ClInclude Include="GLSetup.h">
       <Filter>Header Files\Boilerplate</Filter>
@@ -50,20 +80,38 @@
     <ClInclude Include="Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="WindowManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Vertex.h">
-      <Filter>Header Files\MeshThings</Filter>
-    </ClInclude>
-    <ClInclude Include="InputManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TimeSystem.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Renderables</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderEngine.h">
+      <Filter>Header Files\Engines</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderable.h">
+      <Filter>Header Files\Renderables</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowManager.h">
+      <Filter>Header Files\MainSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeSystem.h">
+      <Filter>Header Files\MainSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="InputManager.h">
+      <Filter>Header Files\MainSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.h">
+      <Filter>Header Files\Entity-Component\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.h">
+      <Filter>Header Files\Entity-Component</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent.h">
+      <Filter>Header Files\Entity-Component\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine.h">
+      <Filter>Header Files\Engines</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
