@@ -18,11 +18,11 @@ public:
 	void addAttractor(PhysicsComponent* _component);
 	void setGravity(glm::vec3 _dir, float _mag);
 	void step();
+	void addForce(PhysicsComponent* _component, glm::vec3 _force, glm::vec3 _position);
 
 private:
 	static PhysicsEngine* instance;
 
-	void addForce(PhysicsComponent* _component,glm::vec3 _force,glm::vec3 _position);
 	void addGravity(PhysicsComponent* _component);
 	void addAttractiveForces(PhysicsComponent* _component);
 	void setAcceleration(PhysicsComponent* _component);

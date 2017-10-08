@@ -125,6 +125,8 @@ int main()
 	RenderEngine::getInstance()->addComponent(render1);
 	RenderEngine::getInstance()->addComponent(render2);
 	PhysicsEngine::getInstance()->addComponent(physics);
+
+	PhysicsEngine::getInstance()->addForce(physics, glm::vec3(0, 0, 0.000002f), glm::vec3());
 	glm::mat4 rotation(1.0f), projection;
 	glm::vec3 lightDir(1, 1, 1);
 
