@@ -4,6 +4,7 @@
 #include <glm\gtx\matrix_operation.hpp>
 #include <glm\gtc\matrix_transform.hpp>
 
+#include <iostream>
 PhysicsEngine* PhysicsEngine::instance = 0;
 
 #pragma region initialization
@@ -48,6 +49,7 @@ void PhysicsEngine::applyPhysics() {
 		momentum(component);
 		rotate(component);
 		translate(component);
+		reset(component);
 	}
 }
 #pragma endregion
@@ -73,6 +75,7 @@ void PhysicsEngine::setVelocity(PhysicsComponent* _component) {
 	if (glm::length(_component->velocity) > MAX_SPEED) {
 		_component->velocity = glm::normalize(_component->velocity)*MAX_SPEED;
 	}
+	//std::cout << "velocity: " << _component->velocity.x << ", " << _component->velocity.y << ", " << _component->velocity.z << std::endl;
 }
 
 #pragma endregion
@@ -91,6 +94,11 @@ void PhysicsEngine::energy(PhysicsComponent* _component) {
 }
 void PhysicsEngine::momentum(PhysicsComponent* _component) {
 	_component->momentum = _component->mass*_component->velocity;
+}
+void PhysicsEngine::reset(PhysicsComponent* _component) {
+	_component->acceleration = glm::vec3();
+	_component->netForce = glm::vec3();
+
 }
 
 #pragma endregion

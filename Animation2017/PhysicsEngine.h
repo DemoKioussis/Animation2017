@@ -32,6 +32,7 @@ private:
 	void momentum(PhysicsComponent* _component);
 	void translate(PhysicsComponent* _component);
 	void rotate(PhysicsComponent* _component);
+	void reset(PhysicsComponent* _component);
 
 	bool gravityEnabled;
 	glm::vec3 gravity;

@@ -89,7 +89,7 @@ int main()
 	Shader shaderProg("ShaderSources/vert.vs", "ShaderSources/frag.fs");
 
 	camera = new Camera(windowManager);
-	camera->translate(glm::vec3(0, 0, -50));
+	camera->translate(glm::vec3(0, 0, -200));
 
 	InputManager::setWindow(windowManager);
 	InputManager::setCamera(camera);
@@ -99,7 +99,7 @@ int main()
 	RenderEngine::getInstance()->setShader(&shaderProg);
 
 	PhysicsEngine::Initialize();
-	PhysicsEngine::getInstance()->setGravity(glm::vec3(0, -1, 0), 0.0000000000981f);
+	PhysicsEngine::getInstance()->setGravity(glm::vec3(0, -1, 0), 0.000000981f);
 
 #pragma endregion
 
@@ -126,7 +126,7 @@ int main()
 	RenderEngine::getInstance()->addComponent(render2);
 	PhysicsEngine::getInstance()->addComponent(physics);
 
-	PhysicsEngine::getInstance()->addForce(physics, glm::vec3(0, 0, 0.000002f), glm::vec3());
+	PhysicsEngine::getInstance()->addForce(physics, glm::vec3(0, 0.03, 0.03f), glm::vec3());
 	glm::mat4 rotation(1.0f), projection;
 	glm::vec3 lightDir(1, 1, 1);
 
@@ -134,7 +134,7 @@ int main()
 	GLuint viewLoc = glGetUniformLocation(shaderProg.ID, "view");
 	GLuint modelLoc = glGetUniformLocation(shaderProg.ID, "model");
 
-	projection = glm::perspective(glm::radians(camera->Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
+	projection = glm::perspective(glm::radians(camera->Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100000.0f);
 
 
 	shaderProg.use();
