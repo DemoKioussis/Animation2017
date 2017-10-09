@@ -1,6 +1,9 @@
 #pragma once
 #include "PhysicsEngine.h"
 #include "PhysicsComponent.h"
+
+#include "TimeSystem.h"
+
 #include <glm\gtx\matrix_operation.hpp>
 #include <glm\gtc\matrix_transform.hpp>
 
@@ -14,6 +17,7 @@ PhysicsEngine* PhysicsEngine::instance = 0;
 	 PhysicsEngine * engine = new PhysicsEngine();
 	 instance = engine;
 	 instance->gravityEnabled = true;
+	 instance->updateTime = 1.0f / 240.0f;
 }
  PhysicsEngine * PhysicsEngine::getInstance() {
 	 return instance;
@@ -31,8 +35,13 @@ PhysicsEngine* PhysicsEngine::instance = 0;
 
 #pragma region mainLoop
  void PhysicsEngine::step() {
-	 updatePhysics();
-	 applyPhysics();
+	 if (TimeSystem::physicsCheck() >= updateTime) {
+		 //step();
+		 TimeSystem::physicsStep();
+		 updatePhysics();
+		 applyPhysics();
+	 }
+
  }
 void PhysicsEngine::updatePhysics() {
 	for (int i = 0; i < targetComponents.size();i++) {
@@ -40,6 +49,10 @@ void PhysicsEngine::updatePhysics() {
 		addGravity(component);
 		setAcceleration(component);
 		setVelocity(component);
+		if (glm::length(component->velocity) > 100) {
+			std::cout << "100m/s reached at time: " << TimeSystem::getTimeSinceStart() << std::endl;;
+			std::cout << "distance traveled = " << glm::length(glm::vec3(component->getTransform()[3][0], component->getTransform()[3][1], component->getTransform()[3][2]))<<std::endl;
+		}
 	}
 }
 void PhysicsEngine::applyPhysics() {
@@ -71,7 +84,7 @@ void PhysicsEngine::setAcceleration(PhysicsComponent* _component) {
 }
 
 void PhysicsEngine::setVelocity(PhysicsComponent* _component) {
-	_component->velocity += _component->acceleration;
+	_component->velocity += _component->acceleration*TimeSystem::getPhysicsDeltaTime();;
 	if (glm::length(_component->velocity) > MAX_SPEED) {
 		_component->velocity = glm::normalize(_component->velocity)*MAX_SPEED;
 	}
@@ -82,7 +95,7 @@ void PhysicsEngine::setVelocity(PhysicsComponent* _component) {
 
 #pragma region application
 void PhysicsEngine::translate(PhysicsComponent* _component) {
-	glm::vec3 translation = _component->velocity;//*TimeSystem::getPhysicsDeltaTime();
+	glm::vec3 translation = _component->velocity*TimeSystem::getPhysicsDeltaTime();
 	_component->getTransform() = glm::translate(_component->getTransform(), translation);
 }
 void PhysicsEngine::rotate(PhysicsComponent* _component) {

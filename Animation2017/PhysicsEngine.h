@@ -19,6 +19,7 @@ public:
 	void setGravity(glm::vec3 _dir, float _mag);
 	void step();
 	void addForce(PhysicsComponent* _component, glm::vec3 _force, glm::vec3 _position);
+	float updateTime;
 
 private:
 	static PhysicsEngine* instance;

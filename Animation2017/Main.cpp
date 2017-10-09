@@ -23,11 +23,12 @@ const unsigned int SCR_WIDTH = 1600;
 const unsigned int SCR_HEIGHT = 900;
 
 const int framerate = 60;
-
+const int physicsrate = 120;
 
 WindowManager* windowManager;
 Camera* camera;
 
+float modelScale = 50.0f;
 Mesh* makeMesh() {
 
 #pragma region MeshStuff
@@ -37,20 +38,27 @@ Mesh* makeMesh() {
 
 	GLfloat vertices[] = {
 		// verticies	//color					//normals
-		-50,-50,0,		1.0f, 0.5, 0.3,		-2,-2,-3		//back left
-		,50,-50,0,		1.0f, 0.5, 0.3,		 2,-2,-3		//back right
-		,50,50,0,		1.0f, 0.5, 0.3,		 2, 2,-3		//front right
-		,-50,50,0,		1.0f, 0.5, 0.3,		-2, 2,-3		//front left
-		,0,0,100,		1.0f, 0.5, 0.3,		 0, 0, 1		//top middle
+		-modelScale,-modelScale,0,		1.0f, 0.5, 0.3,		-2,-2,-3		//back left
+		,modelScale,-modelScale,0,		1.0f, 0.5, 0.3,		 2,-2,-3		//back right
+		,modelScale,modelScale,0,		1.0f, 0.5, 0.3,		 2, 2,-3		//front right
+		,-modelScale,modelScale,0,		1.0f, 0.5, 0.3,		-2, 2,-3		//front left
+		,0,0,2* modelScale,				1.0f, 0.5, 0.3,		 0, 0, 1		//top middle
+
+		,-modelScale,-modelScale,0,		1.0f, 0.5, 0.3,		 0,0,1 		//back left
+		,modelScale,-modelScale,0,		1.0f, 0.5, 0.3,		 0,0,1		//back right
+		,modelScale,modelScale,0,		1.0f, 0.5, 0.3,		 0,0,1		//front right
+		,-modelScale,modelScale,0,		1.0f, 0.5, 0.3,		 0,0,1		//front left
+
 	};
 
 	GLuint indices[] = {  // note that we start from 0!
-		0,1,2
-		,0,3,2
-		,0,4,1
+		 0,4,1
 		,1,4,2
 		,2,4,3
 		,3,4,0
+
+		,5,6,7
+		,5,8,7
 	};
 
 	std::vector<GLfloat> positions(0), colors(0), normals(0);
@@ -99,7 +107,7 @@ int main()
 	RenderEngine::getInstance()->setShader(&shaderProg);
 
 	PhysicsEngine::Initialize();
-	PhysicsEngine::getInstance()->setGravity(glm::vec3(0, -1, 0), 0.000000981f);
+	PhysicsEngine::getInstance()->setGravity(glm::vec3(0, -1, 0), 9.81);
 
 #pragma endregion
 
@@ -126,9 +134,8 @@ int main()
 	RenderEngine::getInstance()->addComponent(render2);
 	PhysicsEngine::getInstance()->addComponent(physics);
 
-	PhysicsEngine::getInstance()->addForce(physics, glm::vec3(0, 0.03, 0.03f), glm::vec3());
+	PhysicsEngine::getInstance()->addForce(physics, glm::vec3(0, 100,100), glm::vec3());
 	glm::mat4 rotation(1.0f), projection;
-	glm::vec3 lightDir(1, 1, 1);
 
 	GLuint projLoc = glGetUniformLocation(shaderProg.ID, "projection");
 	GLuint viewLoc = glGetUniformLocation(shaderProg.ID, "view");
@@ -142,6 +149,7 @@ int main()
 	shaderProg.setMat4(projLoc, projection);
 	shaderProg.setVec3("lightDirection", glm::vec3(1, 1, 0));
 	shaderProg.setVec3("ambientLight", glm::vec3(0.5f, 1.0f, 1.0f));
+	float cosT = 0, sinT = 0;
 
 #pragma region mainLoop
 	while (windowManager->windowHasClosed())
@@ -150,7 +158,6 @@ int main()
 		glm::mat4 view = camera->GetViewMatrix();
 		rotation = glm::rotate(rotation, 0.001f*TimeSystem::getFrameDeltaTime(), glm::vec3(0.0f, 0.0f, 1));
 		glm::mat4 translation = glm::translate(glm::mat4(1.0f), glm::vec3(100, 0, 0));
-	//	entity1->transform = translation*rotation;
 		entity2->transform = glm::inverse(translation)*glm::inverse(rotation);
 
 		shaderProg.setMat4(viewLoc, view);
@@ -160,6 +167,7 @@ int main()
 
 		PhysicsEngine::getInstance()->step();
 
+		
 		windowManager->frameTick();
 	}
 

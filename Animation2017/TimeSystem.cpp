@@ -64,3 +64,8 @@ float TimeSystem::getFrameDeltaTime() {
 float TimeSystem::getPhysicsDeltaTime() {
 	return physicsDeltaTime;
 };
+
+
+const float TimeSystem::getTimeSinceStart() {
+	return elapsedTime;
+}
