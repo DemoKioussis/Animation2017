@@ -36,7 +36,6 @@ PhysicsEngine* PhysicsEngine::instance = 0;
 #pragma region mainLoop
  void PhysicsEngine::step() {
 	 if (TimeSystem::physicsCheck() >= updateTime) {
-		 //step();
 		 TimeSystem::physicsStep();
 		 updatePhysics();
 		 applyPhysics();
@@ -49,10 +48,6 @@ void PhysicsEngine::updatePhysics() {
 		addGravity(component);
 		setAcceleration(component);
 		setVelocity(component);
-		if (glm::length(component->velocity) > 100) {
-			std::cout << "100m/s reached at time: " << TimeSystem::getTimeSinceStart() << std::endl;;
-			std::cout << "distance traveled = " << glm::length(glm::vec3(component->getTransform()[3][0], component->getTransform()[3][1], component->getTransform()[3][2]))<<std::endl;
-		}
 	}
 }
 void PhysicsEngine::applyPhysics() {
@@ -70,9 +65,10 @@ void PhysicsEngine::applyPhysics() {
 #pragma region calculations
 void PhysicsEngine::addForce(PhysicsComponent* _component, glm::vec3 force,glm::vec3 position) {
 	_component->netForce += force;
+	_component->torque = glm::cross(position, force);
 }
 void PhysicsEngine::addGravity(PhysicsComponent* _component) {
-	_component->netForce += gravity;
+	_component->netForce += gravity*_component->gravityMultiplyer*_component->mass;
 }
 void PhysicsEngine::addAttractiveForces(PhysicsComponent* _component) {
 	for (int i = 0; i < attractiveBodies.size();i++) {
@@ -80,15 +76,15 @@ void PhysicsEngine::addAttractiveForces(PhysicsComponent* _component) {
 }
 
 void PhysicsEngine::setAcceleration(PhysicsComponent* _component) {
-	_component->acceleration = _component->netForce;// / _component->mass;
+	_component->acceleration = _component->netForce/_component->mass;
+
 }
 
 void PhysicsEngine::setVelocity(PhysicsComponent* _component) {
-	_component->velocity += _component->acceleration*TimeSystem::getPhysicsDeltaTime();;
+	_component->velocity += _component->acceleration*TimeSystem::getPhysicsDeltaTime();
 	if (glm::length(_component->velocity) > MAX_SPEED) {
 		_component->velocity = glm::normalize(_component->velocity)*MAX_SPEED;
-	}
-	//std::cout << "velocity: " << _component->velocity.x << ", " << _component->velocity.y << ", " << _component->velocity.z << std::endl;
+	}	
 }
 
 #pragma endregion
@@ -99,7 +95,7 @@ void PhysicsEngine::translate(PhysicsComponent* _component) {
 	_component->getTransform() = glm::translate(_component->getTransform(), translation);
 }
 void PhysicsEngine::rotate(PhysicsComponent* _component) {
-
+	
 }
 void PhysicsEngine::energy(PhysicsComponent* _component) {
 	float speed = glm::length(_component->velocity);
@@ -109,8 +105,9 @@ void PhysicsEngine::momentum(PhysicsComponent* _component) {
 	_component->momentum = _component->mass*_component->velocity;
 }
 void PhysicsEngine::reset(PhysicsComponent* _component) {
-	_component->acceleration = glm::vec3();
-	_component->netForce = glm::vec3();
+		_component->acceleration = glm::vec3();
+		_component->netForce = glm::vec3();
+	
 
 }
 

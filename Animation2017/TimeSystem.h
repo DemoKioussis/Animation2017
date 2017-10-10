@@ -25,9 +25,11 @@ public:
 	static float frameCheck();
 	static void frameStep();
 
-	static void setTimeScale(float t);
 	static float getFrameDeltaTime();
 	static float getPhysicsDeltaTime();
 
 	static const float getTimeSinceStart();
+
+	static void setTimeScale(float t);
+	static const float getTimeScale();
 };

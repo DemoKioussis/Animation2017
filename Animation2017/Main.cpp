@@ -28,7 +28,7 @@ const int physicsrate = 120;
 WindowManager* windowManager;
 Camera* camera;
 
-float modelScale = 50.0f;
+float modelScale = 1.0f;
 Mesh* makeMesh() {
 
 #pragma region MeshStuff
@@ -97,7 +97,7 @@ int main()
 	Shader shaderProg("ShaderSources/vert.vs", "ShaderSources/frag.fs");
 
 	camera = new Camera(windowManager);
-	camera->translate(glm::vec3(0, 0, -200));
+	camera->translate(glm::vec3(0, 0, -10));
 
 	InputManager::setWindow(windowManager);
 	InputManager::setCamera(camera);
@@ -114,27 +114,49 @@ int main()
 	Mesh* mesh = makeMesh();
  	RenderEngine::getInstance()->addRenderReference(mesh);
 
+	//RenderComponents
 	RenderComponent *render1 = new RenderComponent();
 	RenderComponent *render2 = new RenderComponent();
+	RenderComponent *render3 = new RenderComponent();
 	render1->setMeshID(0);
 	render2->setMeshID(0);
+	render3->setMeshID(0);
 
-	PhysicsComponent *physics = new PhysicsComponent();
+	//PhysicsComponents
+	PhysicsComponent *physics1 = new PhysicsComponent();
+	PhysicsComponent *physics2 = new PhysicsComponent();
+	PhysicsComponent *physics3 = new PhysicsComponent();
 
+	//Entities
 	Entity* entity1 = new Entity();
 	entity1->addComponent(render1);
-	entity1->addComponent(physics);
+	entity1->addComponent(physics1);
 
 	Entity* entity2 = new Entity();
 	entity2->addComponent(render2);
+	entity2->addComponent(physics2);
 
+	Entity* entity3 = new Entity();
+	entity3->addComponent(render3);
+	entity3->addComponent(physics3);
 	
+	//Placing entities initially
+	entity2->transform = glm::translate(entity2->transform, glm::vec3(-modelScale * 4, 0, 0));
+	entity3->transform = glm::translate(entity3->transform, glm::vec3(modelScale * 4, 0, 0));
 
+	//Adding renderComponents to renderEngine
 	RenderEngine::getInstance()->addComponent(render1);
 	RenderEngine::getInstance()->addComponent(render2);
-	PhysicsEngine::getInstance()->addComponent(physics);
+	RenderEngine::getInstance()->addComponent(render3);
 
-	PhysicsEngine::getInstance()->addForce(physics, glm::vec3(0, 100,100), glm::vec3());
+	//Adding physics components to PhysicsEngine
+	PhysicsEngine::getInstance()->addComponent(physics1);
+	PhysicsEngine::getInstance()->addComponent(physics2);
+	PhysicsEngine::getInstance()->addComponent(physics3);
+
+	//Adding forces to physics components
+	PhysicsEngine::getInstance()->addForce(physics1, glm::vec3(0, 100,100), glm::vec3());
+	PhysicsEngine::getInstance()->addForce(physics3, glm::vec3(0, 200, 0), glm::vec3());
 	glm::mat4 rotation(1.0f), projection;
 
 	GLuint projLoc = glGetUniformLocation(shaderProg.ID, "projection");
@@ -148,7 +170,7 @@ int main()
 
 	shaderProg.setMat4(projLoc, projection);
 	shaderProg.setVec3("lightDirection", glm::vec3(1, 1, 0));
-	shaderProg.setVec3("ambientLight", glm::vec3(0.5f, 1.0f, 1.0f));
+	shaderProg.setVec3("ambientLight", glm::vec3(1.0f, 1.0f, 1.0f));
 	float cosT = 0, sinT = 0;
 
 #pragma region mainLoop
@@ -156,9 +178,6 @@ int main()
 	{
 
 		glm::mat4 view = camera->GetViewMatrix();
-		rotation = glm::rotate(rotation, 0.001f*TimeSystem::getFrameDeltaTime(), glm::vec3(0.0f, 0.0f, 1));
-		glm::mat4 translation = glm::translate(glm::mat4(1.0f), glm::vec3(100, 0, 0));
-		entity2->transform = glm::inverse(translation)*glm::inverse(rotation);
 
 		shaderProg.setMat4(viewLoc, view);
 

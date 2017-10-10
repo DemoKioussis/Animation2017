@@ -12,7 +12,7 @@ float TimeSystem::frameDeltaTime = 0;
 float TimeSystem::physicsDeltaTime = 0;
 
 
-float TimeSystem::timeScale = 0;
+float TimeSystem::timeScale = 1;
 
 
 int TimeSystem::fpsCounter = 0;
@@ -36,7 +36,7 @@ float TimeSystem::physicsCheck() {
 };
 
 void TimeSystem::physicsStep() {
-	physicsDeltaTime = elapsedTime - lastPhysicsStep;
+	physicsDeltaTime = (elapsedTime - lastPhysicsStep)*timeScale;
 	lastPhysicsStep = elapsedTime;
 };
 
@@ -55,9 +55,7 @@ void TimeSystem::frameStep() {
 	}
 };
 
-void TimeSystem::setTimeScale(float t) {
-	timeScale = t;
-};
+
 float TimeSystem::getFrameDeltaTime() {
 	return frameDeltaTime;
 };
@@ -69,3 +67,11 @@ float TimeSystem::getPhysicsDeltaTime() {
 const float TimeSystem::getTimeSinceStart() {
 	return elapsedTime;
 }
+
+void TimeSystem::setTimeScale(float t) {
+	timeScale = t;
+};
+
+const float TimeSystem::getTimeScale() {
+	return timeScale;
+};

@@ -58,6 +58,10 @@ void InputManager::key_callback(GLFWwindow* window, int key, int scancode, int a
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_F1) == GLFW_PRESS) {
 		camera->ToggleFpsMode();
 	}
+
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_P) == GLFW_PRESS) {
+		TimeSystem::setTimeScale(abs(1 - TimeSystem::getTimeScale()));
+	}
 }
 
 void InputManager::setCamera(Camera* c) {
