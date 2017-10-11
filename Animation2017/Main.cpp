@@ -107,7 +107,7 @@ int main()
 	RenderEngine::getInstance()->setShader(&shaderProg);
 
 	PhysicsEngine::Initialize();
-	PhysicsEngine::getInstance()->setGravity(glm::vec3(0, -1, 0), 9.81);
+	PhysicsEngine::getInstance()->setGravity(glm::vec3(0, -1, 0), 0.810);
 
 #pragma endregion
 
@@ -123,10 +123,9 @@ int main()
 	render3->setMeshID(0);
 
 	//PhysicsComponents
-	PhysicsComponent *physics1 = new PhysicsComponent();
+	PhysicsComponent* physics1 = new PhysicsComponent();
 	PhysicsComponent *physics2 = new PhysicsComponent();
 	PhysicsComponent *physics3 = new PhysicsComponent();
-
 	//Entities
 	Entity* entity1 = new Entity();
 	entity1->addComponent(render1);
@@ -141,8 +140,8 @@ int main()
 	entity3->addComponent(physics3);
 	
 	//Placing entities initially
-	entity2->transform = glm::translate(entity2->transform, glm::vec3(-modelScale * 4, 0, 0));
-	entity3->transform = glm::translate(entity3->transform, glm::vec3(modelScale * 4, 0, 0));
+	entity2->translation = glm::translate(entity2->translation, glm::vec3(-modelScale * 4, 0, 0));
+	entity3->translation = glm::translate(entity3->translation, glm::vec3(modelScale * 4, 0, 0));
 
 	//Adding renderComponents to renderEngine
 	RenderEngine::getInstance()->addComponent(render1);
@@ -155,8 +154,10 @@ int main()
 	PhysicsEngine::getInstance()->addComponent(physics3);
 
 	//Adding forces to physics components
-	PhysicsEngine::getInstance()->addForce(physics1, glm::vec3(0, 100,100), glm::vec3());
-	PhysicsEngine::getInstance()->addForce(physics3, glm::vec3(0, 200, 0), glm::vec3());
+	PhysicsEngine::getInstance()->addForce(physics1, glm::vec3(10, 10,0), glm::vec3(0,0,10));
+	//PhysicsEngine::getInstance()->addForce(physics3, glm::vec3(0, 2000, 0), glm::vec3());
+//	physics1->setAngularVelocity(glm::vec3(1, 0, 0), 2);
+	InputManager::physics = physics1;
 	glm::mat4 rotation(1.0f), projection;
 
 	GLuint projLoc = glGetUniformLocation(shaderProg.ID, "projection");
@@ -164,8 +165,6 @@ int main()
 	GLuint modelLoc = glGetUniformLocation(shaderProg.ID, "model");
 
 	projection = glm::perspective(glm::radians(camera->Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100000.0f);
-
-
 	shaderProg.use();
 
 	shaderProg.setMat4(projLoc, projection);
@@ -183,6 +182,7 @@ int main()
 
 		TimeSystem::update();
 		InputManager::processInput();
+		
 
 		PhysicsEngine::getInstance()->step();
 

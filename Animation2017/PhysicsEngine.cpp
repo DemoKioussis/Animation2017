@@ -57,6 +57,7 @@ void PhysicsEngine::applyPhysics() {
 		momentum(component);
 		rotate(component);
 		translate(component);
+		component->getTransform() = component->getTranslation()*component->getRotation();
 		reset(component);
 	}
 }
@@ -85,6 +86,11 @@ void PhysicsEngine::setVelocity(PhysicsComponent* _component) {
 	if (glm::length(_component->velocity) > MAX_SPEED) {
 		_component->velocity = glm::normalize(_component->velocity)*MAX_SPEED;
 	}	
+	float torqueMag = glm::length(_component->torque);
+	if (torqueMag > 0) {
+		_component->addAngularVelocity(_component->torque, glm::length(_component->torque)*TimeSystem::getPhysicsDeltaTime());
+	}
+
 }
 
 #pragma endregion
@@ -92,10 +98,15 @@ void PhysicsEngine::setVelocity(PhysicsComponent* _component) {
 #pragma region application
 void PhysicsEngine::translate(PhysicsComponent* _component) {
 	glm::vec3 translation = _component->velocity*TimeSystem::getPhysicsDeltaTime();
-	_component->getTransform() = glm::translate(_component->getTransform(), translation);
+	_component->getTranslation() = glm::translate(_component->getTranslation(), translation);
 }
 void PhysicsEngine::rotate(PhysicsComponent* _component) {
-	
+	float mag = glm::length(_component->angularVelocity);
+	if (mag > 0) {
+		_component->getRotation() = glm::rotate(_component->getRotation(),
+			mag*TimeSystem::getPhysicsDeltaTime(),
+			glm::normalize(_component->angularVelocity));
+	}
 }
 void PhysicsEngine::energy(PhysicsComponent* _component) {
 	float speed = glm::length(_component->velocity);
@@ -107,7 +118,7 @@ void PhysicsEngine::momentum(PhysicsComponent* _component) {
 void PhysicsEngine::reset(PhysicsComponent* _component) {
 		_component->acceleration = glm::vec3();
 		_component->netForce = glm::vec3();
-	
+		_component->torque = glm::vec3();
 
 }
 

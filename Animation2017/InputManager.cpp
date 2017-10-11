@@ -2,12 +2,14 @@
 #include "WindowManager.h"
 #include "Camera.h"
 #include "TimeSystem.h"
+#include "PhysicsComponent.h"
 
 Camera* InputManager::camera = nullptr;
 WindowManager* InputManager::windowManager = nullptr;
 GLboolean InputManager::firstMouse = false;
 GLfloat InputManager::lastX = 0;
 GLfloat InputManager::lastY = 0;
+PhysicsComponent* InputManager::physics = nullptr;
 
 void InputManager::initialize() {
 	if (windowManager != nullptr) {
@@ -62,6 +64,19 @@ void InputManager::key_callback(GLFWwindow* window, int key, int scancode, int a
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_P) == GLFW_PRESS) {
 		TimeSystem::setTimeScale(abs(1 - TimeSystem::getTimeScale()));
 	}
+
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_DOWN) == GLFW_PRESS) {
+		physics->addAngularVelocity(glm::vec3(1, 0, 0), -2);
+	}
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_UP) == GLFW_PRESS) {
+		physics->addAngularVelocity(glm::vec3(1, 0, 0), 2);
+	}
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_LEFT) == GLFW_PRESS) {
+		physics->addAngularVelocity(glm::vec3(0, 0, 1), 2);
+	}
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_RIGHT) == GLFW_PRESS) {
+		physics->addAngularVelocity(glm::vec3(0, 0, 1), -2);
+	}
 }
 
 void InputManager::setCamera(Camera* c) {
@@ -111,4 +126,6 @@ void InputManager::processCameraInput() {
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
 		camera->ProcessKeyboard(DIRECTION::DOWN, TimeSystem::getFrameDeltaTime());
 	}
+
 }
+

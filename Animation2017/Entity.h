@@ -9,6 +9,8 @@ class Entity {
 public:
 	std::vector<Component*> components;
 	glm::mat4 transform;
+	glm::mat4 translation;
+	glm::mat4 rotation;
 
 	Entity();
 	~Entity();

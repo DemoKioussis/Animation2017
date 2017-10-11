@@ -6,6 +6,8 @@ class PhysicsEngine;
 class PhysicsComponent : public Component {
 	friend class PhysicsEngine;
 private:
+
+	
 	glm::vec3 centerOfMass;
 
 	glm::vec3 velocity;
@@ -34,6 +36,7 @@ public:
 		componentType = PHYSICS_COMPONENT;
 		mass = 1;
 		gravityMultiplyer = 1;
+	//	setAngularVelocity(glm::vec3(0), 0);
 	};
 	~PhysicsComponent() {};
 
@@ -55,5 +58,11 @@ public:
 		float z = _z ? 1.0f : 0.0f;
 
 		rotationLock = glm::vec3(x, y, z);
+	}
+	void setAngularVelocity(glm::vec3 _axis, float _vel) {
+		angularVelocity = glm::normalize(_axis) * _vel;
+	}
+	void addAngularVelocity(glm::vec3 _axis, float _vel) {
+		angularVelocity += glm::normalize(_axis) * _vel;
 	}
 };

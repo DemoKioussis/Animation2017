@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glad\glad.h>
+class PhysicsComponent;
 class Camera;
 class WindowManager;
 class GLFWwindow;
@@ -13,7 +14,6 @@ private:
 	static GLfloat lastX;
 	static GLfloat lastY;
 	static GLboolean firstMouse;
-
 public:
 	static void initialize();
 
@@ -29,5 +29,6 @@ public:
 	static void processInput();
 
 	static void processCameraInput();
+	static PhysicsComponent *physics;
 
 };

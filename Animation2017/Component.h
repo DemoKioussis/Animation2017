@@ -23,6 +23,8 @@ public:
 	void disable();
 	const bool isEnabled();
 	glm::mat4 & getTransform();
+	glm::mat4 & getRotation();
+	glm::mat4 & getTranslation();
 
 
 };
