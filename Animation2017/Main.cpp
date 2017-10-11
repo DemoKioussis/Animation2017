@@ -107,57 +107,30 @@ int main()
 	RenderEngine::getInstance()->setShader(&shaderProg);
 
 	PhysicsEngine::Initialize();
-	PhysicsEngine::getInstance()->setGravity(glm::vec3(0, -1, 0), 0.810);
+	PhysicsEngine::getInstance()->setGravity(glm::vec3(0, -1, 0),0);
 
 #pragma endregion
 
 	Mesh* mesh = makeMesh();
  	RenderEngine::getInstance()->addRenderReference(mesh);
+	int numEnts = 100;
+	std::vector<Entity*> entities(0);
+	for (int i = 0; i < numEnts;i++) {
+		Entity* e = new Entity;
+		RenderComponent *r = new RenderComponent();
+		r->setMeshID(0);
+		PhysicsComponent* p = new PhysicsComponent();
+		e->addComponent(p);
+		e->addComponent(r);
+		RenderEngine::getInstance()->addComponent(r);
+		PhysicsEngine::getInstance()->addComponent(p);
+		e->translation = glm::translate(e->translation, glm::vec3(1, 0, 0)*(i * 5.0f));
+		entities.push_back(e);
+		p->addAngularVelocity(glm::vec3(0, 0, 1), i*0.01);
+		PhysicsEngine::getInstance()->addForce(p, glm::vec3(0, 0, i*i), glm::vec3());
+	}
 
-	//RenderComponents
-	RenderComponent *render1 = new RenderComponent();
-	RenderComponent *render2 = new RenderComponent();
-	RenderComponent *render3 = new RenderComponent();
-	render1->setMeshID(0);
-	render2->setMeshID(0);
-	render3->setMeshID(0);
-
-	//PhysicsComponents
-	PhysicsComponent* physics1 = new PhysicsComponent();
-	PhysicsComponent *physics2 = new PhysicsComponent();
-	PhysicsComponent *physics3 = new PhysicsComponent();
-	//Entities
-	Entity* entity1 = new Entity();
-	entity1->addComponent(render1);
-	entity1->addComponent(physics1);
-
-	Entity* entity2 = new Entity();
-	entity2->addComponent(render2);
-	entity2->addComponent(physics2);
-
-	Entity* entity3 = new Entity();
-	entity3->addComponent(render3);
-	entity3->addComponent(physics3);
-	
-	//Placing entities initially
-	entity2->translation = glm::translate(entity2->translation, glm::vec3(-modelScale * 4, 0, 0));
-	entity3->translation = glm::translate(entity3->translation, glm::vec3(modelScale * 4, 0, 0));
-
-	//Adding renderComponents to renderEngine
-	RenderEngine::getInstance()->addComponent(render1);
-	RenderEngine::getInstance()->addComponent(render2);
-	RenderEngine::getInstance()->addComponent(render3);
-
-	//Adding physics components to PhysicsEngine
-	PhysicsEngine::getInstance()->addComponent(physics1);
-	PhysicsEngine::getInstance()->addComponent(physics2);
-	PhysicsEngine::getInstance()->addComponent(physics3);
-
-	//Adding forces to physics components
-	PhysicsEngine::getInstance()->addForce(physics1, glm::vec3(10, 10,0), glm::vec3(0,0,10));
-	//PhysicsEngine::getInstance()->addForce(physics3, glm::vec3(0, 2000, 0), glm::vec3());
-//	physics1->setAngularVelocity(glm::vec3(1, 0, 0), 2);
-	InputManager::physics = physics1;
+	InputManager::physics = (PhysicsComponent*)entities[0]->getComponent(PHYSICS_COMPONENT);
 	glm::mat4 rotation(1.0f), projection;
 
 	GLuint projLoc = glGetUniformLocation(shaderProg.ID, "projection");
@@ -168,7 +141,7 @@ int main()
 	shaderProg.use();
 
 	shaderProg.setMat4(projLoc, projection);
-	shaderProg.setVec3("lightDirection", glm::vec3(1, 1, 0));
+	shaderProg.setVec3("lightDirection", glm::vec3(0, 1, 0));
 	shaderProg.setVec3("ambientLight", glm::vec3(1.0f, 1.0f, 1.0f));
 	float cosT = 0, sinT = 0;
 
