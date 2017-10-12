@@ -1,6 +1,6 @@
 #pragma once
 #include "Component.h"
-
+#include "glm\gtx\matrix_operation.hpp"
 class Entity;
 class PhysicsEngine;
 class PhysicsComponent : public Component {
@@ -63,6 +63,22 @@ public:
 		angularVelocity = glm::normalize(_axis) * _vel;
 	}
 	void addAngularVelocity(glm::vec3 _axis, float _vel) {
-		angularVelocity += glm::normalize(_axis) * _vel;
+		glm::vec4 w =glm::vec4( glm::normalize(_axis) * _vel,0);
+		glm::vec4 r = getRotation()*w;
+		
+		angularVelocity += glm::vec3(r.x, r.y, r.z);
 	}
+	void addAngularVelocity2(glm::vec3 _axis, float _vel) {
+		glm::vec4 w = glm::vec4(glm::normalize(_axis) * _vel, 0);
+		glm::vec4 r = glm::inverse(getRotation())*w;
+
+		angularVelocity += glm::vec3(r.x, r.y, r.z);
+	}
+	void addAngularVelocity3(glm::vec3 _axis, float _vel) {
+		glm::vec4 w = glm::vec4(glm::normalize(_axis) * _vel, 0);
+		glm::vec4 r = w;
+
+		angularVelocity += glm::vec3(r.x, r.y, r.z);
+	}
+
 };

@@ -15,6 +15,6 @@ void main()
 {
 	gl_Position = projection*view * model * vec4(pos, 1.0f);
 	sendColor = color;
-	sendNorm= (model*vec4(norm,0)).xyz;
+	sendNorm= (model*vec4(-norm,0)).xyz;
 
 }

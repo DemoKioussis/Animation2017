@@ -3,13 +3,15 @@
 #include "Camera.h"
 #include "TimeSystem.h"
 #include "PhysicsComponent.h"
+#include "PhysicsEngine.h"
+#include "Entity.h"
 
 Camera* InputManager::camera = nullptr;
 WindowManager* InputManager::windowManager = nullptr;
 GLboolean InputManager::firstMouse = false;
 GLfloat InputManager::lastX = 0;
 GLfloat InputManager::lastY = 0;
-PhysicsComponent* InputManager::physics = nullptr;
+std::vector<Entity*> *InputManager::Entities = nullptr;
 
 void InputManager::initialize() {
 	if (windowManager != nullptr) {
@@ -62,20 +64,91 @@ void InputManager::key_callback(GLFWwindow* window, int key, int scancode, int a
 	}
 
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_P) == GLFW_PRESS) {
-		TimeSystem::setTimeScale(abs(1 - TimeSystem::getTimeScale()));
+//		TimeSystem::setTimeScale(abs(1 - TimeSystem::getTimeScale()));
+		if(PhysicsEngine::getInstance()->isEnabled())
+			PhysicsEngine::getInstance()->disable();
+		else
+			PhysicsEngine::getInstance()->enable();
+
+	}
+	float rotateSpeed = 0.5f;
+	glm::vec3 x(1, 0, 0);
+	glm::vec3 z(0, 0, 1);
+	glm::vec3 y(0, 1, 0);
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_5) == GLFW_PRESS) {
+		for (int i = 0; i < Entities->size();i++) {
+			auto e = (Entities->at(i)); 
+			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
+
+			if (i == 0)
+				p->addAngularVelocity(-x, rotateSpeed);
+			if (i == 1)
+				p->addAngularVelocity2(-x, rotateSpeed);
+			if (i == 2)
+				p->addAngularVelocity3(-x, rotateSpeed);
+		}
+	}
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_8) == GLFW_PRESS) {
+		for (int i = 0; i < Entities->size();i++) {
+			auto e = (Entities->at(i));
+			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
+			if (i == 0)
+				p->addAngularVelocity(x, rotateSpeed);
+			if(i == 1)
+				p->addAngularVelocity2(x, rotateSpeed);
+			if(i == 2)
+				p->addAngularVelocity3(x,rotateSpeed);
+		}
+	}
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_4) == GLFW_PRESS) {
+		for (int i = 0; i < Entities->size();i++) {
+			auto e = (Entities->at(i));
+			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
+			if (i == 0)
+				p->addAngularVelocity(-z, rotateSpeed);
+			if (i == 1)
+				p->addAngularVelocity2(-z, rotateSpeed);
+			if (i == 2)
+				p->addAngularVelocity3(-z, rotateSpeed);
+		}
+	}
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_6) == GLFW_PRESS) {
+		for (int i = 0; i < Entities->size();i++) {
+			auto e = (Entities->at(i));
+			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
+			if (i == 0)
+				p->addAngularVelocity(z, rotateSpeed);
+			if (i == 1)
+				p->addAngularVelocity2(z, rotateSpeed);
+			if (i == 2)
+				p->addAngularVelocity3(z, rotateSpeed);
+
+		}
 	}
 
-	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_DOWN) == GLFW_PRESS) {
-		physics->addAngularVelocity(glm::vec3(1, 0, 0), -2);
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_9) == GLFW_PRESS) {
+		for (int i = 0; i < Entities->size();i++) {
+			auto e = (Entities->at(i));
+			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
+			if (i == 0)
+				p->addAngularVelocity(y, rotateSpeed);
+			if (i == 1)
+				p->addAngularVelocity2(y, rotateSpeed);
+			if (i == 2)
+				p->addAngularVelocity3(y, rotateSpeed);
+		}
 	}
-	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_UP) == GLFW_PRESS) {
-		physics->addAngularVelocity(glm::vec3(1, 0, 0), 2);
-	}
-	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_LEFT) == GLFW_PRESS) {
-		physics->addAngularVelocity(glm::vec3(0, 0, 1), 2);
-	}
-	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_RIGHT) == GLFW_PRESS) {
-		physics->addAngularVelocity(glm::vec3(0, 0, 1), -2);
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_7) == GLFW_PRESS) {
+		for (int i = 0; i < Entities->size();i++) {
+			auto e = (Entities->at(i));
+			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
+			if (i == 0)
+				p->addAngularVelocity(-y, rotateSpeed);
+			if (i == 1)
+				p->addAngularVelocity2(-y, rotateSpeed);
+			if (i == 2)
+				p->addAngularVelocity3(-y, rotateSpeed);
+		}
 	}
 }
 

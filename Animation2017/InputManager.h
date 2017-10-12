@@ -1,10 +1,12 @@
 #pragma once
 
 #include <glad\glad.h>
-class PhysicsComponent;
+#include <vector>
 class Camera;
 class WindowManager;
 class GLFWwindow;
+
+class Entity;
 
 class InputManager {
 private:
@@ -29,6 +31,6 @@ public:
 	static void processInput();
 
 	static void processCameraInput();
-	static PhysicsComponent *physics;
+	static std::vector<Entity *> *Entities;
 
 };

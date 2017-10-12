@@ -37,28 +37,63 @@ Mesh* makeMesh() {
 
 
 	GLfloat vertices[] = {
-		// verticies	//color					//normals
-		-modelScale,-modelScale,0,		1.0f, 0.5, 0.3,		-2,-2,-3		//back left
-		,modelScale,-modelScale,0,		1.0f, 0.5, 0.3,		 2,-2,-3		//back right
-		,modelScale,modelScale,0,		1.0f, 0.5, 0.3,		 2, 2,-3		//front right
-		,-modelScale,modelScale,0,		1.0f, 0.5, 0.3,		-2, 2,-3		//front left
-		,0,0,2* modelScale,				1.0f, 0.5, 0.3,		 0, 0, 1		//top middle
+		// verticies	/				/color					//normals
+		//back
+		-modelScale,-modelScale,-modelScale,		0.50f, 0.5, 0.5,		 0,0,-1 		//back left
+		,modelScale,-modelScale,-modelScale,		0.50f, 0.5, 0.5,		 0,0,-1		//back right
+		,modelScale,modelScale,-modelScale,			0.50f, 0.5, 0.5,		 0,0,-1		//front right
+		,-modelScale,modelScale,-modelScale,		0.50f, 0.5, 0.5,		 0,0,-1		//front left
 
-		,-modelScale,-modelScale,0,		1.0f, 0.5, 0.3,		 0,0,1 		//back left
-		,modelScale,-modelScale,0,		1.0f, 0.5, 0.3,		 0,0,1		//back right
-		,modelScale,modelScale,0,		1.0f, 0.5, 0.3,		 0,0,1		//front right
-		,-modelScale,modelScale,0,		1.0f, 0.5, 0.3,		 0,0,1		//front left
+		//front
+		,-modelScale,-modelScale,modelScale,			0.50f, 0.5, 0.5,	 0,0,1 		//back left
+		,modelScale,-modelScale,modelScale,			0.50f, 0.5, 0.5,		 0,0,1		//back right
+		,modelScale,modelScale,modelScale,			0.50f, 0.5, 0.5,		 0,0,1		//front right
+		,-modelScale,modelScale,modelScale,			0.50f, 0.5, 0.5,		 0,0,1		//front left
+
+		//left
+		,-modelScale,-modelScale,-modelScale,		0.50f, 0.5, 0.5,		 -1,0,0 		//back left
+		,-modelScale,-modelScale,modelScale,		0.50f, 0.5, 0.5,		 -1,0,0		//back right
+		,-modelScale,modelScale,modelScale,			0.50f, 0.5, 0.5,		 -1,0,0		//front right
+		,-modelScale,modelScale,-modelScale,		0.50f, 0.5, 0.5,		 -1,0,0		//front left
+		//right
+		,modelScale,-modelScale,-modelScale,		0.50f, 0.5, 0.5,		 1,0,0 		//back left
+		,modelScale,-modelScale,modelScale,			0.50f, 0.5, 0.5,		 1,0,0		//back right
+		,modelScale,modelScale,modelScale,			0.50f, 0.5, 0.5,		 1,0,0		//front right
+		,modelScale,modelScale,-modelScale,			0.50f, 0.5, 0.5,		 1,0,0		//front left
+
+		//TOP
+		,-modelScale,modelScale,-modelScale,		0.50f, 0.5, 0.5,		 0,1,0 		//back left
+		,-modelScale,modelScale,modelScale,			0.50f, 0.5, 0.5,		 0,1,0		//back right
+		,modelScale,modelScale,modelScale,			0.50f, 0.5, 0.5,		 0,1,0		//front right
+		,modelScale,modelScale,-modelScale,			0.50f, 0.5, 0.5,		 0,1,0		//front left
+
+		//BOTTOM
+		,-modelScale,-modelScale,-modelScale,		0.50f, 0.5, 0.5,		 0,-1,0	//back left
+		,-modelScale,-modelScale,modelScale,		0.50f, 0.5, 0.5,		 0,-1,0	//back right
+		,modelScale,-modelScale,modelScale,			0.50f, 0.5, 0.5,		 0,-1,0	//front right
+		,modelScale,-modelScale,-modelScale,		0.50f, 0.5, 0.5,		 0,-1,0	//front left
 
 	};
 
 	GLuint indices[] = {  // note that we start from 0!
-		 0,4,1
-		,1,4,2
-		,2,4,3
-		,3,4,0
+		0,1,2
+		,2,3,0
 
-		,5,6,7
-		,5,8,7
+		,4,5,6
+		,6,7,4
+
+		,8,9,10
+		,10,11,8
+
+		,12,13,14
+		,14,15,12
+
+		,16,17,18
+		,18,19,16
+
+		,20,21,22
+		,22,23,20	
+
 	};
 
 	std::vector<GLfloat> positions(0), colors(0), normals(0);
@@ -113,7 +148,8 @@ int main()
 
 	Mesh* mesh = makeMesh();
  	RenderEngine::getInstance()->addRenderReference(mesh);
-	int numEnts = 100;
+	int numEnts = 3;
+	float disp = 5.0f;
 	std::vector<Entity*> entities(0);
 	for (int i = 0; i < numEnts;i++) {
 		Entity* e = new Entity;
@@ -124,13 +160,12 @@ int main()
 		e->addComponent(r);
 		RenderEngine::getInstance()->addComponent(r);
 		PhysicsEngine::getInstance()->addComponent(p);
-		e->translation = glm::translate(e->translation, glm::vec3(1, 0, 0)*(i * 5.0f));
+		e->translation = glm::translate(e->translation, glm::vec3(-1, 0, 0)*(i *disp));
 		entities.push_back(e);
-		p->addAngularVelocity(glm::vec3(0, 0, 1), i*0.01);
-		PhysicsEngine::getInstance()->addForce(p, glm::vec3(0, 0, i*i), glm::vec3());
+
 	}
 
-	InputManager::physics = (PhysicsComponent*)entities[0]->getComponent(PHYSICS_COMPONENT);
+	InputManager::Entities = &entities;
 	glm::mat4 rotation(1.0f), projection;
 
 	GLuint projLoc = glGetUniformLocation(shaderProg.ID, "projection");
@@ -141,7 +176,7 @@ int main()
 	shaderProg.use();
 
 	shaderProg.setMat4(projLoc, projection);
-	shaderProg.setVec3("lightDirection", glm::vec3(0, 1, 0));
+	shaderProg.setVec3("lightDirection", glm::vec3(0, -1, 1));
 	shaderProg.setVec3("ambientLight", glm::vec3(1.0f, 1.0f, 1.0f));
 	float cosT = 0, sinT = 0;
 

@@ -17,7 +17,8 @@ PhysicsEngine* PhysicsEngine::instance = 0;
 	 PhysicsEngine * engine = new PhysicsEngine();
 	 instance = engine;
 	 instance->gravityEnabled = true;
-	 instance->updateTime = 1.0f / 240.0f;
+	 instance->updateTime = 1.0f / 60.0f;
+	 engine->enable();
 }
  PhysicsEngine * PhysicsEngine::getInstance() {
 	 return instance;
@@ -35,10 +36,12 @@ PhysicsEngine* PhysicsEngine::instance = 0;
 
 #pragma region mainLoop
  void PhysicsEngine::step() {
-	 if (TimeSystem::physicsCheck() >= updateTime) {
-		 TimeSystem::physicsStep();
-		 updatePhysics();
-		 applyPhysics();
+	 if (isEnabled()) {
+		 if (TimeSystem::physicsCheck() >= updateTime) {
+			 TimeSystem::physicsStep();
+			 updatePhysics();
+			 applyPhysics();
+		 }
 	 }
 
  }
