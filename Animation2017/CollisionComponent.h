@@ -2,8 +2,7 @@
 #include "Component.h"
 
 class CollisionComponent : public Component
-{	
-	float distanceToFurthestPoint;
+{
 public:
 	CollisionComponent() 
 	{
