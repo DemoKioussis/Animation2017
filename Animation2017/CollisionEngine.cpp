@@ -26,7 +26,8 @@ CollisionEngine * CollisionEngine::getInstance()
 
 void CollisionEngine::step()
 {
-	
+	// Just for testing the areSpheresColliding() method
+	//areColliding((CollisionComponent*)targetComponents[0], (CollisionComponent*)targetComponents[1]);
 }
 
 void CollisionEngine::calculateUniqueIndicesAndFurthestDistances()
@@ -98,5 +99,36 @@ void CollisionEngine::updateCollisionDataForMesh(Mesh * mesh, int meshId)
 	}
 
 	collisionData[meshId] = std::move(collision);
+}
+
+bool CollisionEngine::areColliding(CollisionComponent * c1, CollisionComponent * c2)
+{
+	return areSpheresColliding(c1, c2) ? areCollidingGJK(c1, c2) : false;
+}
+
+bool CollisionEngine::areSpheresColliding(CollisionComponent * c1, CollisionComponent * c2)
+{
+	RenderComponent* r1 = (RenderComponent*)c1->entity->getComponent(RENDER_COMPONENT);
+	RenderComponent* r2 = (RenderComponent*)c2->entity->getComponent(RENDER_COMPONENT);
+
+	mat4& transformMatrix1 = c1->entity->transform;
+	mat4& transformMatrix2 = c2->entity->transform;
+
+	// Assuming that the origin of both of the entities is at (0,0,0)
+	vec4 origin(0, 0, 0, 1);
+	
+	// Calculate the positions of the origins of both entities in world coordinates
+	vec4 centerInWorldCoordinates1 = transformMatrix1 * origin;
+	vec4 centerInWorldCoordinates2 = transformMatrix2 * origin;
+
+	float distanceBetweenOrigins = glm::length(centerInWorldCoordinates2 - centerInWorldCoordinates1);
+	float sumOfRadiuses = collisionData[r1->getMeshID()].distanceToFurthestPoint + collisionData[r2->getMeshID()].distanceToFurthestPoint;
+
+	return sumOfRadiuses > distanceBetweenOrigins;
+}
+
+bool CollisionEngine::areCollidingGJK(CollisionComponent * c1, CollisionComponent * c2)
+{
+	return false;
 }
 
