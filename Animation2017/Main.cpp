@@ -15,6 +15,9 @@
 
 #include "PhysicsEngine.h"
 #include "PhysicsComponent.h"
+
+#include "CollisionEngine.h"
+#include "CollisionComponent.h"
 /**
 This class right now just sets thigns up, ideally by the end of this it would be a list of settings and nothing else
 */
@@ -144,6 +147,8 @@ int main()
 	PhysicsEngine::Initialize();
 	PhysicsEngine::getInstance()->setGravity(glm::vec3(0, -1, 0),0);
 
+	CollisionEngine::Initialize();
+
 #pragma endregion
 
 	Mesh* mesh = makeMesh();
@@ -156,14 +161,19 @@ int main()
 		RenderComponent *r = new RenderComponent();
 		r->setMeshID(0);
 		PhysicsComponent* p = new PhysicsComponent();
+		CollisionComponent* c = new CollisionComponent();		
 		e->addComponent(p);
 		e->addComponent(r);
+		e->addComponent(c);
 		RenderEngine::getInstance()->addComponent(r);
 		PhysicsEngine::getInstance()->addComponent(p);
-		e->translation = glm::translate(e->translation, glm::vec3(-1, 0, 0)*(i *disp));
+		e->translation = glm::translate(e->translation, glm::vec3(-1, 0, 0)*(i *disp));		
+		CollisionEngine::getInstance()->addComponent(c);
 		entities.push_back(e);
 
 	}
+
+	CollisionEngine::getInstance()->calculateUniqueIndicesAndFurthestDistances(); // Important for u[datign the info about the collisions
 
 	InputManager::Entities = &entities;
 	glm::mat4 rotation(1.0f), projection;
@@ -193,7 +203,7 @@ int main()
 		
 
 		PhysicsEngine::getInstance()->step();
-
+		CollisionEngine::getInstance()->step();
 		
 		windowManager->frameTick();
 	}

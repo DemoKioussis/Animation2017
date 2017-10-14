@@ -17,5 +17,6 @@ public:
 	void setVerticies(vector<GLfloat>& p, vector<GLfloat>& c, vector<GLfloat>& n);
 	void setVerticies(vector<GLfloat>* v);
 	void setIndices(vector<GLuint>* i);
+	vector<GLfloat>* getVerticies();
 	void draw();
 };

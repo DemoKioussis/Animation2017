@@ -83,6 +83,15 @@ void Mesh::setIndices(std::vector<GLuint>* i) {
 
 #pragma endregion
 
+#pragma region Getters
+
+vector<GLfloat>* Mesh::getVerticies()
+{
+	return vertices;
+}
+
+#pragma endregion
+
 void Mesh::draw() {
 		glBindVertexArray(VAO); 
 		glDrawElements(GL_TRIANGLES, sizeof(GLuint)*indices->size(), GL_UNSIGNED_INT, 0);
