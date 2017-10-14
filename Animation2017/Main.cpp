@@ -161,7 +161,7 @@ int main()
 		RenderComponent *r = new RenderComponent();
 		r->setMeshID(0);
 		PhysicsComponent* p = new PhysicsComponent();
-		CollisionComponent* c = new CollisionComponent();		
+		CollisionComponent* c = new CollisionComponent(ColliderType::VERTICES);
 		e->addComponent(p);
 		e->addComponent(r);
 		e->addComponent(c);

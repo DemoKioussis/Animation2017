@@ -103,7 +103,26 @@ void CollisionEngine::updateCollisionDataForMesh(Mesh * mesh, int meshId)
 
 bool CollisionEngine::areColliding(CollisionComponent * c1, CollisionComponent * c2)
 {
-	return areSpheresColliding(c1, c2) ? areCollidingGJK(c1, c2) : false;
+	if (c1->colliderType == ColliderType::SPHERE && c2->colliderType == ColliderType::SPHERE)
+	{
+		// Sphere collides with sphere
+		return areSpheresColliding(c1, c2); 
+	}
+	else if (c1->colliderType == ColliderType::SPHERE && c2->colliderType == ColliderType::VERTICES)
+	{
+		// Sphere collides with vertex object
+		return isSphereCollidingWithVertexObject(c1, c2);
+	}
+	else if (c1->colliderType == ColliderType::VERTICES && c2->colliderType == ColliderType::SPHERE)
+	{
+		// Vertex object collides with sphere
+		return isSphereCollidingWithVertexObject(c2, c1); 
+	}
+	else if (c1->colliderType == ColliderType::VERTICES && c2->colliderType == ColliderType::VERTICES)
+	{
+		//Vertex object collides with vertex object
+		return areSpheresColliding(c1, c2) ? areCollidingGJK(c1, c2) : false;
+	}
 }
 
 bool CollisionEngine::areSpheresColliding(CollisionComponent * c1, CollisionComponent * c2)
@@ -125,6 +144,62 @@ bool CollisionEngine::areSpheresColliding(CollisionComponent * c1, CollisionComp
 	float sumOfRadiuses = collisionData[r1->getMeshID()].distanceToFurthestPoint + collisionData[r2->getMeshID()].distanceToFurthestPoint;
 
 	return sumOfRadiuses > distanceBetweenOrigins;
+}
+
+bool CollisionEngine::isSphereCollidingWithVertexObject(CollisionComponent * sphere, CollisionComponent * vertexObject)
+{
+	RenderComponent* sphereRender = (RenderComponent*)sphere->entity->getComponent(RENDER_COMPONENT);
+	RenderComponent* vertexObjectRender = (RenderComponent*)vertexObject->entity->getComponent(RENDER_COMPONENT);
+
+	mat4& transformMatrixSphere = sphere->entity->transform;
+	mat4& transformMatrixVertex = vertexObject->entity->transform;
+
+	// Assuming that the origin of both of the entities is at (0,0,0)
+	vec4 origin(0, 0, 0, 1);
+
+	// Calculate the positions of the origins of both entities in world coordinates
+	vec4 centerInWorldCoordinatesSphere = transformMatrixSphere * origin;
+	vec4 centerInWorldCoordinatesVertex = transformMatrixVertex * origin;
+
+	float sphereRadius = collisionData[sphereRender->getMeshID()].distanceToFurthestPoint;
+		 
+	float distanceBetweenOrigins = glm::length(centerInWorldCoordinatesVertex - centerInWorldCoordinatesSphere);
+	float sumOfRadiuses = sphereRadius + collisionData[vertexObjectRender->getMeshID()].distanceToFurthestPoint;
+
+	if (sumOfRadiuses <= distanceBetweenOrigins)
+	{
+		// Bounding spheres are not colliding, so we know that the two objects are not colliding
+		return false;
+	}
+
+	std::vector<Renderable*>& allRenderables = RenderEngine::getInstance()->getAllRenderReferences();
+	Mesh* currentMesh = dynamic_cast<Mesh*>(allRenderables[vertexObjectRender->getMeshID()]);
+
+	if (currentMesh == nullptr)
+	{
+		throw runtime_error("An entity having a collider component has a render component that doesn't countain a Mesh");
+	}
+
+	// Check if any of the vertices are inside the sphere
+	std::vector<int>& indices = collisionData[vertexObjectRender->getMeshID()].uniqueVerticesIndices;
+	vector<GLfloat>& vertices = *currentMesh->getVerticies();
+	for (size_t i = 0; i < indices.size(); i++)
+	{
+		vec4 vertexObjectCoordiantes(vertices[indices[i]], vertices[indices[i] + 1], vertices[indices[i] + 2] , 1);
+		vec4 vertexWorldCoordiantes = transformMatrixVertex * vertexObjectCoordiantes;
+		float distanceToVertexFromSphereCenter = glm::length(vertexWorldCoordiantes - centerInWorldCoordinatesSphere);
+
+		if (distanceToVertexFromSphereCenter < sphereRadius)
+		{
+			// A vetex is inside the sphere, so we know that the two object are colliding
+			return true;
+		}
+	}
+
+	// Check the center of the sphere is inside the vertex object
+	//// GJK ???????????????????????????????
+
+	return false;
 }
 
 bool CollisionEngine::areCollidingGJK(CollisionComponent * c1, CollisionComponent * c2)

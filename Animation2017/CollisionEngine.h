@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include "Mesh.h"
 
+
+
 struct CollisionData
 {
 	float distanceToFurthestPoint;
@@ -19,6 +21,7 @@ class CollisionEngine : public Engine
 	
 	bool areColliding(CollisionComponent* c1, CollisionComponent* c2);
 	bool areSpheresColliding(CollisionComponent* c1, CollisionComponent* c2);
+	bool isSphereCollidingWithVertexObject(CollisionComponent* sphere, CollisionComponent* vertexObject);
 	bool areCollidingGJK(CollisionComponent* c1, CollisionComponent* c2);
 public:
 	static void Initialize();
