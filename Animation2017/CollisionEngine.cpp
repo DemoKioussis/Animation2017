@@ -121,7 +121,9 @@ bool CollisionEngine::areColliding(CollisionComponent * c1, CollisionComponent *
 	else if (c1->colliderType == ColliderType::VERTICES && c2->colliderType == ColliderType::VERTICES)
 	{
 		//Vertex object collides with vertex object
-		return areSpheresColliding(c1, c2) ? areCollidingGJK(c1, c2) : false;
+		//return areSpheresColliding(c1, c2) ? areCollidingGJK(c1, c2) : false;
+
+		return areCollidingGJK(c1, c2); // For testing
 	}
 }
 
@@ -204,6 +206,68 @@ bool CollisionEngine::isSphereCollidingWithVertexObject(CollisionComponent * sph
 
 bool CollisionEngine::areCollidingGJK(CollisionComponent * c1, CollisionComponent * c2)
 {
+	//using namespace glm::gtx::random;
+
+	// Preparation for GJK
+	std::vector<Renderable*>& allRenderables = RenderEngine::getInstance()->getAllRenderReferences();
+
+	RenderComponent* renderC1 = (RenderComponent*)c1->entity->getComponent(RENDER_COMPONENT);
+	RenderComponent* renderC2 = (RenderComponent*)c2->entity->getComponent(RENDER_COMPONENT);
+
+	mat4& transformMatrixC1 = c1->entity->transform;
+	mat4& transformMatrixC2 = c2->entity->transform;
+
+	mat4 transformMatrixC1Inverse = glm::inverse(c1->entity->transform);
+	mat4 transformMatrixC2Inverse = glm::inverse(c2->entity->transform);	
+
+	Mesh* meshC1 = dynamic_cast<Mesh*>(allRenderables[renderC1->getMeshID()]);
+	std::vector<int>& indicesC1 = collisionData[renderC1->getMeshID()].uniqueVerticesIndices;	
+	vector<GLfloat>& verticesC1 = *meshC1->getVerticies();
+
+	Mesh* meshC2 = dynamic_cast<Mesh*>(allRenderables[renderC2->getMeshID()]);
+	std::vector<int>& indicesC2 = collisionData[renderC2->getMeshID()].uniqueVerticesIndices;
+	vector<GLfloat>& verticesC2 = *meshC2->getVerticies();
+
+	// Use a random direction to get the furthest point of that direction
+	vec3 furthestPoint = gjkGetFurthestPointInDirection(vec3(1, 1, 1), transformMatrixC1, transformMatrixC1Inverse, indicesC1, verticesC1, transformMatrixC2, transformMatrixC2Inverse, indicesC2, verticesC2);
+
 	return false;
+}
+
+glm::vec3 CollisionEngine::gjkGetFurthestPointInDirection(glm::vec3& directionInWorldCoordinates, glm::mat4& modelC1, glm::mat4& inverseModelC1, std::vector<int>& indicesC1, vector<GLfloat>& verticesC1, glm::mat4& modelC2, glm::mat4& inverseModelC2, std::vector<int>& indicesC2, vector<GLfloat>& verticesC2)
+{
+	vec3 directionInObjectCoordinates = inverseModelC1 * vec4(directionInWorldCoordinates, 0);
+	vec3 directionInObjectCoordinatesNormalized = glm::normalize(directionInObjectCoordinates);
+
+	vec3 furthestC1ObjectCoordinates = gjkGetFurthestPointInDirectionSingle(modelC1, directionInObjectCoordinatesNormalized, indicesC1, verticesC1);
+	vec3 furthestC2ObjectCoordinates = gjkGetFurthestPointInDirectionSingle(modelC2, -directionInObjectCoordinatesNormalized, indicesC2, verticesC2);
+
+	vec3 furthestC1WorldCoordinates = modelC1 * vec4(furthestC1ObjectCoordinates,1);
+	vec3 furthestC2WorldCoordinates = modelC2 * vec4(furthestC2ObjectCoordinates, 1);
+
+	return  furthestC1WorldCoordinates + furthestC2WorldCoordinates; // Could be minus ?
+}
+
+glm::vec3 CollisionEngine::gjkGetFurthestPointInDirectionSingle(glm::mat4& model, glm::vec3& directionInObjectCoordinatesNormalized, std::vector<int>& indices, vector<GLfloat>& vertices)
+{
+	float dotProductMax = -1;
+	vec3 biggestVector(0,0,0);
+
+	for (size_t i = 0; i < indices.size(); i++)
+	{
+		vec3 vertexInObjectCoordiantes(vertices[indices[i]], vertices[indices[i] + 1], vertices[indices[i] + 2]);
+		vec3 vertexInObjectCoordiantesNormalized = glm::normalize(vertexInObjectCoordiantes);
+
+		float dotProduct = glm::dot(directionInObjectCoordinatesNormalized, vertexInObjectCoordiantesNormalized);
+
+		if (dotProduct > dotProductMax)
+		{
+			dotProductMax = dotProduct;
+			biggestVector = vertexInObjectCoordiantes;
+		}
+	}
+	vec4 furthestPoint(model * vec4(biggestVector, 0));
+
+	return furthestPoint;
 }
 
