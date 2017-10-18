@@ -32,6 +32,9 @@ glm::mat4 & Component::getTransform() {
 glm::mat4 & Component::getRotation() {
 	return entity->rotation;
 }
+glm::mat4 & Component::getInverseRotation() {
+	return entity->inverseRotation;
+}
 glm::mat4 & Component::getTranslation() {
 	return entity->translation;
 }

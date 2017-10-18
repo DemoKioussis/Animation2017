@@ -39,44 +39,44 @@ Mesh* makeMesh() {
 	GLfloat vertices[] = {
 		// verticies	/				/color					//normals
 		//back
-		-modelScale,-modelScale,-modelScale,		0.50f, 0.5, 0.5,		 0,0,-1 		//back left
-		,modelScale,-modelScale,-modelScale,		0.50f, 0.5, 0.5,		 0,0,-1		//back right
-		,modelScale,modelScale,-modelScale,			0.50f, 0.5, 0.5,		 0,0,-1		//front right
-		,-modelScale,modelScale,-modelScale,		0.50f, 0.5, 0.5,		 0,0,-1		//front left
+		-modelScale,-modelScale,-modelScale,		0.8f,  0.3, 0.3,		 0,0,-1 		//back left
+		,modelScale,-modelScale,-modelScale,		0.80f, 0.3, 0.3,		 0,0,-1		//back right
+		,modelScale,modelScale,-modelScale,			0.80f, 0.3, 0.3,		 0,0,-1		//front right
+		,-modelScale,modelScale,-modelScale,		0.80f, 0.3, 0.3,		 0,0,-1		//front left
 
 		//front
-		,-modelScale,-modelScale,modelScale,			0.50f, 0.5, 0.5,	 0,0,1 		//back left
-		,modelScale,-modelScale,modelScale,			0.50f, 0.5, 0.5,		 0,0,1		//back right
-		,modelScale,modelScale,modelScale,			0.50f, 0.5, 0.5,		 0,0,1		//front right
-		,-modelScale,modelScale,modelScale,			0.50f, 0.5, 0.5,		 0,0,1		//front left
+		,-modelScale,-modelScale,modelScale,		0.80f, 0.3, 0.3,	 0,0,1 		//back left
+		,modelScale,-modelScale,modelScale,			0.80f, 0.3, 0.3,		 0,0,1		//back right
+		,modelScale,modelScale,modelScale,			0.80f, 0.3, 0.3,		 0,0,1		//front right
+		,-modelScale,modelScale,modelScale,			0.80f, 0.3, 0.3,		 0,0,1		//front left
 
 		//left
-		,-modelScale,-modelScale,-modelScale,		0.50f, 0.5, 0.5,		 -1,0,0 		//back left
-		,-modelScale,-modelScale,modelScale,		0.50f, 0.5, 0.5,		 -1,0,0		//back right
-		,-modelScale,modelScale,modelScale,			0.50f, 0.5, 0.5,		 -1,0,0		//front right
-		,-modelScale,modelScale,-modelScale,		0.50f, 0.5, 0.5,		 -1,0,0		//front left
+		,-modelScale,-modelScale,-modelScale,		0.50f, 0.3, 0.3,		 -1,0,0 		//back left
+		,-modelScale,-modelScale,modelScale,		0.50f, 0.3, 0.3,		 -1,0,0		//back right
+		,-modelScale,modelScale,modelScale,			0.50f, 0.3, 0.3,		 -1,0,0		//front right
+		,-modelScale,modelScale,-modelScale,		0.50f, 0.3, 0.3,		 -1,0,0		//front left
 		//right
-		,modelScale,-modelScale,-modelScale,		0.50f, 0.5, 0.5,		 1,0,0 		//back left
-		,modelScale,-modelScale,modelScale,			0.50f, 0.5, 0.5,		 1,0,0		//back right
-		,modelScale,modelScale,modelScale,			0.50f, 0.5, 0.5,		 1,0,0		//front right
-		,modelScale,modelScale,-modelScale,			0.50f, 0.5, 0.5,		 1,0,0		//front left
+		,modelScale,-modelScale,-modelScale,		0.30f, 0.8, 0.3,		 1,0,0 		//back left
+		,modelScale,-modelScale,modelScale,			0.30f, 0.8, 0.3,		 1,0,0		//back right
+		,modelScale,modelScale,modelScale,			0.30f, 0.8, 0.3,		 1,0,0		//front right
+		,modelScale,modelScale,-modelScale,			0.30f, 0.8, 0.3,		 1,0,0		//front left
 
 		//TOP
-		,-modelScale,modelScale,-modelScale,		0.50f, 0.5, 0.5,		 0,1,0 		//back left
-		,-modelScale,modelScale,modelScale,			0.50f, 0.5, 0.5,		 0,1,0		//back right
-		,modelScale,modelScale,modelScale,			0.50f, 0.5, 0.5,		 0,1,0		//front right
-		,modelScale,modelScale,-modelScale,			0.50f, 0.5, 0.5,		 0,1,0		//front left
+		,-modelScale,modelScale,-modelScale,		0.30f, 0.3, 0.8,		 0,1,0 		//back left
+		,-modelScale,modelScale,modelScale,			0.30f, 0.3, 0.8,		 0,1,0		//back right
+		,modelScale,modelScale,modelScale,			0.30f, 0.3, 0.8,		 0,1,0		//front right
+		,modelScale,modelScale,-modelScale,			0.3f, 0.3, 0.8,		 0,1,0		//front left
 
 		//BOTTOM
-		,-modelScale,-modelScale,-modelScale,		0.50f, 0.5, 0.5,		 0,-1,0	//back left
-		,-modelScale,-modelScale,modelScale,		0.50f, 0.5, 0.5,		 0,-1,0	//back right
-		,modelScale,-modelScale,modelScale,			0.50f, 0.5, 0.5,		 0,-1,0	//front right
-		,modelScale,-modelScale,-modelScale,		0.50f, 0.5, 0.5,		 0,-1,0	//front left
+		,-modelScale,-modelScale,-modelScale,		0.50f, 0.5, 0.8,		 0,-1,0	//back left
+		,-modelScale,-modelScale,modelScale,		0.50f, 0.5, 0.8,		 0,-1,0	//back right
+		,modelScale,-modelScale,modelScale,			0.50f, 0.5, 0.8,		 0,-1,0	//front right
+		,modelScale,-modelScale,-modelScale,		0.50f, 0.5, 0.8,		 0,-1,0	//front left
 
 	};
 
 	GLuint indices[] = {  // note that we start from 0!
-		0,1,2
+		 0,1,2
 		,2,3,0
 
 		,4,5,6
@@ -148,8 +148,8 @@ int main()
 
 	Mesh* mesh = makeMesh();
  	RenderEngine::getInstance()->addRenderReference(mesh);
-	int numEnts = 3;
-	float disp = 5.0f;
+	int numEnts = 1;//00;
+	float disp = 0.30f;
 	std::vector<Entity*> entities(0);
 	for (int i = 0; i < numEnts;i++) {
 		Entity* e = new Entity;
@@ -161,8 +161,8 @@ int main()
 		RenderEngine::getInstance()->addComponent(r);
 		PhysicsEngine::getInstance()->addComponent(p);
 		e->translation = glm::translate(e->translation, glm::vec3(-1, 0, 0)*(i *disp));
-		entities.push_back(e);
 
+		entities.push_back(e);
 	}
 
 	InputManager::Entities = &entities;
@@ -179,6 +179,7 @@ int main()
 	shaderProg.setVec3("lightDirection", glm::vec3(0, -1, 1));
 	shaderProg.setVec3("ambientLight", glm::vec3(1.0f, 1.0f, 1.0f));
 	float cosT = 0, sinT = 0;
+
 
 #pragma region mainLoop
 	while (windowManager->windowHasClosed())

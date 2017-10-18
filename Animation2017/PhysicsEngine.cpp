@@ -1,7 +1,7 @@
 #pragma once
 #include "PhysicsEngine.h"
 #include "PhysicsComponent.h"
-
+#include "Entity.h"
 #include "TimeSystem.h"
 
 #include <glm\gtx\matrix_operation.hpp>
@@ -17,7 +17,7 @@ PhysicsEngine* PhysicsEngine::instance = 0;
 	 PhysicsEngine * engine = new PhysicsEngine();
 	 instance = engine;
 	 instance->gravityEnabled = true;
-	 instance->updateTime = 1.0f / 60.0f;
+	 instance->updateTime = 1.0f / 120.0f;
 	 engine->enable();
 }
  PhysicsEngine * PhysicsEngine::getInstance() {
@@ -81,17 +81,26 @@ void PhysicsEngine::addAttractiveForces(PhysicsComponent* _component) {
 
 void PhysicsEngine::setAcceleration(PhysicsComponent* _component) {
 	_component->acceleration = _component->netForce/_component->mass;
-
+	glm::vec3 inertia = _component->momentOfInertia;
+	glm::vec4 accel =/* _component->getRotation()*/glm::vec4(_component->torque,0);
+	accel = glm::vec4(accel.x / inertia.x, accel.y / inertia.y, accel.z / inertia.z, 0);
+	accel = _component->getInverseRotation()*accel;
+	_component->angularAcceleration = accel;
 }
 
 void PhysicsEngine::setVelocity(PhysicsComponent* _component) {
 	_component->velocity += _component->acceleration*TimeSystem::getPhysicsDeltaTime();
-	if (glm::length(_component->velocity) > MAX_SPEED) {
+	
+	if (glm::length(_component->velocity) > MAX_SPEED ) {
 		_component->velocity = glm::normalize(_component->velocity)*MAX_SPEED;
 	}	
-	float torqueMag = glm::length(_component->torque);
-	if (torqueMag > 0) {
-		_component->addAngularVelocity(_component->torque, glm::length(_component->torque)*TimeSystem::getPhysicsDeltaTime());
+	float accelMag = glm::length(_component->angularAcceleration)*TimeSystem::getPhysicsDeltaTime();
+	if (accelMag > 0) {
+		glm::vec4 w = glm::vec4(glm::normalize(_component->angularAcceleration) * accelMag, 0);
+		glm::vec4 r = w;//*_component->getRotation();
+		_component->angularVelocity += glm::vec3(r.x, r.y, r.z);
+		glm::vec3 v = _component->angularVelocity;
+		std::cout << "RPS: "<<glm::length(v)/6.28f << std::endl;
 	}
 
 }
@@ -110,6 +119,7 @@ void PhysicsEngine::rotate(PhysicsComponent* _component) {
 			mag*TimeSystem::getPhysicsDeltaTime(),
 			glm::normalize(_component->angularVelocity));
 	}
+	_component->getInverseRotation() = glm::inverse(_component->getRotation());
 }
 void PhysicsEngine::energy(PhysicsComponent* _component) {
 	float speed = glm::length(_component->velocity);

@@ -35,6 +35,7 @@ void RenderEngine::addRenderReference(Renderable * _renderReference) {
 
 void RenderEngine::draw(int _renderIndex) {
 	renderReferences[_renderIndex]->draw();
+	
 }
 
 RenderEngine* RenderEngine::getInstance() {

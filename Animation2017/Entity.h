@@ -11,6 +11,7 @@ public:
 	glm::mat4 transform;
 	glm::mat4 translation;
 	glm::mat4 rotation;
+	glm::mat4 inverseRotation;
 
 	Entity();
 	~Entity();
