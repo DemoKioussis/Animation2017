@@ -33,6 +33,11 @@ void RenderEngine::addRenderReference(Renderable * _renderReference) {
 	renderReferences.push_back(_renderReference);
 }
 
+std::vector<Renderable*>& RenderEngine::getAllRenderReferences()
+{
+	return renderReferences;
+}
+
 void RenderEngine::draw(int _renderIndex) {
 	renderReferences[_renderIndex]->draw();
 	

@@ -9,6 +9,7 @@ public:
 	static void Initialize();
 	void setShader(Shader* _shader);
 	void addRenderReference(Renderable *_renderReference);
+	std::vector<Renderable*>& getAllRenderReferences();
 	std::vector<Renderable*> renderReferences;
 //	void addComponent(RenderComponent *_renderComponent);
 	void drawRenderComponents();
