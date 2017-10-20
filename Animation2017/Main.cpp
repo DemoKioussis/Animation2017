@@ -153,8 +153,8 @@ int main()
 
 	Mesh* mesh = makeMesh();
  	RenderEngine::getInstance()->addRenderReference(mesh);
-	int numEnts = 1;//00;
-	float disp = 0.30f;
+	int numEnts = 2;//00;
+	float disp = 2.1f;
 	std::vector<Entity*> entities(0);
 	for (int i = 0; i < numEnts;i++) {
 		Entity* e = new Entity;
