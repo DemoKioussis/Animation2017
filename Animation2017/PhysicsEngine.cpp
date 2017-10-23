@@ -68,7 +68,8 @@ void PhysicsEngine::applyPhysics() {
 
 #pragma region calculations
 void PhysicsEngine::addForce(PhysicsComponent* _component, glm::vec3 force,glm::vec3 position) {
-	_component->netForce += force;
+	//_component->netForce += force;
+	
 	_component->torque = glm::cross(position, force);
 }
 void PhysicsEngine::addGravity(PhysicsComponent* _component) {
@@ -81,11 +82,10 @@ void PhysicsEngine::addAttractiveForces(PhysicsComponent* _component) {
 
 void PhysicsEngine::setAcceleration(PhysicsComponent* _component) {
 	_component->acceleration = _component->netForce/_component->mass;
-	glm::vec3 inertia = _component->momentOfInertia;
-	glm::vec4 accel =/* _component->getRotation()*/glm::vec4(_component->torque,0);
-	accel = glm::vec4(accel.x / inertia.x, accel.y / inertia.y, accel.z / inertia.z, 0);
-	accel = _component->getInverseRotation()*accel;
-	_component->angularAcceleration = accel;
+	glm::mat4 inertia = _component->getRotation()*_component->momentOfInertia*_component->getInverseRotation();
+	_component->angularMomentum += TimeSystem::getPhysicsDeltaTime()*_component->torque;
+	_component->angularVelocity = _component->getInverseRotation()*glm::inverse(inertia)*glm::vec4(_component->angularMomentum, 0);
+
 }
 
 void PhysicsEngine::setVelocity(PhysicsComponent* _component) {
@@ -94,14 +94,7 @@ void PhysicsEngine::setVelocity(PhysicsComponent* _component) {
 	if (glm::length(_component->velocity) > MAX_SPEED ) {
 		_component->velocity = glm::normalize(_component->velocity)*MAX_SPEED;
 	}	
-	float accelMag = glm::length(_component->angularAcceleration)*TimeSystem::getPhysicsDeltaTime();
-	if (accelMag > 0) {
-		glm::vec4 w = glm::vec4(glm::normalize(_component->angularAcceleration) * accelMag, 0);
-		glm::vec4 r = w;//*_component->getRotation();
-		_component->angularVelocity += glm::vec3(r.x, r.y, r.z);
-		glm::vec3 v = _component->angularVelocity;
-		std::cout << "RPS: "<<glm::length(v)/6.28f << std::endl;
-	}
+
 
 }
 

@@ -165,6 +165,8 @@ int main()
 		e->addComponent(p);
 		e->addComponent(r);
 		e->addComponent(c);
+		glm::mat4 moment(1.0f);
+		moment*(1.0f / 12.0f) * (2.0f);
 		RenderEngine::getInstance()->addComponent(r);
 		PhysicsEngine::getInstance()->addComponent(p);
 		e->translation = glm::translate(e->translation, glm::vec3(-1, 0, 0)*(i *disp));		
