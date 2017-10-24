@@ -15,7 +15,9 @@ flat out vec3 sendNorm;
 
 void main()
 {
+//	gl_Position = projection*view * model * vec4(pos, 1.0f);
 	gl_Position = projection*view * transform * vec4(pos, 1.0f);
+
 	sendColor = color;
 	sendNorm= (transform*vec4(-norm,0)).xyz;
 

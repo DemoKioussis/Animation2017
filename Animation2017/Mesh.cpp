@@ -87,6 +87,32 @@ void Mesh::setIndices(std::vector<GLuint>* i) {
 	//	glBindVertexArray(0);
 }
 
+void Mesh::setBufferData(vector<glm::mat4> & data) {
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER,transformBuffer);
+	if (numPrims < data.size()) {
+		glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(glm::mat4), &data[0],GL_DYNAMIC_DRAW);
+
+		glEnableVertexAttribArray(3);
+		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
+		glEnableVertexAttribArray(4);
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
+		glEnableVertexAttribArray(5);
+		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+		glEnableVertexAttribArray(6);
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+
+
+		glVertexAttribDivisor(3, 1);
+		glVertexAttribDivisor(4, 1);
+		glVertexAttribDivisor(5, 1);
+		glVertexAttribDivisor(6, 1);
+	}
+	else
+		glBufferSubData(GL_ARRAY_BUFFER, 0, data.size() * sizeof(glm::mat4), &data[0]);
+
+
+}
 #pragma endregion
 
 #pragma region Getters
@@ -100,6 +126,11 @@ vector<GLfloat>* Mesh::getVerticies()
 
 void Mesh::draw() {
 		glBindVertexArray(VAO); 
-	//	glDrawElements(GL_TRIANGLES, sizeof(GLuint)*indices->size(), GL_UNSIGNED_INT, 0);
-		glDrawElementsInstanced(GL_TRIANGLES, sizeof(GLuint)*indices->size(), GL_UNSIGNED_INT, 0,numPrims);
+#ifndef USE_INSTANCING
+	glDrawElements(GL_TRIANGLES, sizeof(GLuint)*indices->size(), GL_UNSIGNED_INT, 0);
+#else
+		glDrawElementsInstanced(GL_TRIANGLES, sizeof(GLuint)*indices->size(), GL_UNSIGNED_INT, 0, numPrims);
+
+#endif
+
 }

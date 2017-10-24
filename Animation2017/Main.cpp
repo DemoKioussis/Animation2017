@@ -25,8 +25,8 @@ This class right now just sets thigns up, ideally by the end of this it would be
 const unsigned int SCR_WIDTH = 1600;
 const unsigned int SCR_HEIGHT = 900;
 
-const int framerate = 60;
-const int physicsrate = 120;
+const int framerate = 30;
+const int physicsrate = 60;
 
 WindowManager* windowManager;
 Camera* camera;
@@ -135,7 +135,7 @@ int main()
 	Shader shaderProg("ShaderSources/vert.vs", "ShaderSources/frag.fs");
 
 	camera = new Camera(windowManager);
-	camera->translate(glm::vec3(0, 0, -10));
+	camera->translate(glm::vec3(0, 0, -100));
 
 	InputManager::setWindow(windowManager);
 	InputManager::setCamera(camera);
@@ -153,15 +153,17 @@ int main()
 
 	Mesh* mesh = makeMesh();
  	RenderEngine::getInstance()->addRenderReference(mesh);
-	int numX = 2;
-	int numY = 1;
-	int numZ = 1;
+	int numX = 50;
+	int numY = 50;
+	int numZ = 25;
+
+
 
 	float disp = 2.1f;
 	std::vector<Entity*> entities(0);
-	for (int x = 0; x < numX; x++) {
-		for (int y = 0; y < numY;y++) {
-			for (int z = 0; z < numZ;z++) {
+	for (int x = -numX/2; x < numX/2; x++) {
+		for (int y = -numY/2; y < numY/2;y++) {
+			for (int z = -numZ/2; z < numZ/2;z++) {
 				Entity* e = new Entity;
 				RenderComponent *r = new RenderComponent();
 				r->setMeshID(0);
@@ -204,7 +206,7 @@ int main()
 	{
 		float cosT = cosf(glfwGetTime()), sinT = sinf(glfwGetTime());
 		glm::mat4 view = camera->GetViewMatrix();
-	//	glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(1,1,1));
+		glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(1,1,1));
 		shaderProg.setMat4(viewLoc, view);
 	//	shaderProg.setMat4(modelLoc, model);
 
@@ -213,7 +215,7 @@ int main()
 		
 
 		PhysicsEngine::getInstance()->step();
-		CollisionEngine::getInstance()->step();
+	//	CollisionEngine::getInstance()->step();
 		
 		windowManager->frameTick();
 	}

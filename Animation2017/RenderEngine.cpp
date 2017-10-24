@@ -4,7 +4,6 @@
 #include "Shader.h"
 
 //bool RenderEngine::enabled = true;
-//std::vector<Renderable*> RenderEngine::renderReferences(0);
 
 RenderEngine* RenderEngine::instance = 0;
 
@@ -27,15 +26,17 @@ void RenderEngine::addComponent(Component* _renderComponent) {
 	sortedRenderCompoents[mesID]->push_back((RenderComponent*)_renderComponent);
 }
 void RenderEngine::drawRenderComponents() {
-//	for (int i = 0; i < targetComponents.size();i++) {
-//		Component* component = targetComponents[i];
-//		int meshID = ((RenderComponent*)component)->getMeshID();
-//		shader->setMat4(modelLoc,component->getTransform());
-//		renderReferences[meshID]->draw();
-//	}
-	
+#ifndef USE_INSTANCING
+
+	for (int i = 0; i < targetComponents.size();i++) {
+		Component* component = targetComponents[i];
+		int meshID = ((RenderComponent*)component)->getMeshID();
+		shader->setMat4(modelLoc,component->getTransform());
+		renderReferences[meshID]->draw();
+	}
 
 
+#else	
 	for (int i = 0; i < sortedRenderCompoents.size();i++) {
 		
 		vector<glm::mat4> data;
@@ -45,31 +46,13 @@ void RenderEngine::drawRenderComponents() {
 				data.push_back(trans);
 		}
 
-		glBindVertexArray(renderReferences[i]->VAO);
-		glBindBuffer(GL_ARRAY_BUFFER,renderReferences[i]->transformBuffer);
-		glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(glm::mat4), &data[0], GL_DYNAMIC_DRAW);
-
-		glEnableVertexAttribArray(3);
-		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
-		glEnableVertexAttribArray(4);
-		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
-		glEnableVertexAttribArray(5);
-		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
-		glEnableVertexAttribArray(6);
-		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
-
-	
-		glVertexAttribDivisor(3, 1);
-		glVertexAttribDivisor(4, 1);
-		glVertexAttribDivisor(5, 1);
-		glVertexAttribDivisor(6, 1);
-
+		renderReferences[i]->setBufferData(data);
 		renderReferences[i]->numPrims = sortedRenderCompoents[i]->size();
 	}
 	for (int i = 0; i < renderReferences.size();i++) {
 		renderReferences[i]->draw();
 	}
-	
+#endif
 }
 
 void RenderEngine::addRenderReference(Mesh * _renderReference) {

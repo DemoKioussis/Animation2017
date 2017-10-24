@@ -6,8 +6,10 @@
 
 #include <glm\gtx\matrix_operation.hpp>
 #include <glm\gtc\matrix_transform.hpp>
-
+#include <omp.h>
 #include <iostream>
+
+#define updateTime 1.0f/60.0f
 PhysicsEngine* PhysicsEngine::instance = 0;
 
 #pragma region initialization
@@ -17,7 +19,7 @@ PhysicsEngine* PhysicsEngine::instance = 0;
 	 PhysicsEngine * engine = new PhysicsEngine();
 	 instance = engine;
 	 instance->gravityEnabled = true;
-	 instance->updateTime = 1.0f / 60.0f;
+	// instance->updateTime = 1.0f / 60.0f;
 	 engine->enable();
 }
  PhysicsEngine * PhysicsEngine::getInstance() {
@@ -45,17 +47,20 @@ PhysicsEngine* PhysicsEngine::instance = 0;
 	 }
 
  }
-#pragma omp parallel for
+
 void PhysicsEngine::updatePhysics() {
+	#pragma omp parallel for
 	for (int i = 0; i < targetComponents.size();i++) {
+
 		PhysicsComponent* component = (PhysicsComponent*)targetComponents[i];
 		addGravity(component);
 		setAcceleration(component);
 		setVelocity(component);
 	}
 }
-#pragma omp parallel for
+
 void PhysicsEngine::applyPhysics() {
+	#pragma omp parallel for
 	for (int i = 0; i < targetComponents.size();i++) {
 		PhysicsComponent* component = (PhysicsComponent*)targetComponents[i];
 		energy(component);
