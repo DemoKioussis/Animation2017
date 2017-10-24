@@ -33,7 +33,7 @@ void CollisionEngine::step()
 
 void CollisionEngine::calculateUniqueIndicesAndFurthestDistances()
 {
-	std::vector<Renderable*>& allRenderables = RenderEngine::getInstance()->getAllRenderReferences();
+	std::vector<Mesh*>& allRenderables = RenderEngine::getInstance()->getAllRenderReferences();
 
 	for (int i = 0; i < targetComponents.size(); i++)
 	{
@@ -175,7 +175,7 @@ bool CollisionEngine::isSphereCollidingWithVertexObject(CollisionComponent * sph
 		return false;
 	}
 
-	std::vector<Renderable*>& allRenderables = RenderEngine::getInstance()->getAllRenderReferences();
+	std::vector<Mesh*>& allRenderables = RenderEngine::getInstance()->getAllRenderReferences();
 	Mesh* currentMesh = dynamic_cast<Mesh*>(allRenderables[vertexObjectRender->getMeshID()]);
 
 	if (currentMesh == nullptr)
@@ -210,7 +210,7 @@ bool CollisionEngine::areCollidingGJK(CollisionComponent * c1, CollisionComponen
 	//using namespace glm::gtx::random;
 
 	// Preparation for GJK
-	std::vector<Renderable*>& allRenderables = RenderEngine::getInstance()->getAllRenderReferences();
+	std::vector<Mesh*>& allRenderables = RenderEngine::getInstance()->getAllRenderReferences();
 
 	RenderComponent* renderC1 = (RenderComponent*)c1->entity->getComponent(RENDER_COMPONENT);
 	RenderComponent* renderC2 = (RenderComponent*)c2->entity->getComponent(RENDER_COMPONENT);

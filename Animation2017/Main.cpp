@@ -153,25 +153,32 @@ int main()
 
 	Mesh* mesh = makeMesh();
  	RenderEngine::getInstance()->addRenderReference(mesh);
-	int numEnts = 2;//00;
+	int numX = 2;
+	int numY = 1;
+	int numZ = 1;
+
 	float disp = 2.1f;
 	std::vector<Entity*> entities(0);
-	for (int i = 0; i < numEnts;i++) {
-		Entity* e = new Entity;
-		RenderComponent *r = new RenderComponent();
-		r->setMeshID(0);
-		PhysicsComponent* p = new PhysicsComponent();
-		CollisionComponent* c = new CollisionComponent(ColliderType::VERTICES);
-		e->addComponent(p);
-		e->addComponent(r);
-		e->addComponent(c);
-		glm::mat4 moment(1.0f);
-		moment*(1.0f / 12.0f) * (2.0f);
-		RenderEngine::getInstance()->addComponent(r);
-		PhysicsEngine::getInstance()->addComponent(p);
-		e->translation = glm::translate(e->translation, glm::vec3(-1, 0, 0)*(i *disp));		
-		CollisionEngine::getInstance()->addComponent(c);
-		entities.push_back(e);
+	for (int x = 0; x < numX; x++) {
+		for (int y = 0; y < numY;y++) {
+			for (int z = 0; z < numZ;z++) {
+				Entity* e = new Entity;
+				RenderComponent *r = new RenderComponent();
+				r->setMeshID(0);
+				PhysicsComponent* p = new PhysicsComponent();
+				CollisionComponent* c = new CollisionComponent(ColliderType::VERTICES);
+				e->addComponent(p);
+				e->addComponent(r);
+				e->addComponent(c);
+				glm::mat4 moment(1.0f);
+				moment*(1.0f / 12.0f) * (2.0f);
+				RenderEngine::getInstance()->addComponent(r);
+				PhysicsEngine::getInstance()->addComponent(p);
+				e->translation = glm::translate(e->translation, glm::vec3(x*disp, y*disp, z*disp));
+				CollisionEngine::getInstance()->addComponent(c);
+				entities.push_back(e);
+			}
+		}
 	}
 
 	CollisionEngine::getInstance()->calculateUniqueIndicesAndFurthestDistances(); // Important for u[datign the info about the collisions
@@ -195,10 +202,11 @@ int main()
 #pragma region mainLoop
 	while (windowManager->windowHasClosed())
 	{
-
+		float cosT = cosf(glfwGetTime()), sinT = sinf(glfwGetTime());
 		glm::mat4 view = camera->GetViewMatrix();
-
+	//	glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(1,1,1));
 		shaderProg.setMat4(viewLoc, view);
+	//	shaderProg.setMat4(modelLoc, model);
 
 		TimeSystem::update();
 		InputManager::processInput();

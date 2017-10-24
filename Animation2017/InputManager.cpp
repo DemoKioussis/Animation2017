@@ -107,7 +107,7 @@ void InputManager::processInput() {
 		for (int i = 0; i < Entities->size();i++) {
 			auto e = (Entities->at(i));
 			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
-			PhysicsEngine::getInstance()->addForce(p, -z*force*(float)(i + 1), y);
+			PhysicsEngine::getInstance()->addForce(p, -z*force*(float)(1), y);
 
 		}
 	}
@@ -115,7 +115,7 @@ void InputManager::processInput() {
 		for (int i = 0; i < Entities->size();i++) {
 			auto e = (Entities->at(i));
 			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
-			PhysicsEngine::getInstance()->addForce(p, z*force*(float)(i + 1), y);
+			PhysicsEngine::getInstance()->addForce(p, z*force*(float)(1), y);
 
 		}
 	}
@@ -123,14 +123,14 @@ void InputManager::processInput() {
 		for (int i = 0; i < Entities->size();i++) {
 			auto e = (Entities->at(i));
 			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
-			PhysicsEngine::getInstance()->addForce(p, x*force*(float)(i + 1), y);
+			PhysicsEngine::getInstance()->addForce(p, x*force*(float)( 1), y);
 		}
 	}
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_6) == GLFW_PRESS) {
 		for (int i = 0; i < Entities->size();i++) {
 			auto e = (Entities->at(i));
 			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
-			PhysicsEngine::getInstance()->addForce(p, -x*force*(float)(i + 1), y);
+			PhysicsEngine::getInstance()->addForce(p, -x*force*(float)( 1), y);
 		}
 	}
 
@@ -138,7 +138,7 @@ void InputManager::processInput() {
 		for (int i = 0; i < Entities->size();i++) {
 			auto e = (Entities->at(i));
 			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
-			PhysicsEngine::getInstance()->addForce(p, x*force*(float)(i + 1), z);
+			PhysicsEngine::getInstance()->addForce(p, x*force*(float)(1), z);
 
 		}
 	}
@@ -146,7 +146,7 @@ void InputManager::processInput() {
 		for (int i = 0; i < Entities->size();i++) {
 			auto e = (Entities->at(i));
 			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
-			PhysicsEngine::getInstance()->addForce(p, -x*force*(float)(i + 1), z);
+			PhysicsEngine::getInstance()->addForce(p, -x*force*(float)( 1), z);
 
 		}
 	}

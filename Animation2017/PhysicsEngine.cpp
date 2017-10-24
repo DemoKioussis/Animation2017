@@ -17,7 +17,7 @@ PhysicsEngine* PhysicsEngine::instance = 0;
 	 PhysicsEngine * engine = new PhysicsEngine();
 	 instance = engine;
 	 instance->gravityEnabled = true;
-	 instance->updateTime = 1.0f / 120.0f;
+	 instance->updateTime = 1.0f / 60.0f;
 	 engine->enable();
 }
  PhysicsEngine * PhysicsEngine::getInstance() {
@@ -45,6 +45,7 @@ PhysicsEngine* PhysicsEngine::instance = 0;
 	 }
 
  }
+#pragma omp parallel for
 void PhysicsEngine::updatePhysics() {
 	for (int i = 0; i < targetComponents.size();i++) {
 		PhysicsComponent* component = (PhysicsComponent*)targetComponents[i];
@@ -53,6 +54,7 @@ void PhysicsEngine::updatePhysics() {
 		setVelocity(component);
 	}
 }
+#pragma omp parallel for
 void PhysicsEngine::applyPhysics() {
 	for (int i = 0; i < targetComponents.size();i++) {
 		PhysicsComponent* component = (PhysicsComponent*)targetComponents[i];
@@ -68,8 +70,7 @@ void PhysicsEngine::applyPhysics() {
 
 #pragma region calculations
 void PhysicsEngine::addForce(PhysicsComponent* _component, glm::vec3 force,glm::vec3 position) {
-	//_component->netForce += force;
-	
+	_component->netForce += force;
 	_component->torque = glm::cross(position, force);
 }
 void PhysicsEngine::addGravity(PhysicsComponent* _component) {

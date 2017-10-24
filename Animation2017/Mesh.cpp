@@ -10,18 +10,22 @@ Mesh::Mesh() {
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
+	glGenBuffers(1, &transformBuffer);
 
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	
 
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0); // verts
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float))); // color
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float))); // norm
 	glEnableVertexAttribArray(2);
+
+
 
 	vertices = new std::vector<GLfloat>(0);
 	indices = new std::vector<GLuint>(0);
@@ -65,6 +69,7 @@ void Mesh::setVerticies(std::vector<GLfloat>& p, std::vector<GLfloat>& c, std::v
 void Mesh::setVerticies(std::vector<GLfloat>* v) {
 
 	glBindVertexArray(VAO);
+	glEnableVertexAttribArray(0);
 	glBufferData(GL_ARRAY_BUFFER, vertices->size() * sizeof(GLfloat), NULL, GL_STATIC_DRAW);
 	vertices = v;
 	glBufferData(GL_ARRAY_BUFFER, vertices->size() * sizeof(GLfloat), &vertices->front(), GL_STATIC_DRAW);
@@ -74,6 +79,7 @@ void Mesh::setVerticies(std::vector<GLfloat>* v) {
 }
 void Mesh::setIndices(std::vector<GLuint>* i) {
 	glBindVertexArray(VAO);
+
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*indices->size(), NULL, GL_STATIC_DRAW);
 	indices = i;
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*indices->size(), &indices->front(), GL_STATIC_DRAW);
@@ -94,7 +100,6 @@ vector<GLfloat>* Mesh::getVerticies()
 
 void Mesh::draw() {
 		glBindVertexArray(VAO); 
-		glDrawElements(GL_TRIANGLES, sizeof(GLuint)*indices->size(), GL_UNSIGNED_INT, 0);
-
-
+	//	glDrawElements(GL_TRIANGLES, sizeof(GLuint)*indices->size(), GL_UNSIGNED_INT, 0);
+		glDrawElementsInstanced(GL_TRIANGLES, sizeof(GLuint)*indices->size(), GL_UNSIGNED_INT, 0,numPrims);
 }

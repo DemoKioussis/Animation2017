@@ -4,11 +4,14 @@
 #include "Renderable.h"
 #include <glad\glad.h>
 using namespace std;
-class Mesh : public Renderable{
+class RenderEngine;
+class Mesh {
+	friend class RenderEngine;
 private:
 	vector<GLfloat>* vertices;
 	vector<GLuint>* indices;
-	GLuint VBO, VAO, EBO;
+	GLuint VBO, VAO, EBO, transformBuffer;
+	int numPrims;
 public:
 
 	Mesh();

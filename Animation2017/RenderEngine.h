@@ -1,17 +1,18 @@
 #pragma once
 #include "Engine.h"
 #include <glad\glad.h>
-class Renderable;
+class Mesh;
 class Shader;
+class RenderComponent;
 class RenderEngine : public Engine{
 
 public:
 	static void Initialize();
 	void setShader(Shader* _shader);
-	void addRenderReference(Renderable *_renderReference);
-	std::vector<Renderable*>& getAllRenderReferences();
-	std::vector<Renderable*> renderReferences;
-//	void addComponent(RenderComponent *_renderComponent);
+	void addRenderReference(Mesh *_renderReference);
+	std::vector<Mesh*>& getAllRenderReferences();
+	std::vector<Mesh*> renderReferences;
+	void addComponent(Component *_renderComponent);
 	void drawRenderComponents();
 	static RenderEngine * getInstance();
 private:
@@ -21,4 +22,6 @@ private:
 	GLuint viewLoc;
 	GLuint modelLoc;
 	void draw(int _renderIndex);
+
+	std::vector<std::vector<RenderComponent*>*> sortedRenderCompoents;
 };
