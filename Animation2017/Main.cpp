@@ -15,6 +15,9 @@
 
 #include "PhysicsEngine.h"
 #include "PhysicsComponent.h"
+
+#include "CollisionEngine.h"
+#include "CollisionComponent.h"
 /**
 This class right now just sets thigns up, ideally by the end of this it would be a list of settings and nothing else
 */
@@ -22,8 +25,8 @@ This class right now just sets thigns up, ideally by the end of this it would be
 const unsigned int SCR_WIDTH = 1600;
 const unsigned int SCR_HEIGHT = 900;
 
-const int framerate = 60;
-const int physicsrate = 120;
+const int framerate = 30;
+const int physicsrate = 60;
 
 WindowManager* windowManager;
 Camera* camera;
@@ -34,6 +37,7 @@ Mesh* makeMesh(char* objName) {
 #pragma region MeshStuff
 
 	// to load into vectors
+
 
 
 	//GLfloat vertices[] = {
@@ -116,7 +120,6 @@ Mesh* makeMesh(char* objName) {
 	//}
 
 
-
 	Mesh*m = new Mesh();
 	vector<GLfloat> positionTest;
 	vector<GLfloat> colourTest = { 0.50f,0.5,0.5 };
@@ -145,7 +148,7 @@ int main()
 	Shader shaderProg("ShaderSources/vert.vs", "ShaderSources/frag.fs");
 
 	camera = new Camera(windowManager);
-	camera->translate(glm::vec3(0, 0, -10));
+	camera->translate(glm::vec3(0, 0, -100));
 
 	InputManager::setWindow(windowManager);
 	InputManager::setCamera(camera);
@@ -157,26 +160,43 @@ int main()
 	PhysicsEngine::Initialize();
 	PhysicsEngine::getInstance()->setGravity(glm::vec3(0, -1, 0),0);
 
+	CollisionEngine::Initialize();
+
 #pragma endregion
 
 	Mesh* mesh = makeMesh("sphere.obj");
  	RenderEngine::getInstance()->addRenderReference(mesh);
-	int numEnts = 3;
-	float disp = 5.0f;
-	std::vector<Entity*> entities(0);
-	for (int i = 0; i < numEnts;i++) {
-		Entity* e = new Entity;
-		RenderComponent *r = new RenderComponent();
-		r->setMeshID(0);
-		PhysicsComponent* p = new PhysicsComponent();
-		e->addComponent(p);
-		e->addComponent(r);
-		RenderEngine::getInstance()->addComponent(r);
-		PhysicsEngine::getInstance()->addComponent(p);
-		e->translation = glm::translate(e->translation, glm::vec3(-1, 0, 0)*(i *disp));
-		entities.push_back(e);
+	int numX = 5;
+	int numY = 5;
+	int numZ = 5;
 
+
+
+	float disp = 2.1f;
+	std::vector<Entity*> entities(0);
+	for (int x = -numX/2; x < numX/2; x++) {
+		for (int y = -numY/2; y < numY/2;y++) {
+			for (int z = -numZ/2; z < numZ/2;z++) {
+				Entity* e = new Entity;
+				RenderComponent *r = new RenderComponent();
+				r->setMeshID(0);
+				PhysicsComponent* p = new PhysicsComponent();
+				CollisionComponent* c = new CollisionComponent(ColliderType::VERTICES);
+				e->addComponent(p);
+				e->addComponent(r);
+				e->addComponent(c);
+				glm::mat4 moment(1.0f);
+				moment*(1.0f / 12.0f) * (2.0f);
+				RenderEngine::getInstance()->addComponent(r);
+				PhysicsEngine::getInstance()->addComponent(p);
+				e->translation = glm::translate(e->translation, glm::vec3(x*disp, y*disp, z*disp));
+				CollisionEngine::getInstance()->addComponent(c);
+				entities.push_back(e);
+			}
+		}
 	}
+
+	CollisionEngine::getInstance()->calculateUniqueIndicesAndFurthestDistances(); // Important for u[datign the info about the collisions
 
 	InputManager::Entities = &entities;
 	glm::mat4 rotation(1.0f), projection;
@@ -193,20 +213,22 @@ int main()
 	shaderProg.setVec3("ambientLight", glm::vec3(1.0f, 1.0f, 1.0f));
 	float cosT = 0, sinT = 0;
 
+
 #pragma region mainLoop
 	while (windowManager->windowHasClosed())
 	{
-
+		float cosT = cosf(glfwGetTime()), sinT = sinf(glfwGetTime());
 		glm::mat4 view = camera->GetViewMatrix();
-
+		glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(1,1,1));
 		shaderProg.setMat4(viewLoc, view);
+	//	shaderProg.setMat4(modelLoc, model);
 
 		TimeSystem::update();
 		InputManager::processInput();
 		
 
 		PhysicsEngine::getInstance()->step();
-
+	//	CollisionEngine::getInstance()->step();
 		
 		windowManager->frameTick();
 	}

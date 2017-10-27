@@ -71,85 +71,7 @@ void InputManager::key_callback(GLFWwindow* window, int key, int scancode, int a
 			PhysicsEngine::getInstance()->enable();
 
 	}
-	float rotateSpeed = 0.5f;
-	glm::vec3 x(1, 0, 0);
-	glm::vec3 z(0, 0, 1);
-	glm::vec3 y(0, 1, 0);
-	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_5) == GLFW_PRESS) {
-		for (int i = 0; i < Entities->size();i++) {
-			auto e = (Entities->at(i)); 
-			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
 
-			if (i == 0)
-				p->addAngularVelocity(-x, rotateSpeed);
-			if (i == 1)
-				p->addAngularVelocity2(-x, rotateSpeed);
-			if (i == 2)
-				p->addAngularVelocity3(-x, rotateSpeed);
-		}
-	}
-	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_8) == GLFW_PRESS) {
-		for (int i = 0; i < Entities->size();i++) {
-			auto e = (Entities->at(i));
-			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
-			if (i == 0)
-				p->addAngularVelocity(x, rotateSpeed);
-			if(i == 1)
-				p->addAngularVelocity2(x, rotateSpeed);
-			if(i == 2)
-				p->addAngularVelocity3(x,rotateSpeed);
-		}
-	}
-	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_4) == GLFW_PRESS) {
-		for (int i = 0; i < Entities->size();i++) {
-			auto e = (Entities->at(i));
-			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
-			if (i == 0)
-				p->addAngularVelocity(-z, rotateSpeed);
-			if (i == 1)
-				p->addAngularVelocity2(-z, rotateSpeed);
-			if (i == 2)
-				p->addAngularVelocity3(-z, rotateSpeed);
-		}
-	}
-	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_6) == GLFW_PRESS) {
-		for (int i = 0; i < Entities->size();i++) {
-			auto e = (Entities->at(i));
-			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
-			if (i == 0)
-				p->addAngularVelocity(z, rotateSpeed);
-			if (i == 1)
-				p->addAngularVelocity2(z, rotateSpeed);
-			if (i == 2)
-				p->addAngularVelocity3(z, rotateSpeed);
-
-		}
-	}
-
-	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_9) == GLFW_PRESS) {
-		for (int i = 0; i < Entities->size();i++) {
-			auto e = (Entities->at(i));
-			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
-			if (i == 0)
-				p->addAngularVelocity(y, rotateSpeed);
-			if (i == 1)
-				p->addAngularVelocity2(y, rotateSpeed);
-			if (i == 2)
-				p->addAngularVelocity3(y, rotateSpeed);
-		}
-	}
-	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_7) == GLFW_PRESS) {
-		for (int i = 0; i < Entities->size();i++) {
-			auto e = (Entities->at(i));
-			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
-			if (i == 0)
-				p->addAngularVelocity(-y, rotateSpeed);
-			if (i == 1)
-				p->addAngularVelocity2(-y, rotateSpeed);
-			if (i == 2)
-				p->addAngularVelocity3(-y, rotateSpeed);
-		}
-	}
 }
 
 void InputManager::setCamera(Camera* c) {
@@ -177,6 +99,57 @@ void InputManager::processInput() {
 	}
 	else
 		std::cout << "Cannot process input - no window" << std::endl;
+	float force = 0.010f;
+	glm::vec3 x(10, 0, 0);
+	glm::vec3 y(0, 10, 0);
+	glm::vec3 z(0, 0, 10);
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_5) == GLFW_PRESS) {
+		for (int i = 0; i < Entities->size();i++) {
+			auto e = (Entities->at(i));
+			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
+			PhysicsEngine::getInstance()->addForce(p, -z*force*(float)(1), y);
+
+		}
+	}
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_8) == GLFW_PRESS) {
+		for (int i = 0; i < Entities->size();i++) {
+			auto e = (Entities->at(i));
+			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
+			PhysicsEngine::getInstance()->addForce(p, z*force*(float)(1), y);
+
+		}
+	}
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_4) == GLFW_PRESS) {
+		for (int i = 0; i < Entities->size();i++) {
+			auto e = (Entities->at(i));
+			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
+			PhysicsEngine::getInstance()->addForce(p, x*force*(float)( 1), y);
+		}
+	}
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_6) == GLFW_PRESS) {
+		for (int i = 0; i < Entities->size();i++) {
+			auto e = (Entities->at(i));
+			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
+			PhysicsEngine::getInstance()->addForce(p, -x*force*(float)( 1), y);
+		}
+	}
+
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_9) == GLFW_PRESS) {
+		for (int i = 0; i < Entities->size();i++) {
+			auto e = (Entities->at(i));
+			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
+			PhysicsEngine::getInstance()->addForce(p, x*force*(float)(1), z);
+
+		}
+	}
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_7) == GLFW_PRESS) {
+		for (int i = 0; i < Entities->size();i++) {
+			auto e = (Entities->at(i));
+			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
+			PhysicsEngine::getInstance()->addForce(p, -x*force*(float)( 1), z);
+
+		}
+	}
 }
 
 void InputManager::processCameraInput() {

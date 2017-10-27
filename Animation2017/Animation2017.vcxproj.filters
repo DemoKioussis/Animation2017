@@ -78,8 +78,8 @@
     <ClCompile Include="PhysicsEngine.cpp">
       <Filter>Source Files\Engines</Filter>
     </ClCompile>
-    <ClCompile Include="objloader.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="CollisionEngine.cpp">
+      <Filter>Source Files\Engines</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -131,8 +131,11 @@
     <ClInclude Include="Engine.h">
       <Filter>Header Files\Engines</Filter>
     </ClInclude>
-    <ClInclude Include="objloader.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="CollisionComponent.h">
+      <Filter>Header Files\Entity-Component\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionEngine.h">
+      <Filter>Header Files\Engines</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

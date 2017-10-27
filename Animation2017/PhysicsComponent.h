@@ -18,7 +18,7 @@ private:
 	glm::vec3 angularVelocity;
 	glm::vec3 angularAcceleration;
 	glm::vec3 torque;
-	glm::mat3 momentOfInertia;
+	glm::mat4 momentOfInertia;
 
 
 	float kineticEnergy; // 1/2 mv^2
@@ -36,14 +36,14 @@ public:
 		componentType = PHYSICS_COMPONENT;
 		mass = 1;
 		gravityMultiplyer = 1;
-	//	setAngularVelocity(glm::vec3(0), 0);
+		setMomentOfInertia(glm::mat4(1.0f));
 	};
 	~PhysicsComponent() {};
 
 	void setMass(float _mass) {
 		mass = _mass;
 	}
-	void setMomentOfInertia(glm::mat3 _moment) {
+	void setMomentOfInertia(glm::mat4 _moment) {
 		momentOfInertia = _moment;
 	}
 	void setGravityMultiply(float _multiplyer) {
@@ -77,7 +77,6 @@ public:
 	void addAngularVelocity3(glm::vec3 _axis, float _vel) {
 		glm::vec4 w = glm::vec4(glm::normalize(_axis) * _vel, 0);
 		glm::vec4 r = w;
-
 		angularVelocity += glm::vec3(r.x, r.y, r.z);
 	}
 

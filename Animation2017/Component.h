@@ -2,7 +2,7 @@
 #include <glm\glm.hpp>
 enum ComponentType
 {
-	COMPONENT,RENDER_COMPONENT,PHYSICS_COMPONENT
+	COMPONENT,RENDER_COMPONENT,PHYSICS_COMPONENT, COLLISION_COMPONENT
 };
 
 class Component {
@@ -24,6 +24,7 @@ public:
 	const bool isEnabled();
 	glm::mat4 & getTransform();
 	glm::mat4 & getRotation();
+	glm::mat4 & getInverseRotation();
 	glm::mat4 & getTranslation();
 
 

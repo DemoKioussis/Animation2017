@@ -9,18 +9,22 @@ Mesh::Mesh() {
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
+	glGenBuffers(1, &transformBuffer);
 
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0); // verts
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float))); // color
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float))); // norm
 	glEnableVertexAttribArray(2);
+
+
 
 	vertices = new std::vector<GLfloat>(0);
 	indices = new std::vector<GLuint>(0);
@@ -140,6 +144,7 @@ void Mesh::setVerticiesStaticColour(std::vector<GLfloat>& p, std::vector<GLfloat
 void Mesh::setVerticies(std::vector<GLfloat>* v) {
 
 	glBindVertexArray(VAO);
+	glEnableVertexAttribArray(0);
 	glBufferData(GL_ARRAY_BUFFER, vertices->size() * sizeof(GLfloat), NULL, GL_STATIC_DRAW);
 	vertices = v;
 	glBufferData(GL_ARRAY_BUFFER, vertices->size() * sizeof(GLfloat), &vertices->front(), GL_STATIC_DRAW);
@@ -148,20 +153,64 @@ void Mesh::setVerticies(std::vector<GLfloat>* v) {
 
 }
 void Mesh::setIndices(std::vector<GLuint>* i) {
+
 	//glBindVertexArray(VAO);
 	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*indices->size(), NULL, GL_STATIC_DRAW);
+
 	indices = i;
 	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*indices->size(), &indices->front(), GL_STATIC_DRAW);
 
 	//	glBindVertexArray(0);
 }
 
+void Mesh::setBufferData(vector<glm::mat4> & data) {
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER,transformBuffer);
+	if (numPrims < data.size()) {
+		glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(glm::mat4), &data[0],GL_DYNAMIC_DRAW);
+
+		glEnableVertexAttribArray(3);
+		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
+		glEnableVertexAttribArray(4);
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
+		glEnableVertexAttribArray(5);
+		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+		glEnableVertexAttribArray(6);
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+
+
+		glVertexAttribDivisor(3, 1);
+		glVertexAttribDivisor(4, 1);
+		glVertexAttribDivisor(5, 1);
+		glVertexAttribDivisor(6, 1);
+	}
+	else
+		glBufferSubData(GL_ARRAY_BUFFER, 0, data.size() * sizeof(glm::mat4), &data[0]);
+
+
+}
+#pragma endregion
+
+#pragma region Getters
+
+vector<GLfloat>* Mesh::getVerticies()
+{
+	return vertices;
+}
+
 #pragma endregion
 
 void Mesh::draw() {
 		glBindVertexArray(VAO); 
-		glDrawArrays(GL_TRIANGLES, 0, vertices->size());
+		//glDrawArrays(GL_TRIANGLES, 0, vertices->size());
 		//glDrawElements(GL_TRIANGLES, sizeof(GLuint)*indices->size(), GL_UNSIGNED_INT, 0);
+#ifndef USE_INSTANCING
+	//glDrawElements(GL_TRIANGLES, sizeof(GLuint)*indices->size(), GL_UNSIGNED_INT, 0);
+	glDrawArrays(GL_TRIANGLES, 0, vertices->size());
+#else
+	//	glDrawArrays(GL_TRIANGLES, 0, vertices->size());
+	glDrawArraysInstanced(GL_TRIANGLES,  0, sizeof(GLfloat)*vertices->size(), numPrims);
 
+#endif
 
 }
