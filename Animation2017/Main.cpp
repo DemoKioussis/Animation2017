@@ -4,7 +4,7 @@
 #include "Camera.h"
 #include "InputManager.h"
 #include <iostream>
-
+#include "objloader.hpp"
 #include "TimeSystem.h"
 
 #include <glm/glm.hpp>
@@ -29,95 +29,108 @@ WindowManager* windowManager;
 Camera* camera;
 
 float modelScale = 1.0f;
-Mesh* makeMesh() {
+Mesh* makeMesh(char* objName) {
 
 #pragma region MeshStuff
 
 	// to load into vectors
 
 
-	GLfloat vertices[] = {
-		// verticies	/				/color					//normals
-		//back
-		-modelScale,-modelScale,-modelScale,		0.50f, 0.5, 0.5,		 0,0,-1 		//back left
-		,modelScale,-modelScale,-modelScale,		0.50f, 0.5, 0.5,		 0,0,-1		//back right
-		,modelScale,modelScale,-modelScale,			0.50f, 0.5, 0.5,		 0,0,-1		//front right
-		,-modelScale,modelScale,-modelScale,		0.50f, 0.5, 0.5,		 0,0,-1		//front left
+	//GLfloat vertices[] = {
+	//	// verticies	/				/color					//normals
+	//	//back
+	//	-modelScale,-modelScale,-modelScale,		0.50f, 0.5, 0.5,		 0,0,-1 		//back left
+	//	,modelScale,-modelScale,-modelScale,		0.50f, 0.5, 0.5,		 0,0,-1		//back right
+	//	,modelScale,modelScale,-modelScale,			0.50f, 0.5, 0.5,		 0,0,-1		//front right
+	//	,-modelScale,modelScale,-modelScale,		0.50f, 0.5, 0.5,		 0,0,-1		//front left
 
-		//front
-		,-modelScale,-modelScale,modelScale,			0.50f, 0.5, 0.5,	 0,0,1 		//back left
-		,modelScale,-modelScale,modelScale,			0.50f, 0.5, 0.5,		 0,0,1		//back right
-		,modelScale,modelScale,modelScale,			0.50f, 0.5, 0.5,		 0,0,1		//front right
-		,-modelScale,modelScale,modelScale,			0.50f, 0.5, 0.5,		 0,0,1		//front left
+	//	//front
+	//	,-modelScale,-modelScale,modelScale,			0.50f, 0.5, 0.5,	 0,0,1 		//back left
+	//	,modelScale,-modelScale,modelScale,			0.50f, 0.5, 0.5,		 0,0,1		//back right
+	//	,modelScale,modelScale,modelScale,			0.50f, 0.5, 0.5,		 0,0,1		//front right
+	//	,-modelScale,modelScale,modelScale,			0.50f, 0.5, 0.5,		 0,0,1		//front left
 
-		//left
-		,-modelScale,-modelScale,-modelScale,		0.50f, 0.5, 0.5,		 -1,0,0 		//back left
-		,-modelScale,-modelScale,modelScale,		0.50f, 0.5, 0.5,		 -1,0,0		//back right
-		,-modelScale,modelScale,modelScale,			0.50f, 0.5, 0.5,		 -1,0,0		//front right
-		,-modelScale,modelScale,-modelScale,		0.50f, 0.5, 0.5,		 -1,0,0		//front left
-		//right
-		,modelScale,-modelScale,-modelScale,		0.50f, 0.5, 0.5,		 1,0,0 		//back left
-		,modelScale,-modelScale,modelScale,			0.50f, 0.5, 0.5,		 1,0,0		//back right
-		,modelScale,modelScale,modelScale,			0.50f, 0.5, 0.5,		 1,0,0		//front right
-		,modelScale,modelScale,-modelScale,			0.50f, 0.5, 0.5,		 1,0,0		//front left
+	//	//left
+	//	,-modelScale,-modelScale,-modelScale,		0.50f, 0.5, 0.5,		 -1,0,0 		//back left
+	//	,-modelScale,-modelScale,modelScale,		0.50f, 0.5, 0.5,		 -1,0,0		//back right
+	//	,-modelScale,modelScale,modelScale,			0.50f, 0.5, 0.5,		 -1,0,0		//front right
+	//	,-modelScale,modelScale,-modelScale,		0.50f, 0.5, 0.5,		 -1,0,0		//front left
+	//	//right
+	//	,modelScale,-modelScale,-modelScale,		0.50f, 0.5, 0.5,		 1,0,0 		//back left
+	//	,modelScale,-modelScale,modelScale,			0.50f, 0.5, 0.5,		 1,0,0		//back right
+	//	,modelScale,modelScale,modelScale,			0.50f, 0.5, 0.5,		 1,0,0		//front right
+	//	,modelScale,modelScale,-modelScale,			0.50f, 0.5, 0.5,		 1,0,0		//front left
 
-		//TOP
-		,-modelScale,modelScale,-modelScale,		0.50f, 0.5, 0.5,		 0,1,0 		//back left
-		,-modelScale,modelScale,modelScale,			0.50f, 0.5, 0.5,		 0,1,0		//back right
-		,modelScale,modelScale,modelScale,			0.50f, 0.5, 0.5,		 0,1,0		//front right
-		,modelScale,modelScale,-modelScale,			0.50f, 0.5, 0.5,		 0,1,0		//front left
+	//	//TOP
+	//	,-modelScale,modelScale,-modelScale,		0.50f, 0.5, 0.5,		 0,1,0 		//back left
+	//	,-modelScale,modelScale,modelScale,			0.50f, 0.5, 0.5,		 0,1,0		//back right
+	//	,modelScale,modelScale,modelScale,			0.50f, 0.5, 0.5,		 0,1,0		//front right
+	//	,modelScale,modelScale,-modelScale,			0.50f, 0.5, 0.5,		 0,1,0		//front left
 
-		//BOTTOM
-		,-modelScale,-modelScale,-modelScale,		0.50f, 0.5, 0.5,		 0,-1,0	//back left
-		,-modelScale,-modelScale,modelScale,		0.50f, 0.5, 0.5,		 0,-1,0	//back right
-		,modelScale,-modelScale,modelScale,			0.50f, 0.5, 0.5,		 0,-1,0	//front right
-		,modelScale,-modelScale,-modelScale,		0.50f, 0.5, 0.5,		 0,-1,0	//front left
+	//	//BOTTOM
+	//	,-modelScale,-modelScale,-modelScale,		0.50f, 0.5, 0.5,		 0,-1,0	//back left
+	//	,-modelScale,-modelScale,modelScale,		0.50f, 0.5, 0.5,		 0,-1,0	//back right
+	//	,modelScale,-modelScale,modelScale,			0.50f, 0.5, 0.5,		 0,-1,0	//front right
+	//	,modelScale,-modelScale,-modelScale,		0.50f, 0.5, 0.5,		 0,-1,0	//front left
 
-	};
+	//};
 
-	GLuint indices[] = {  // note that we start from 0!
-		0,1,2
-		,2,3,0
+	//GLuint indices[] = {  // note that we start from 0!
+	//	0,1,2
+	//	,2,3,0
 
-		,4,5,6
-		,6,7,4
+	//	,4,5,6
+	//	,6,7,4
 
-		,8,9,10
-		,10,11,8
+	//	,8,9,10
+	//	,10,11,8
 
-		,12,13,14
-		,14,15,12
+	//	,12,13,14
+	//	,14,15,12
 
-		,16,17,18
-		,18,19,16
+	//	,16,17,18
+	//	,18,19,16
 
-		,20,21,22
-		,22,23,20	
+	//	,20,21,22
+	//	,22,23,20	
 
-	};
+	//};
 
-	std::vector<GLfloat> positions(0), colors(0), normals(0);
-	std::vector<GLuint>* inds= new std::vector<GLuint>(0);
-	for (int i = 0; i < sizeof(vertices) / sizeof(GLfloat); i += 9) {
-		positions.push_back(vertices[i]);
-		positions.push_back(vertices[i + 1]);
-		positions.push_back(vertices[i + 2]);
+	//std::vector<GLfloat> positions(0), colors(0), normals(0);
+	//std::vector<GLuint>* inds= new std::vector<GLuint>(0);
+	//for (int i = 0; i < sizeof(vertices) / sizeof(GLfloat); i += 9) {
+	//	positions.push_back(vertices[i]);
+	//	positions.push_back(vertices[i + 1]);
+	//	positions.push_back(vertices[i + 2]);
 
-		colors.push_back(vertices[i + 3]);
-		colors.push_back(vertices[i + 4]);
-		colors.push_back(vertices[i + 5]);
+	//	colors.push_back(vertices[i + 3]);
+	//	colors.push_back(vertices[i + 4]);
+	//	colors.push_back(vertices[i + 5]);
 
-		normals.push_back(vertices[i + 6]);
-		normals.push_back(vertices[i + 7]);
-		normals.push_back(vertices[i + 8]);
-	}
-	for (int i = 0; i < sizeof(indices) / sizeof(GLuint); i++) {
-		inds->push_back(indices[i]);
-	}
+	//	normals.push_back(vertices[i + 6]);
+	//	normals.push_back(vertices[i + 7]);
+	//	normals.push_back(vertices[i + 8]);
+	//}
+	//for (int i = 0; i < sizeof(indices) / sizeof(GLuint); i++) {
+	//	inds->push_back(indices[i]);
+	//}
+
+
 
 	Mesh*m = new Mesh();
-	m->setVerticies(positions, colors, normals);
-	m->setIndices(inds);
+	vector<GLfloat> positionTest;
+	vector<GLfloat> colourTest = { 0.50f,0.5,0.5 };
+	vector<GLfloat> normalsTest;
+	vector<GLuint> indicesTest;
+	char pathfile[100];
+	strcpy_s(pathfile, "Models/");
+	strcat_s(pathfile, objName);
+	loadOBJNoUV(pathfile, positionTest, normalsTest, indicesTest);
+	m->setVerticiesStaticColour(positionTest, colourTest,normalsTest);
+	m->setIndices(&indicesTest);
+
+	//m->setVerticies(positions, colors, normals);
+	//m->setIndices(inds);
 	return m;
 }
 int main()
@@ -146,7 +159,7 @@ int main()
 
 #pragma endregion
 
-	Mesh* mesh = makeMesh();
+	Mesh* mesh = makeMesh("sphere.obj");
  	RenderEngine::getInstance()->addRenderReference(mesh);
 	int numEnts = 3;
 	float disp = 5.0f;

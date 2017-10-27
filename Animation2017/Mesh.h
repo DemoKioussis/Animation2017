@@ -15,6 +15,8 @@ public:
 	~Mesh();
 
 	void setVerticies(vector<GLfloat>& p, vector<GLfloat>& c, vector<GLfloat>& n);
+	void setVerticiesStaticColour(std::vector<GLfloat> &p, std::vector<GLfloat> &c, std::vector<GLfloat> &n);
+	//void setVerticiesStaticColour(std::vector<GLfloat>& p, std::vector<GLfloat>& c);
 	void setVerticies(vector<GLfloat>* v);
 	void setIndices(vector<GLuint>* i);
 	void draw();

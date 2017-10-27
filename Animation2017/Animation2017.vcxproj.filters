@@ -78,6 +78,9 @@
     <ClCompile Include="PhysicsEngine.cpp">
       <Filter>Source Files\Engines</Filter>
     </ClCompile>
+    <ClCompile Include="objloader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mesh.h">
@@ -127,6 +130,9 @@
     </ClInclude>
     <ClInclude Include="Engine.h">
       <Filter>Header Files\Engines</Filter>
+    </ClInclude>
+    <ClInclude Include="objloader.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
