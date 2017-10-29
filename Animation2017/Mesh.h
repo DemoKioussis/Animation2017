@@ -3,6 +3,7 @@
 #include <glm\glm.hpp>
 #include "Renderable.h"
 #include <glad\glad.h>
+#include "objloader.hpp"
 
 #define USE_INSTANCING
 
@@ -18,6 +19,7 @@ private:
 public:
 
 	Mesh();
+	Mesh(char* objName);
 	~Mesh();
 
 	void setVerticies(vector<GLfloat>& p, vector<GLfloat>& c, vector<GLfloat>& n);
@@ -28,4 +30,5 @@ public:
 	void setBufferData(vector<glm::mat4> & data);
 	vector<GLfloat>* getVerticies();
 	void draw();
+	void Mesh::makeMesh(char* objName);
 };

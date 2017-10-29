@@ -30,6 +30,33 @@ Mesh::Mesh() {
 	indices = new std::vector<GLuint>(0);
 
 }
+
+Mesh::Mesh(char* objName) {
+
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &EBO);
+	glGenBuffers(1, &transformBuffer);
+
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
+
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0); // verts
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float))); // color
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float))); // norm
+	glEnableVertexAttribArray(2);
+
+
+
+	vertices = new std::vector<GLfloat>(0);
+	indices = new std::vector<GLuint>(0);
+	makeMesh(objName);
+}
 Mesh::~Mesh() {
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
@@ -213,4 +240,27 @@ void Mesh::draw() {
 
 #endif
 
+}
+
+
+void Mesh::makeMesh(char* objName) {
+
+
+	//Mesh*m = new Mesh();
+	vector<GLfloat> positionTest;
+	vector<GLfloat> colourTest = { 0.50f,0.5,0.5 };
+	vector<GLfloat> normalsTest;
+	vector<GLuint> indicesTest;
+	char pathfile[100];
+	strcpy_s(pathfile, "Models/");
+	strcat_s(pathfile, objName);
+	loadOBJNoUV(pathfile, positionTest, normalsTest, indicesTest);
+	//m->setVerticiesStaticColour(positionTest, colourTest, normalsTest);
+	//m->setIndices(&indicesTest);
+	setVerticiesStaticColour(positionTest, colourTest, normalsTest);
+	setIndices(&indicesTest);
+
+	//m->setVerticies(positions, colors, normals);
+	//m->setIndices(inds);
+	;
 }
