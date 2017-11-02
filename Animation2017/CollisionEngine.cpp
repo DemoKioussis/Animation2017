@@ -26,9 +26,11 @@ CollisionEngine * CollisionEngine::getInstance()
 }
 
 void CollisionEngine::step()
-{
-	// Just for testing the areSpheresColliding() method
-	//areColliding((CollisionComponent*)targetComponents[0], (CollisionComponent*)targetComponents[1]);
+{	
+	if (isEnabled()) {
+		// Just for testing the areSpheresColliding() method
+		//areColliding((CollisionComponent*)targetComponents[0], (CollisionComponent*)targetComponents[1]);
+	}
 }
 
 void CollisionEngine::calculateUniqueIndicesAndFurthestDistances()

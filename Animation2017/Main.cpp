@@ -24,8 +24,7 @@ This class right now just sets thigns up, ideally by the end of this it would be
 const unsigned int SCR_WIDTH = 1600;
 const unsigned int SCR_HEIGHT = 900;
 
-const int framerate = 30;
-const int physicsrate = 60;
+const int framerate = 120;
 
 WindowManager* windowManager;
 Camera* camera;
@@ -157,7 +156,7 @@ int main()
 	RenderEngine::getInstance()->setShader(&shaderProg);
 
 	PhysicsEngine::Initialize();
-	PhysicsEngine::getInstance()->setGravity(glm::vec3(0, -1, 0),0);
+	PhysicsEngine::getInstance()->setGravity(glm::vec3(0, -1, 0),1);
 
 	CollisionEngine::Initialize();
 
@@ -196,7 +195,7 @@ int main()
 		}
 	}
 
-	CollisionEngine::getInstance()->calculateUniqueIndicesAndFurthestDistances(); // Important for u[datign the info about the collisions
+	CollisionEngine::getInstance()->calculateUniqueIndicesAndFurthestDistances(); // Important for updating the info about the collisions
 
 	InputManager::Entities = &entities;
 	glm::mat4 rotation(1.0f), projection;
@@ -213,6 +212,7 @@ int main()
 	shaderProg.setVec3("ambientLight", glm::vec3(1.0f, 1.0f, 1.0f));
 	float cosT = 0, sinT = 0;
 
+	 
 
 #pragma region mainLoop
 	while (windowManager->windowHasClosed())
@@ -223,12 +223,9 @@ int main()
 		shaderProg.setMat4(viewLoc, view);
 	//	shaderProg.setMat4(modelLoc, model);
 
-		TimeSystem::update();
-		InputManager::processInput();
+		TimeSystem::update();				
 		
-
 		PhysicsEngine::getInstance()->step();
-	//	CollisionEngine::getInstance()->step();
 		
 		windowManager->frameTick();
 	}
