@@ -15,12 +15,16 @@ GJK::GJK(CollisionComponent & cc1, CollisionComponent & cc2) : c1(cc1), c2(cc2),
 	transform2I = glm::inverse(transform2);
 
 	Mesh* mesh1 = allRenderables[render1->getMeshID()];
-	indices1 = &CollisionEngine::getInstance()->getCollisionData()[render1->getMeshID()].uniqueVerticesIndices;
+	collisionData1 = &CollisionEngine::getInstance()->getCollisionData()[render1->getMeshID()];
+	indices1 = &collisionData1->uniqueVerticesIndices;
 	vertices1 = mesh1->getVerticies();
+	meshType1 = mesh1->getMeshType();
 
 	Mesh* mesh2 = allRenderables[render2->getMeshID()];
-	indices2 = &CollisionEngine::getInstance()->getCollisionData()[render2->getMeshID()].uniqueVerticesIndices;
+	collisionData2 = &CollisionEngine::getInstance()->getCollisionData()[render2->getMeshID()];
+	indices2 = &collisionData2->uniqueVerticesIndices;
 	vertices2 = mesh2->getVerticies();
+	meshType2 = mesh2->getMeshType();
 }
 
 bool GJK::areColliding()
@@ -84,12 +88,8 @@ glm::vec3 GJK::support(glm::vec3& directionWC)
 	vec3 directionOC2 = transform2I * vec4(-directionWC, 0);
 	vec3 directionOC2normalized = glm::normalize(directionOC2);
 
-	int index1 = -1;
-	int index2 = -1;
-	vec3 furthestOC1 = furthestPointInDirection1(directionOC1normalized, index1);
-	vec3 furthestOC2 = furthestPointInDirection2(directionOC2normalized, index2);
-	ignoreIndices1.insert(index1);
-	ignoreIndices2.insert(index2);
+	vec3 furthestOC1 = (meshType1 == MeshType::VERTICES) ? furthestPointInDirectionVertex(directionOC1normalized, *vertices1, *indices1) : furthestPointInDirectionSphere(directionOC1normalized, collisionData1);
+	vec3 furthestOC2 = (meshType2 == MeshType::VERTICES) ? furthestPointInDirectionVertex(directionOC2normalized, *vertices2, *indices2) : furthestPointInDirectionSphere(directionOC2normalized, collisionData2);
 
 	vec3 furthestWC1 = transform1 * vec4(furthestOC1, 1);
 	vec3 furthestWC2 = transform2 * vec4(furthestOC2, 1);
@@ -97,19 +97,14 @@ glm::vec3 GJK::support(glm::vec3& directionWC)
 	return  furthestWC1 - furthestWC2;
 }
 
-glm::vec3 GJK::furthestPointInDirection1(glm::vec3& directionOCnormalized, int& index)
+glm::vec3 GJK::furthestPointInDirectionVertex(glm::vec3& directionOCnormalized, std::vector<GLfloat>& vertices, std::vector<int>& indices)
 {
 	float dotProductMax = -1;
 	vec3 mostSimilarVectorOC(0, 0, 0);
 
-	for (size_t i = 0; i < indices1->size(); i++)
+	for (size_t i = 0; i < indices.size(); i++)
 	{
-		/*if (ignoreIndices1.find(i) != ignoreIndices1.end())
-		{
-			continue;
-		}*/
-
-		vec3 vertexOC((*vertices1)[(*indices1)[i]], (*vertices1)[(*indices1)[i] + 1], (*vertices1)[(*indices1)[i] + 2]);
+		vec3 vertexOC(vertices[indices[i]], vertices[indices[i] + 1], vertices[indices[i] + 2]);
 		vec3 vertexOCnormalized = glm::normalize(vertexOC);
 
 		float dotProduct = glm::dot(directionOCnormalized, vertexOCnormalized);
@@ -118,39 +113,15 @@ glm::vec3 GJK::furthestPointInDirection1(glm::vec3& directionOCnormalized, int& 
 		{
 			dotProductMax = dotProduct;
 			mostSimilarVectorOC = vertexOC;
-			index = i;
 		}
 	}
 
 	return mostSimilarVectorOC;
 }
 
-glm::vec3 GJK::furthestPointInDirection2(glm::vec3& directionOCnormalized, int& index)
+glm::vec3 GJK::furthestPointInDirectionSphere(glm::vec3& directionOCnormalized, CollisionData* collisionData)
 {
-	float dotProductMax = -1;
-	vec3 mostSimilarVectorOC(0, 0, 0);
-
-	for (size_t i = 0; i < indices1->size(); i++)
-	{
-		/*if (ignoreIndices2.find(i) != ignoreIndices2.end())
-		{
-			continue;
-		}*/
-
-		vec3 vertexOC((*vertices2)[(*indices2)[i]], (*vertices2)[(*indices2)[i] + 1], (*vertices2)[(*indices2)[i] + 2]);
-		vec3 vertexOCnormalized = glm::normalize(vertexOC);
-
-		float dotProduct = glm::dot(directionOCnormalized, vertexOCnormalized);
-
-		if (dotProduct > dotProductMax)
-		{
-			dotProductMax = dotProduct;
-			mostSimilarVectorOC = vertexOC;
-			index = i;
-		}
-	}
-
-	return mostSimilarVectorOC;
+	return directionOCnormalized * collisionData->distanceToFurthestPoint;
 }
 
 bool GJK::simplex(vec3& direction)

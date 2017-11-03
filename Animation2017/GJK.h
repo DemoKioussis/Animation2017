@@ -5,6 +5,9 @@
 #include "CollisionComponent.h"
 #include "Entity.h"
 #include "RenderComponent.h"
+#include "CollisionEngine.h"
+
+class CollisionData;
 
 class GJK
 {
@@ -23,18 +26,22 @@ class GJK
 	std::vector<int>* indices2;
 	vector<GLfloat>* vertices2;
 
+	CollisionData* collisionData1;
+	CollisionData* collisionData2;
+
+	MeshType meshType1;
+	MeshType meshType2;
+
 	// Important GJK variables
 	glm::vec3 a;
 	glm::vec3 b;
 	glm::vec3 c;
 	glm::vec3 d;
 	int pointsCount = 0;
-	unordered_set<int> ignoreIndices1; // Helps to avoid taking the same point twice
-	unordered_set<int> ignoreIndices2;
 
 	glm::vec3 support(glm::vec3& directionWC);
-	glm::vec3 furthestPointInDirection1(glm::vec3& directionOCnormalized, int& index);
-	glm::vec3 furthestPointInDirection2(glm::vec3& directionOCnormalized, int& index);
+	glm::vec3 furthestPointInDirectionVertex(glm::vec3& directionOCnormalized, std::vector<GLfloat>& vertices, std::vector<int>& indices);
+	glm::vec3 furthestPointInDirectionSphere(glm::vec3& directionOCnormalized, CollisionData* collisionData);
 	bool simplex(glm::vec3& direction);
 	bool simplex2(glm::vec3 & direction);
 	bool simplex3(glm::vec3 & direction);

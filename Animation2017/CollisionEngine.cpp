@@ -67,36 +67,44 @@ void CollisionEngine::updateCollisionDataForMesh(Mesh * mesh, int meshId)
 	vector<GLfloat>& vertices = *mesh->getVerticies();
 	MeshType meshType = mesh->getMeshType();
 
-	collision.distanceToFurthestPoint = 0;
+	if (meshType == MeshType::VERTICES)
+	{	
+		collision.distanceToFurthestPoint = 0;
 
-	// Iterate through all the vertices
-	for (int index = 0; index < vertices.size(); index += 9)
-	{
-		glm::vec3 vertex(vertices[index], vertices[index + 1], vertices[index + 2]);
-
-		// Store the index for the current vertex if there isn't already a vertex with almsot the same position
-		bool alreadyExists = false;
-		for (int existingIndex : collision.uniqueVerticesIndices)
+		// Iterate through all the vertices
+		for (int index = 0; index < vertices.size(); index += 9)
 		{
-			vec3 alreadyExisting(vertices[existingIndex], vertices[existingIndex + 1], vertices[existingIndex + 2]);
-			float lengthOfDifference = glm::length(vertex - alreadyExisting);
-			if (lengthOfDifference < 0.001f)
+			glm::vec3 vertex(vertices[index], vertices[index + 1], vertices[index + 2]);
+
+			// Store the index for the current vertex if there isn't already a vertex with almsot the same position
+			bool alreadyExists = false;
+			for (int existingIndex : collision.uniqueVerticesIndices)
 			{
-				// Difference is too small, we consider them as being the same vertex
-				alreadyExists = true;
+				vec3 alreadyExisting(vertices[existingIndex], vertices[existingIndex + 1], vertices[existingIndex + 2]);
+				float lengthOfDifference = glm::length(vertex - alreadyExisting);
+				if (lengthOfDifference < 0.001f)
+				{
+					// Difference is too small, we consider them as being the same vertex
+					alreadyExists = true;
+				}
+			}
+			if (!alreadyExists)
+			{
+				collision.uniqueVerticesIndices.push_back(index);
+			}
+
+			// Calculate the distance to the furthest point				
+			float lengthOfVertex = glm::length(vertex);
+			if (lengthOfVertex > collision.distanceToFurthestPoint)
+			{
+				collision.distanceToFurthestPoint = lengthOfVertex;
 			}
 		}
-		if (!alreadyExists)
-		{
-			collision.uniqueVerticesIndices.push_back(index);
-		}
-
-		// Calculate the distance to the furthest point				
-		float lengthOfVertex = glm::length(vertex);
-		if (lengthOfVertex > collision.distanceToFurthestPoint)
-		{
-			collision.distanceToFurthestPoint = lengthOfVertex;
-		}
+	}
+	else // Sphere
+	{
+		glm::vec3 vertex(vertices[0], vertices[1], vertices[2]);
+		collision.distanceToFurthestPoint = glm::length(vertex);
 	}
 
 	collisionData[meshId] = std::move(collision);

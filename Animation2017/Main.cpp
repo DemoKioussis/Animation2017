@@ -162,9 +162,11 @@ int main()
 
 #pragma endregion
 
-	Mesh* mesh = new Mesh("sphere.obj", MeshType::VERTICES);
+	Mesh* mesh = new Mesh("sphere.obj", MeshType::SPHERE);
+	Mesh* mesh2 = new Mesh("cube.obj", MeshType::VERTICES);
 	//mesh->makeMesh("cube.obj"); //dynamically change mesh
  	RenderEngine::getInstance()->addRenderReference(mesh);
+	RenderEngine::getInstance()->addRenderReference(mesh2);
 	int numX = 2;
 	int numY = 1;
 	int numZ = 1;
@@ -180,7 +182,7 @@ int main()
 			for (int z = 0; z < numZ;z++) {
 				Entity* e = new Entity;
 				RenderComponent *r = new RenderComponent();
-				r->setMeshID(0);
+				r->setMeshID(x);
 				PhysicsComponent* p = new PhysicsComponent();
 				CollisionComponent* c = new CollisionComponent();
 				e->addComponent(p);
@@ -190,7 +192,7 @@ int main()
 				moment*(1.0f / 12.0f) * (2.0f);
 				RenderEngine::getInstance()->addComponent(r);
 				PhysicsEngine::getInstance()->addComponent(p);
-				e->translation = glm::translate(e->translation, glm::vec3(x*disp, y*disp + float(x)  * 1.1, z*disp + float(x) * 1.3));
+				e->translation = glm::translate(e->translation, glm::vec3(x*disp + float(x) * -0.5, y*disp + float(x)  * 1.8, z*disp + float(x) * 1.55));
 				CollisionEngine::getInstance()->addComponent(c);
 				entities.push_back(e);
 			}

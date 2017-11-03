@@ -4,9 +4,9 @@
 #include <unordered_map>
 #include "Mesh.h"
 #include "GJK.h"
-#include <deque>
 
 class CollisionComponent;
+class GJK;
 
 struct CollisionData
 {

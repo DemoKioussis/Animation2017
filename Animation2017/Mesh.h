@@ -10,7 +10,6 @@
 enum class MeshType
 {
 	VERTICES,
-	CYLINDER,
 	SPHERE,
 };
 
