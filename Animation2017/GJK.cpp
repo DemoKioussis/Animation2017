@@ -1,4 +1,5 @@
 #include "GJK.h"
+#include <iostream>
 
 using namespace std;
 using namespace glm;
@@ -32,7 +33,7 @@ bool GJK::areColliding()
 
 	vec3 direction = -furthestPoint;
 
-	for (size_t i = 0; i < 20; i++) // Limit of terations ot avoid
+	for (size_t i = 0; i < 20; i++) // Limit of iterations to avoid looping forever in an unlucky case
 	{
 		vec3 nextPoint = support(direction);
 
@@ -58,44 +59,44 @@ bool GJK::areColliding()
 	return false;
 }
 
-glm::vec3 GJK::support(glm::vec3& directionInWorldCoordinates)
+glm::vec3 GJK::support(glm::vec3& directionWC)
 {
-	vec3 directionInObjectCoordinates1 = transform1I * vec4(directionInWorldCoordinates, 0);
-	vec3 directionInObjectCoordinates1Normalized = glm::normalize(directionInObjectCoordinates1);
+	// OC means object coordinates, WC means world coordinates
+	vec3 directionOC1 = transform1I * vec4(directionWC, 0);
+	vec3 directionOC1normalized = glm::normalize(directionOC1);
 
-	vec3 directionInObjectCoordinates2 = transform2I * vec4(-directionInWorldCoordinates, 0);
-	vec3 directionInObjectCoordinates2Normalized = glm::normalize(directionInObjectCoordinates2);
+	vec3 directionOC2 = transform2I * vec4(-directionWC, 0);
+	vec3 directionOC2normalized = glm::normalize(directionOC2);
 
-	vec3 furthestC1ObjectCoordinates = furthestPointInDirection(transform1, directionInObjectCoordinates1Normalized, *indices1, *vertices1);
-	vec3 furthestC2ObjectCoordinates = furthestPointInDirection(transform2, directionInObjectCoordinates2Normalized, *indices2, *vertices2);
+	vec3 furthestOC1 = furthestPointInDirection(directionOC1normalized, *indices1, *vertices1);
+	vec3 furthestOC2 = furthestPointInDirection(directionOC2normalized, *indices2, *vertices2);
 
-	vec3 furthestC1WorldCoordinates = transform1 * vec4(furthestC1ObjectCoordinates, 1);
-	vec3 furthestC2WorldCoordinates = transform2 * vec4(furthestC2ObjectCoordinates, 1);
+	vec3 furthestWC1 = transform1 * vec4(furthestOC1, 1);
+	vec3 furthestWC2 = transform2 * vec4(furthestOC2, 1);
 
-	return  furthestC1WorldCoordinates - furthestC2WorldCoordinates;
+	return  furthestWC1 - furthestWC2;
 }
 
-glm::vec3 GJK::furthestPointInDirection(glm::mat4& model, glm::vec3& directionInObjectCoordinatesNormalized, std::vector<int>& indices, vector<GLfloat>& vertices)
+glm::vec3 GJK::furthestPointInDirection(glm::vec3& directionOCnormalized, std::vector<int>& indices, vector<GLfloat>& vertices)
 {
 	float dotProductMax = -1;
-	vec3 biggestVector(0, 0, 0);
+	vec3 mostSimilarVectorOC(0, 0, 0);
 
 	for (size_t i = 0; i < indices.size(); i++)
 	{
-		vec3 vertexInObjectCoordiantes(vertices[indices[i]], vertices[indices[i] + 1], vertices[indices[i] + 2]);
-		vec3 vertexInObjectCoordiantesNormalized = glm::normalize(vertexInObjectCoordiantes);
+		vec3 vertexOC(vertices[indices[i]], vertices[indices[i] + 1], vertices[indices[i] + 2]);
+		vec3 vertexOCnormalized = glm::normalize(vertexOC);
 
-		float dotProduct = glm::dot(directionInObjectCoordinatesNormalized, vertexInObjectCoordiantesNormalized);
+		float dotProduct = glm::dot(directionOCnormalized, vertexOCnormalized);
 
 		if (dotProduct > dotProductMax)
 		{
 			dotProductMax = dotProduct;
-			biggestVector = vertexInObjectCoordiantes;
+			mostSimilarVectorOC = vertexOC;
 		}
 	}
-	vec4 furthestPoint = model * vec4(biggestVector, 0);
 
-	return furthestPoint;
+	return mostSimilarVectorOC;
 }
 
 bool GJK::simplex(vec3& direction)

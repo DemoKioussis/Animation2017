@@ -169,7 +169,7 @@ int main()
 	int numY = 1;
 	int numZ = 1;
 
-	float disp = 1.1f;
+	float disp = 1.0f;
 	std::vector<Entity*> entities(0);
 
 	/*for (int x = -numX / 2; x < numX / 2; x++) {
@@ -190,7 +190,7 @@ int main()
 				moment*(1.0f / 12.0f) * (2.0f);
 				RenderEngine::getInstance()->addComponent(r);
 				PhysicsEngine::getInstance()->addComponent(p);
-				e->translation = glm::translate(e->translation, glm::vec3(x*disp, y*disp, z*disp));
+				e->translation = glm::translate(e->translation, glm::vec3(x*disp, y*disp + float(x), z*disp + float(x) * 1.3));
 				CollisionEngine::getInstance()->addComponent(c);
 				entities.push_back(e);
 			}

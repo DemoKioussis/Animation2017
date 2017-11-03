@@ -29,8 +29,8 @@ class GJK
 	glm::vec3 d;
 	int pointsCount = 0;
 
-	glm::vec3 support(glm::vec3& directionInWorldCoordinates);
-	glm::vec3 furthestPointInDirection(glm::mat4& model, glm::vec3& directionInObjectCoordinatesNormalized, std::vector<int>& indices, vector<GLfloat>& vertices);
+	glm::vec3 support(glm::vec3& directionWC);
+	glm::vec3 furthestPointInDirection(glm::vec3& directionOCnormalized, std::vector<int>& indices, vector<GLfloat>& vertices);
 	bool simplex(glm::vec3& direction);
 	bool simplex2(glm::vec3 & direction);
 	bool simplex3(glm::vec3 & direction);
