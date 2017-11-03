@@ -156,31 +156,33 @@ int main()
 	RenderEngine::getInstance()->setShader(&shaderProg);
 
 	PhysicsEngine::Initialize();
-	PhysicsEngine::getInstance()->setGravity(glm::vec3(0, -1, 0),1);
+	PhysicsEngine::getInstance()->setGravity(glm::vec3(0, -1, 0),0);
 
 	CollisionEngine::Initialize();
 
 #pragma endregion
 
-	Mesh* mesh = new Mesh("sphere.obj");
+	Mesh* mesh = new Mesh("cube.obj", MeshType::VERTICES);
 	//mesh->makeMesh("cube.obj"); //dynamically change mesh
  	RenderEngine::getInstance()->addRenderReference(mesh);
-	int numX = 5;
-	int numY = 5;
-	int numZ = 5;
-
-
+	int numX = 2;
+	int numY = 1;
+	int numZ = 1;
 
 	float disp = 2.1f;
 	std::vector<Entity*> entities(0);
-	for (int x = -numX/2; x < numX/2; x++) {
-		for (int y = -numY/2; y < numY/2;y++) {
-			for (int z = -numZ/2; z < numZ/2;z++) {
+
+	/*for (int x = -numX / 2; x < numX / 2; x++) {
+		for (int y = -numY / 2; y < numY / 2; y++) {
+			for (int z = -numZ / 2; z < numZ / 2; z++) {*/
+	for (int x = 0; x < numX; x++) {
+		for (int y = 0; y < numY;y++) {
+			for (int z = 0; z < numZ;z++) {
 				Entity* e = new Entity;
 				RenderComponent *r = new RenderComponent();
 				r->setMeshID(0);
 				PhysicsComponent* p = new PhysicsComponent();
-				CollisionComponent* c = new CollisionComponent(ColliderType::VERTICES);
+				CollisionComponent* c = new CollisionComponent();
 				e->addComponent(p);
 				e->addComponent(r);
 				e->addComponent(c);

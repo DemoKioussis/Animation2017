@@ -2,18 +2,18 @@
 #include "Component.h"
 #include "CollisionEngine.h"
 
-enum class ColliderType
-{
-	VERTICES,
-	SPHERE
-};
+//enum class ColliderType
+//{
+//	VERTICES,
+//	SPHERE
+//};
 
 class CollisionComponent : public Component
 {
 	friend class CollisionEngine;
-	ColliderType colliderType;
+	//ColliderType colliderType;
 public:
-	CollisionComponent(ColliderType _colliderType) : Component(), colliderType(_colliderType)
+	CollisionComponent() : Component() //,colliderType(_colliderType)
 	{
 		componentType = COLLISION_COMPONENT;
 	}

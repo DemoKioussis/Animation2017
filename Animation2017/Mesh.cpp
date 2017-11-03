@@ -31,7 +31,8 @@ Mesh::Mesh() {
 
 }
 
-Mesh::Mesh(char* objName) {
+Mesh::Mesh(char* objName, MeshType type) : meshType(type)
+{
 
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
@@ -263,4 +264,9 @@ void Mesh::makeMesh(char* objName) {
 	//m->setVerticies(positions, colors, normals);
 	//m->setIndices(inds);
 	;
+}
+
+MeshType Mesh::getMeshType()
+{
+	return meshType;
 }

@@ -7,6 +7,14 @@
 
 #define USE_INSTANCING
 
+enum class MeshType
+{
+	VERTICES,
+	CYLINDER,
+	SPHERE,
+};
+
+
 using namespace std;
 class RenderEngine;
 class Mesh {
@@ -16,10 +24,11 @@ private:
 	vector<GLuint>* indices;
 	GLuint VBO, VAO, EBO, transformBuffer;
 	int numPrims;
+	MeshType meshType;
 public:
 
 	Mesh();
-	Mesh(char* objName);
+	Mesh(char* objName, MeshType type);
 	~Mesh();
 
 	void setVerticies(vector<GLfloat>& p, vector<GLfloat>& c, vector<GLfloat>& n);
@@ -31,4 +40,5 @@ public:
 	vector<GLfloat>* getVerticies();
 	void draw();
 	void Mesh::makeMesh(char* objName);
+	MeshType getMeshType();
 };
