@@ -72,6 +72,8 @@ bool GJK::areColliding()
 		// Collision check
 		if (simplex(direction))
 		{
+			EPA epa(*this);
+			epa.getPenetrationVector();
 			return true;
 		}
 	}

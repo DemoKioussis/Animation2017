@@ -87,6 +87,9 @@
     <ClCompile Include="GJK.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="EPA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mesh.h">
@@ -147,6 +150,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GJK.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EPA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

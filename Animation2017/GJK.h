@@ -6,11 +6,15 @@
 #include "Entity.h"
 #include "RenderComponent.h"
 #include "CollisionEngine.h"
+#include "EPA.h"
 
 class CollisionData;
+class EPA;
 
 class GJK
 {
+	friend class EPA;
+
 	CollisionComponent & c1; 
 	CollisionComponent & c2;
 
