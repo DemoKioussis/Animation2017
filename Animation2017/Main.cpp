@@ -169,7 +169,7 @@ int main()
 	int numY = 1;
 	int numZ = 1;
 
-	float disp = 2.1f;
+	float disp = 1.1f;
 	std::vector<Entity*> entities(0);
 
 	/*for (int x = -numX / 2; x < numX / 2; x++) {

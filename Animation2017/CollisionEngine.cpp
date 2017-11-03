@@ -30,7 +30,7 @@ void CollisionEngine::step()
 {	
 	if (isEnabled()) {
 		// Just for testing the areSpheresColliding() method
-		//areColliding((CollisionComponent*)targetComponents[0], (CollisionComponent*)targetComponents[1]);
+		areColliding((CollisionComponent*)targetComponents[0], (CollisionComponent*)targetComponents[1]);
 	}
 }
 
