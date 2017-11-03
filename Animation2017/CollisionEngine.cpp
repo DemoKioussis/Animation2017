@@ -5,7 +5,7 @@
 #include "GJK.h"
 
 #include <stdexcept>
-#include <algorithm>
+#include <iostream>
 
 using namespace std;
 using namespace glm;
@@ -30,7 +30,8 @@ void CollisionEngine::step()
 {	
 	if (isEnabled()) {
 		// Just for testing the areSpheresColliding() method
-		areColliding((CollisionComponent*)targetComponents[0], (CollisionComponent*)targetComponents[1]);
+		bool colliding = areColliding((CollisionComponent*)targetComponents[0], (CollisionComponent*)targetComponents[1]);
+		cout << "Are colliding: " << (colliding ? "true" : "false") << endl;
 	}
 }
 

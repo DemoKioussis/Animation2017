@@ -1,5 +1,6 @@
 #pragma once
 
+#include <unordered_set>
 #include "RenderEngine.h"
 #include "CollisionComponent.h"
 #include "Entity.h"
@@ -28,9 +29,12 @@ class GJK
 	glm::vec3 c;
 	glm::vec3 d;
 	int pointsCount = 0;
+	unordered_set<int> ignoreIndices1; // Helps to avoid taking the same point twice
+	unordered_set<int> ignoreIndices2;
 
 	glm::vec3 support(glm::vec3& directionWC);
-	glm::vec3 furthestPointInDirection(glm::vec3& directionOCnormalized, std::vector<int>& indices, vector<GLfloat>& vertices);
+	glm::vec3 furthestPointInDirection1(glm::vec3& directionOCnormalized, int& index);
+	glm::vec3 furthestPointInDirection2(glm::vec3& directionOCnormalized, int& index);
 	bool simplex(glm::vec3& direction);
 	bool simplex2(glm::vec3 & direction);
 	bool simplex3(glm::vec3 & direction);

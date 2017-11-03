@@ -25,6 +25,22 @@ GJK::GJK(CollisionComponent & cc1, CollisionComponent & cc2) : c1(cc1), c2(cc2),
 
 bool GJK::areColliding()
 {	
+	/*vector<vec3> v;
+	v.push_back(support(vec3(1, 1, 1)));
+	v.push_back(support(vec3(-1, 1, 1)));
+	v.push_back(support(vec3(-1, -1, 1)));
+	v.push_back(support(vec3(-1, -1, -1)));
+
+	v.push_back(support(vec3(1, -1, 1)));
+	v.push_back(support(vec3(1, -1, -1)));
+	v.push_back(support(vec3(1, 1, -1)));
+	v.push_back(support(vec3(-1, 1, -1)));
+	
+	cout << "start" << endl;
+	for (vec3 t : v)
+	{		
+		cout << t.x << ", " << t.y << ", " << t.z << endl;
+	}*/
 
 	// Use a random direction to get the furthest point of that direction
 	vec3 furthestPoint = support(vec3(1, 1, 1));
@@ -33,7 +49,7 @@ bool GJK::areColliding()
 
 	vec3 direction = -furthestPoint;
 
-	for (size_t i = 0; i < 20; i++) // Limit of iterations to avoid looping forever in an unlucky case
+	for (size_t i = 0; i < 40; i++) // Limit of iterations to avoid looping forever in an unlucky case
 	{
 		vec3 nextPoint = support(direction);
 
@@ -68,8 +84,12 @@ glm::vec3 GJK::support(glm::vec3& directionWC)
 	vec3 directionOC2 = transform2I * vec4(-directionWC, 0);
 	vec3 directionOC2normalized = glm::normalize(directionOC2);
 
-	vec3 furthestOC1 = furthestPointInDirection(directionOC1normalized, *indices1, *vertices1);
-	vec3 furthestOC2 = furthestPointInDirection(directionOC2normalized, *indices2, *vertices2);
+	int index1 = -1;
+	int index2 = -1;
+	vec3 furthestOC1 = furthestPointInDirection1(directionOC1normalized, index1);
+	vec3 furthestOC2 = furthestPointInDirection2(directionOC2normalized, index2);
+	ignoreIndices1.insert(index1);
+	ignoreIndices2.insert(index2);
 
 	vec3 furthestWC1 = transform1 * vec4(furthestOC1, 1);
 	vec3 furthestWC2 = transform2 * vec4(furthestOC2, 1);
@@ -77,14 +97,19 @@ glm::vec3 GJK::support(glm::vec3& directionWC)
 	return  furthestWC1 - furthestWC2;
 }
 
-glm::vec3 GJK::furthestPointInDirection(glm::vec3& directionOCnormalized, std::vector<int>& indices, vector<GLfloat>& vertices)
+glm::vec3 GJK::furthestPointInDirection1(glm::vec3& directionOCnormalized, int& index)
 {
 	float dotProductMax = -1;
 	vec3 mostSimilarVectorOC(0, 0, 0);
 
-	for (size_t i = 0; i < indices.size(); i++)
+	for (size_t i = 0; i < indices1->size(); i++)
 	{
-		vec3 vertexOC(vertices[indices[i]], vertices[indices[i] + 1], vertices[indices[i] + 2]);
+		/*if (ignoreIndices1.find(i) != ignoreIndices1.end())
+		{
+			continue;
+		}*/
+
+		vec3 vertexOC((*vertices1)[(*indices1)[i]], (*vertices1)[(*indices1)[i] + 1], (*vertices1)[(*indices1)[i] + 2]);
 		vec3 vertexOCnormalized = glm::normalize(vertexOC);
 
 		float dotProduct = glm::dot(directionOCnormalized, vertexOCnormalized);
@@ -93,6 +118,35 @@ glm::vec3 GJK::furthestPointInDirection(glm::vec3& directionOCnormalized, std::v
 		{
 			dotProductMax = dotProduct;
 			mostSimilarVectorOC = vertexOC;
+			index = i;
+		}
+	}
+
+	return mostSimilarVectorOC;
+}
+
+glm::vec3 GJK::furthestPointInDirection2(glm::vec3& directionOCnormalized, int& index)
+{
+	float dotProductMax = -1;
+	vec3 mostSimilarVectorOC(0, 0, 0);
+
+	for (size_t i = 0; i < indices1->size(); i++)
+	{
+		/*if (ignoreIndices2.find(i) != ignoreIndices2.end())
+		{
+			continue;
+		}*/
+
+		vec3 vertexOC((*vertices2)[(*indices2)[i]], (*vertices2)[(*indices2)[i] + 1], (*vertices2)[(*indices2)[i] + 2]);
+		vec3 vertexOCnormalized = glm::normalize(vertexOC);
+
+		float dotProduct = glm::dot(directionOCnormalized, vertexOCnormalized);
+
+		if (dotProduct > dotProductMax)
+		{
+			dotProductMax = dotProduct;
+			mostSimilarVectorOC = vertexOC;
+			index = i;
 		}
 	}
 
@@ -171,23 +225,23 @@ bool GJK::simplex4(glm::vec3 & direction)
 	vec3 ab = b - a;
 	vec3 ac = c - a;
 	vec3 ad = d - a;
-	vec3 acb = cross(ac, ab);
-	vec3 abd = cross(ab, ad);
-	vec3 adc = cross(ad, ac);
+	vec3 abc = cross(ab, ac);
+	vec3 adb = cross(ad, ab);
+	vec3 acd = cross(ac, ad);
 
-	if (sameDirection(acb, ao))
+	if (sameDirection(abc, ao))
 	{
-		setPoints(a, c, b);
+		setPoints(a, b, c);
 		return simplex3(direction);
 	}
-	if (sameDirection(abd, ao))
+	if (sameDirection(adb, ao))
 	{
-		setPoints(a, b, d);
+		setPoints(a, d, b);
 		return simplex3(direction);
 	}
-	if (sameDirection(adc, ao))
+	if (sameDirection(acd, ao))
 	{
-		setPoints(a, d, c);
+		setPoints(a, c, d);
 		return simplex3(direction);
 	}
 

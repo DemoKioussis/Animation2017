@@ -162,7 +162,7 @@ int main()
 
 #pragma endregion
 
-	Mesh* mesh = new Mesh("cube.obj", MeshType::VERTICES);
+	Mesh* mesh = new Mesh("sphere.obj", MeshType::VERTICES);
 	//mesh->makeMesh("cube.obj"); //dynamically change mesh
  	RenderEngine::getInstance()->addRenderReference(mesh);
 	int numX = 2;
@@ -190,7 +190,7 @@ int main()
 				moment*(1.0f / 12.0f) * (2.0f);
 				RenderEngine::getInstance()->addComponent(r);
 				PhysicsEngine::getInstance()->addComponent(p);
-				e->translation = glm::translate(e->translation, glm::vec3(x*disp, y*disp + float(x), z*disp + float(x) * 1.3));
+				e->translation = glm::translate(e->translation, glm::vec3(x*disp, y*disp + float(x)  * 1.1, z*disp + float(x) * 1.3));
 				CollisionEngine::getInstance()->addComponent(c);
 				entities.push_back(e);
 			}
