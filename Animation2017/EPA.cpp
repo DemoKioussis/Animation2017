@@ -71,15 +71,46 @@ float EPA::projectionOnNormalLength(glm::vec3 supportPoint, glm::vec3 normal)
 
 void EPA::extendPolytope(glm::vec3 extendPoint)
 {
-	vector<vec3> edges;
+	vector<pair<vec3,vec3>> edges;
 
 	for (size_t i = 0; i < faces.size(); i++)
 	{
 		Face* face = &faces[i];
 
-		if (dot(face->getNormal(), extendPoint))
+		if (gjk.sameDirection(face->getNormal(), extendPoint))
 		{
+			Face f = *face;
+			faces.erase(faces.begin() + i);
+			i--;
 
+			addOrRemoveEdge(edges, make_pair(f.a,f.b));
+			addOrRemoveEdge(edges, make_pair(f.b, f.c));
+			addOrRemoveEdge(edges, make_pair(f.c, f.a));
 		}
 	}
+
+	for (pair<vec3, vec3>& edge : edges)
+	{
+		faces.push_back(Face(edge.first, edge.second, extendPoint));
+	}
+}
+
+void EPA::addOrRemoveEdge(vector<pair<vec3, vec3>>& edges, pair<vec3, vec3>& edge)
+{
+	static const int treshold = 0.001;
+	vec3 edgeReverse = edge.first - edge.second;
+
+	for (size_t i = 0; i < edges.size(); i++)
+	{
+		vec3 e = edges[i].second - edges[i].first;
+
+		if (abs(e.x - edgeReverse.x) < treshold && abs(e.x - edgeReverse.x) < treshold && abs(e.x - edgeReverse.x) < treshold)
+		{
+			edges.erase(edges.begin() + i); // Edge already exists
+			return;
+		}
+	}
+
+	// Edge doesn't exist
+	edges.push_back(edge);
 }
