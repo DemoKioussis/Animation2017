@@ -28,7 +28,11 @@ glm::vec3 EPA::getPenetrationVector()
 
 		if (abs(projectionLength - closestFaceDistance) < 0.01f)
 		{
-
+			return normalOfClosest;
+		}
+		else
+		{
+			extendPolytope(supportPoint);
 		}
 	}
 
@@ -63,4 +67,19 @@ Face & EPA::getClosestFaceToOrigin(float& closestFaceDistance)
 float EPA::projectionOnNormalLength(glm::vec3 supportPoint, glm::vec3 normal)
 {
 	return length((dot(supportPoint, normal) / dot(normal, normal)) * normal);
+}
+
+void EPA::extendPolytope(glm::vec3 extendPoint)
+{
+	vector<vec3> edges;
+
+	for (size_t i = 0; i < faces.size(); i++)
+	{
+		Face* face = &faces[i];
+
+		if (dot(face->getNormal(), extendPoint))
+		{
+
+		}
+	}
 }

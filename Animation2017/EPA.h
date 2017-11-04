@@ -32,6 +32,7 @@ class EPA
 	float distanceFromFaceToPoint(Face& face, glm::vec3 point);
 	Face& getClosestFaceToOrigin(float& closestFaceDistance);
 	float projectionOnNormalLength(glm::vec3 supportPoint, glm::vec3 normal);
+	void extendPolytope(glm::vec3 extendPoint);
 public:
 	EPA(GJK& gjkWithCollision);
 	glm::vec3 getPenetrationVector();
