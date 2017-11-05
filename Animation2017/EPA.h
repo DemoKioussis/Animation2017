@@ -8,28 +8,31 @@ struct Face
 {
 	Face(glm::vec3& pa, glm::vec3& pb, glm::vec3& pc) : a(pa), b(pb), c(pc)
 	{
-
-	}
-
-	glm::vec3 a;
-	glm::vec3 b;
-	glm::vec3 c;
-
-	glm::vec3 getNormal()
-	{
 		glm::vec3 ab = b - a;
 		glm::vec3 ac = c - a;
 
-		return glm::normalize(glm::cross(ab, ac));
+		normal = glm::normalize(glm::cross(ab, ac));		
 	}
+
+	const glm::vec3 a;
+	const glm::vec3 b;
+	const glm::vec3 c;
+
+	glm::vec3 getNormal()
+	{
+		return normal;
+	}
+
+private: 
+	glm::vec3 normal;
 };
 
 class EPA
 {
 	GJK& gjk;
-	std::vector<Face> faces;
+	std::vector<Face*> faces;
 
-	float distanceFromFaceToPoint(Face& face, glm::vec3 point);
+	float distanceFromFaceToOrigin(Face& face);
 	Face& getClosestFaceToOrigin(float& closestFaceDistance);
 	float projectionOnNormalLength(glm::vec3 supportPoint, glm::vec3 normal);
 	void extendPolytope(glm::vec3 extendPoint);

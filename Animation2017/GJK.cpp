@@ -73,7 +73,8 @@ bool GJK::areColliding()
 		if (simplex(direction))
 		{
 			EPA epa(*this);
-			epa.getPenetrationVector();
+			vec3 t = epa.getPenetrationVector();
+			cout << t.x << ", " << t.y << ", " << t.z << endl;
 			return true;
 		}
 	}
