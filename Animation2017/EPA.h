@@ -34,8 +34,9 @@ class EPA
 
 	float distanceFromFaceToOrigin(Face& face);
 	Face& getClosestFaceToOrigin(float& closestFaceDistance);
-	float projectionOnNormalLength(glm::vec3 supportPoint, glm::vec3 normal);
+	glm::vec3 projectionOnNormal(glm::vec3 supportPoint, glm::vec3 normal);
 	void extendPolytope(glm::vec3 extendPoint);
+	bool canSeeFaceFromPoint(Face& face, glm::vec3& point);
 	void addOrRemoveEdge(std::vector<std::pair<glm::vec3, glm::vec3>>& edges, std::pair<glm::vec3, glm::vec3>& edge);
 public:
 	EPA(GJK& gjkWithCollision);

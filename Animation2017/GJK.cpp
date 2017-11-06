@@ -74,7 +74,7 @@ bool GJK::areColliding()
 		{
 			EPA epa(*this);
 			vec3 t = epa.getPenetrationVector();
-			cout << t.x << ", " << t.y << ", " << t.z << endl;
+			cout << "Penetration vector : " << t.x << ", " << t.y << ", " << t.z << endl;
 			return true;
 		}
 	}

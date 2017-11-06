@@ -111,7 +111,7 @@ void InputManager::processInput() {
 
 		}
 	}
-	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_8) == GLFW_PRESS) {
+	if ((glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_8) == GLFW_PRESS) || (glfwGetKey(windowManager->getWindow(), GLFW_KEY_8) == GLFW_PRESS)) {
 		for (int i = 0; i < Entities->size();i++) {
 			auto e = (Entities->at(i));
 			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);

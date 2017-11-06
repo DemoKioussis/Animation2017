@@ -21,7 +21,7 @@ EPA::EPA(GJK& gjkWithCollision) : gjk(gjkWithCollision)
 glm::vec3 EPA::getPenetrationVector()
 {
 	int a = 0;
-	//while (true)
+	while (true)
 	{
 		/*{
 			ofstream myfile;
@@ -41,7 +41,8 @@ glm::vec3 EPA::getPenetrationVector()
 		Face& closestFace = getClosestFaceToOrigin(closestFaceDistance);
 		vec3 normalOfClosest = closestFace.getNormal();
 		vec3 supportPoint = gjk.support(normalOfClosest);
-		float projectionLength = projectionOnNormalLength(supportPoint, normalOfClosest);
+		vec3 projection = projectionOnNormal(supportPoint, normalOfClosest);
+		float projectionLength = glm::length(projection);
 		cout << ++a << ", " << closestFaceDistance << endl;
 		if (abs(projectionLength - closestFaceDistance) < 0.01f)
 		{
@@ -49,7 +50,7 @@ glm::vec3 EPA::getPenetrationVector()
 			{
 				delete faces[i];
 			}
-			return normalOfClosest;
+			return projection;
 		}
 		else
 		{
@@ -85,9 +86,9 @@ Face & EPA::getClosestFaceToOrigin(float& closestFaceDistance)
 	return *closestFace;
 }
 
-float EPA::projectionOnNormalLength(glm::vec3 supportPoint, glm::vec3 normal)
+vec3 EPA::projectionOnNormal(glm::vec3 supportPoint, glm::vec3 normal)
 {
-	return length((dot(supportPoint, normal) / dot(normal, normal)) * normal);
+	return (dot(supportPoint, normal) / dot(normal, normal)) * normal;
 }
 
 void EPA::extendPolytope(glm::vec3 extendPoint)
@@ -98,7 +99,7 @@ void EPA::extendPolytope(glm::vec3 extendPoint)
 	{
 		Face* face = faces[i];
 
-		if (gjk.sameDirection(face->getNormal(), extendPoint))
+		if (canSeeFaceFromPoint(*face, extendPoint))
 		{
 			Face& f = *face;
 			faces.erase(faces.begin() + i);
@@ -116,6 +117,27 @@ void EPA::extendPolytope(glm::vec3 extendPoint)
 	{
 		faces.push_back(new Face(edge.first, edge.second, extendPoint));
 	}
+}
+
+//bool sameDirection(glm::vec3 & vec1, glm::vec3 & vec2)
+//{
+//	return dot(vec1, vec2) > 0;
+//}
+
+bool EPA::canSeeFaceFromPoint(Face & face, glm::vec3 & point)
+{
+	if (!gjk.sameDirection(face.getNormal(), point))
+	{
+		return false;
+	}
+
+	vec3& q = point;
+	const vec3& p = face.a;
+	vec3& normal = face.getNormal();
+	vec3 pointProjectedOnPlane = q - dot(q - p, normal) * normal;
+
+	return length(point) > length(pointProjectedOnPlane);
+	//return gjk.sameDirection(face.getNormal(), point);
 }
 
 void EPA::addOrRemoveEdge(vector<pair<vec3, vec3>>& edges, pair<vec3, vec3>& edge)
