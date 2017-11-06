@@ -143,15 +143,17 @@ bool EPA::canSeeFaceFromPoint(Face & face, glm::vec3 & point)
 void EPA::addOrRemoveEdge(vector<pair<vec3, vec3>>& edges, pair<vec3, vec3>& edge)
 {
 	static const float treshold = 0.001;
-	vec3 edgeReverse = edge.first - edge.second;
+	//vec3 edgeReverse = edge.first - edge.second;
 
 	for (size_t i = 0; i < edges.size(); i++)
 	{
-		vec3 e = edges[i].second - edges[i].first;
-		vec3 diff = e - edgeReverse;
-		float diffLength = length(diff);
+		//vec3 e = edges[i].second - edges[i].first;
+		vec3 diff1 = edges[i].second - edge.first;
+		vec3 diff2 = edges[i].first - edge.second;
+		float diffLength1 = length(diff1);
+		float diffLength2 = length(diff2);
 
-		if (diffLength < treshold)
+		if (diffLength1 < treshold && diffLength2 < treshold)
 		{
 			edges.erase(edges.begin() + i); // Edge already exists
 			return;
