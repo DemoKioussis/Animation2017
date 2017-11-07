@@ -28,23 +28,7 @@ GJK::GJK(CollisionComponent & cc1, CollisionComponent & cc2) : c1(cc1), c2(cc2),
 }
 
 bool GJK::areColliding()
-{	
-	/*vector<vec3> v;
-	v.push_back(support(vec3(1, 1, 1)));
-	v.push_back(support(vec3(-1, 1, 1)));
-	v.push_back(support(vec3(-1, -1, 1)));
-	v.push_back(support(vec3(-1, -1, -1)));
-
-	v.push_back(support(vec3(1, -1, 1)));
-	v.push_back(support(vec3(1, -1, -1)));
-	v.push_back(support(vec3(1, 1, -1)));
-	v.push_back(support(vec3(-1, 1, -1)));
-	
-	cout << "start" << endl;
-	for (vec3 t : v)
-	{		
-		cout << t.x << ", " << t.y << ", " << t.z << endl;
-	}*/
+{
 
 	// Use a random direction to get the furthest point of that direction
 	vec3 furthestPoint = support(vec3(1, 1, 1));
