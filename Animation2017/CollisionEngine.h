@@ -22,8 +22,6 @@ class CollisionEngine : public Engine
 
 	static CollisionEngine* instance;
 	std::unordered_map<int, CollisionData> collisionData; // Maps the mesh with its collision data
-
-	void updateCollisionDataForMesh(Mesh* mesh, int meshId);
 	
 	bool areColliding(CollisionComponent* c1, CollisionComponent* c2);
 	bool areSpheresColliding(CollisionComponent* c1, CollisionComponent* c2);
@@ -35,6 +33,6 @@ public:
 	std::vector<Mesh*>& getAllMeshes();
 	static CollisionEngine * getInstance();
 	void step();
-	void calculateUniqueIndicesAndFurthestDistances();
+	void calculateUniqueIndices();
 	std::unordered_map<int, CollisionData>& getCollisionData();
 };

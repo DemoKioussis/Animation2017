@@ -79,7 +79,7 @@ int main()
 	for (int x = 0; x < numX; x++) {
 		for (int y = 0; y < numY;y++) {
 			for (int z = 0; z < numZ;z++) {
-				Entity* e = new Entity;
+				Entity* e = new Entity(false);
 				RenderComponent *r = new RenderComponent();
 				r->setMeshID(x);
 				PhysicsComponent* p = new PhysicsComponent();
@@ -99,7 +99,7 @@ int main()
 		}
 	}
 
-	CollisionEngine::getInstance()->calculateUniqueIndicesAndFurthestDistances(); // Important for updating the info about the collisions
+	CollisionEngine::getInstance()->calculateUniqueIndices(); // Important for updating the info about the collisions
 
 	InputManager::Entities = &entities;
 	glm::mat4 rotation(1.0f), projection;

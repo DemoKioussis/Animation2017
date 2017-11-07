@@ -3,7 +3,8 @@
 #include "iostream"
 
 int Entity::idCounter = 0;
-Entity::Entity() {
+Entity::Entity(bool _isStatic) : isStaticEntity(_isStatic)
+{
 	id = idCounter++;
 	transform = glm::mat4(1.0f);
 }
@@ -31,4 +32,9 @@ void Entity::removeComponent(int _componentType) {
 
 const int Entity::getID() {
 	return id;
+}
+
+bool Entity::isStatic()
+{
+	return isStaticEntity;
 }
