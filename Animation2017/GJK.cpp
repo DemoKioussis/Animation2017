@@ -6,22 +6,19 @@ using namespace glm;
 
 GJK::GJK(CollisionComponent & cc1, CollisionComponent & cc2) : c1(cc1), c2(cc2), transform1(c1.entity->transform), transform2(c2.entity->transform)
 {
-	std::vector<Mesh*>& allRenderables = RenderEngine::getInstance()->getAllRenderReferences();
-	
-	RenderComponent* render1 = (RenderComponent*)c1.entity->getComponent(RENDER_COMPONENT);
-	RenderComponent* render2 = (RenderComponent*)c2.entity->getComponent(RENDER_COMPONENT);
+	std::vector<Mesh*>& meshes = CollisionEngine::getInstance()->getAllMeshes();
 
 	transform1I = glm::inverse(transform1);
 	transform2I = glm::inverse(transform2);
 
-	Mesh* mesh1 = allRenderables[render1->getMeshID()];
-	collisionData1 = &CollisionEngine::getInstance()->getCollisionData()[render1->getMeshID()];
+	Mesh* mesh1 = meshes[cc1.getMeshID()];
+	collisionData1 = &CollisionEngine::getInstance()->getCollisionData()[cc1.getMeshID()];
 	indices1 = &collisionData1->uniqueVerticesIndices;
 	vertices1 = mesh1->getVerticies();
 	meshType1 = mesh1->getMeshType();
 
-	Mesh* mesh2 = allRenderables[render2->getMeshID()];
-	collisionData2 = &CollisionEngine::getInstance()->getCollisionData()[render2->getMeshID()];
+	Mesh* mesh2 = meshes[cc2.getMeshID()];
+	collisionData2 = &CollisionEngine::getInstance()->getCollisionData()[cc2.getMeshID()];
 	indices2 = &collisionData2->uniqueVerticesIndices;
 	vertices2 = mesh2->getVerticies();
 	meshType2 = mesh2->getMeshType();

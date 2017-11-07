@@ -1,6 +1,4 @@
 #include "CollisionEngine.h"
-#include "RenderComponent.h"
-#include "RenderEngine.h"
 #include "Entity.h"
 #include "GJK.h"
 
@@ -37,27 +35,33 @@ void CollisionEngine::step()
 
 void CollisionEngine::calculateUniqueIndicesAndFurthestDistances()
 {
-	std::vector<Mesh*>& allRenderables = RenderEngine::getInstance()->getAllRenderReferences();
-
 	for (int i = 0; i < targetComponents.size(); i++)
 	{
 		// Get the required components for the current entity
 		CollisionComponent* collisionComponent = (CollisionComponent*)targetComponents[i];
 		
-		RenderComponent* renderComponent = (RenderComponent*)collisionComponent->entity->getComponent(RENDER_COMPONENT); // Get the render component	
-		
 		// Obtain the current mesh
-		int currentMeshId = renderComponent->getMeshID();
+		int currentMeshId = collisionComponent->getMeshID();
 
 		if (collisionData.find(currentMeshId) != collisionData.end())
 		{
 			continue; // Collision info already exists in this mesh, so we skip it
 		}
 
-		Mesh* currentMesh = allRenderables[currentMeshId];
+		Mesh* currentMesh = meshes[currentMeshId];
 
 		updateCollisionDataForMesh(currentMesh, currentMeshId);
 	}
+}
+
+void CollisionEngine::addMesh(Mesh * _mesh)
+{
+	meshes.push_back(_mesh);
+}
+
+std::vector<Mesh*>& CollisionEngine::getAllMeshes()
+{
+	return meshes;
 }
 
 // Update the collision data for the current mesh
@@ -112,43 +116,22 @@ void CollisionEngine::updateCollisionDataForMesh(Mesh * mesh, int meshId)
 
 bool CollisionEngine::areColliding(CollisionComponent * c1, CollisionComponent * c2)
 {
-	std::vector<Mesh*>& allRenderables = RenderEngine::getInstance()->getAllRenderReferences();
-	RenderComponent* renderComponent1 = (RenderComponent*)c1->entity->getComponent(RENDER_COMPONENT);
-	RenderComponent* renderComponent2 = (RenderComponent*)c2->entity->getComponent(RENDER_COMPONENT);
-	int m1Id = renderComponent1->getMeshID();
-	int m2Id = renderComponent2->getMeshID();
-	Mesh* m1 = allRenderables[m1Id];
-	Mesh* m2 = allRenderables[m2Id];
+	Mesh* m1 = meshes[c1->getMeshID()];
+	Mesh* m2 = meshes[c2->getMeshID()];
 
 	if (m1->getMeshType() == MeshType::SPHERE && m2->getMeshType() == MeshType::SPHERE)
 	{
 		// Sphere collides with sphere
 		return areSpheresColliding(c1, c2); 
 	}
-	//else if (c1->colliderType == ColliderType::SPHERE && c2->colliderType == ColliderType::VERTICES)
-	//{
-	//	// Sphere collides with vertex object
-	//	return isSphereCollidingWithVertexObject(c1, c2);
-	//}
-	//else if (c1->colliderType == ColliderType::VERTICES && c2->colliderType == ColliderType::SPHERE)
-	//{
-	//	// Vertex object collides with sphere
-	//	return isSphereCollidingWithVertexObject(c2, c1); 
-	//}
-	else //if (c1->colliderType == ColliderType::VERTICES && c2->colliderType == ColliderType::VERTICES)
+	else // Any other collisions
 	{
-		//Vertex object collides with vertex object
-		//return areSpheresColliding(c1, c2) ? areCollidingGJK(c1, c2) : false;
-
 		return areCollidingGJK(c1, c2); // For testing
 	}
 }
 
 bool CollisionEngine::areSpheresColliding(CollisionComponent * c1, CollisionComponent * c2)
 {
-	RenderComponent* r1 = (RenderComponent*)c1->entity->getComponent(RENDER_COMPONENT);
-	RenderComponent* r2 = (RenderComponent*)c2->entity->getComponent(RENDER_COMPONENT);
-
 	mat4& transformMatrix1 = c1->entity->transform;
 	mat4& transformMatrix2 = c2->entity->transform;
 
@@ -160,15 +143,13 @@ bool CollisionEngine::areSpheresColliding(CollisionComponent * c1, CollisionComp
 	vec4 centerInWorldCoordinates2 = transformMatrix2 * origin;
 
 	float distanceBetweenOrigins = glm::length(centerInWorldCoordinates2 - centerInWorldCoordinates1);
-	float sumOfRadiuses = collisionData[r1->getMeshID()].distanceToFurthestPoint + collisionData[r2->getMeshID()].distanceToFurthestPoint;
+	float sumOfRadiuses = collisionData[c1->getMeshID()].distanceToFurthestPoint + collisionData[c2->getMeshID()].distanceToFurthestPoint;
 
 	return sumOfRadiuses > distanceBetweenOrigins;
 }
 
 bool CollisionEngine::isSphereCollidingWithVertexObject(CollisionComponent * sphere, CollisionComponent * vertexObject)
 {
-	RenderComponent* sphereRender = (RenderComponent*)sphere->entity->getComponent(RENDER_COMPONENT);
-	RenderComponent* vertexObjectRender = (RenderComponent*)vertexObject->entity->getComponent(RENDER_COMPONENT);
 
 	mat4& transformMatrixSphere = sphere->entity->transform;
 	mat4& transformMatrixVertex = vertexObject->entity->transform;
@@ -180,10 +161,10 @@ bool CollisionEngine::isSphereCollidingWithVertexObject(CollisionComponent * sph
 	vec4 centerInWorldCoordinatesSphere = transformMatrixSphere * origin;
 	vec4 centerInWorldCoordinatesVertex = transformMatrixVertex * origin;
 
-	float sphereRadius = collisionData[sphereRender->getMeshID()].distanceToFurthestPoint;
+	float sphereRadius = collisionData[sphere->getMeshID()].distanceToFurthestPoint;
 		 
 	float distanceBetweenOrigins = glm::length(centerInWorldCoordinatesVertex - centerInWorldCoordinatesSphere);
-	float sumOfRadiuses = sphereRadius + collisionData[vertexObjectRender->getMeshID()].distanceToFurthestPoint;
+	float sumOfRadiuses = sphereRadius + collisionData[vertexObject->getMeshID()].distanceToFurthestPoint;
 
 	if (sumOfRadiuses <= distanceBetweenOrigins)
 	{
@@ -191,16 +172,10 @@ bool CollisionEngine::isSphereCollidingWithVertexObject(CollisionComponent * sph
 		return false;
 	}
 
-	std::vector<Mesh*>& allRenderables = RenderEngine::getInstance()->getAllRenderReferences();
-	Mesh* currentMesh = dynamic_cast<Mesh*>(allRenderables[vertexObjectRender->getMeshID()]);
-
-	if (currentMesh == nullptr)
-	{
-		throw runtime_error("An entity having a collider component has a render component that doesn't countain a Mesh");
-	}
+	Mesh* currentMesh = meshes[vertexObject->getMeshID()];
 
 	// Check if any of the vertices are inside the sphere
-	std::vector<int>& indices = collisionData[vertexObjectRender->getMeshID()].uniqueVerticesIndices;
+	std::vector<int>& indices = collisionData[vertexObject->getMeshID()].uniqueVerticesIndices;
 	vector<GLfloat>& vertices = *currentMesh->getVerticies();
 	for (size_t i = 0; i < indices.size(); i++)
 	{

@@ -64,6 +64,8 @@ int main()
 	//mesh->makeMesh("cube.obj"); //dynamically change mesh
  	RenderEngine::getInstance()->addRenderReference(mesh);
 	RenderEngine::getInstance()->addRenderReference(mesh2);
+	CollisionEngine::getInstance()->addMesh(mesh);
+	CollisionEngine::getInstance()->addMesh(mesh2);
 	int numX = 2;
 	int numY = 1;
 	int numZ = 1;
@@ -82,6 +84,7 @@ int main()
 				r->setMeshID(x);
 				PhysicsComponent* p = new PhysicsComponent();
 				CollisionComponent* c = new CollisionComponent();
+				c->setMeshID(x);
 				e->addComponent(p);
 				e->addComponent(r);
 				e->addComponent(c);
@@ -89,7 +92,7 @@ int main()
 				moment*(1.0f / 12.0f) * (2.0f);
 				RenderEngine::getInstance()->addComponent(r);
 				PhysicsEngine::getInstance()->addComponent(p);
-				e->translation = glm::translate(e->translation, glm::vec3(x*disp, y*disp + float(x), z*disp + float(x) * 1.5));
+				e->translation = glm::translate(e->translation, glm::vec3(x*disp, y*disp + float(x), z*disp + float(x) * 1.8));
 				CollisionEngine::getInstance()->addComponent(c);
 				entities.push_back(e);
 			}

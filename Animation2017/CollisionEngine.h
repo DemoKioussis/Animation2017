@@ -17,6 +17,9 @@ struct CollisionData
 
 class CollisionEngine : public Engine
 {
+	std::vector<Mesh*> meshes;
+	
+
 	static CollisionEngine* instance;
 	std::unordered_map<int, CollisionData> collisionData; // Maps the mesh with its collision data
 
@@ -28,6 +31,8 @@ class CollisionEngine : public Engine
 	bool areCollidingGJK(CollisionComponent* c1, CollisionComponent* c2);
 public:
 	static void Initialize();
+	void addMesh(Mesh *_mesh);
+	std::vector<Mesh*>& getAllMeshes();
 	static CollisionEngine * getInstance();
 	void step();
 	void calculateUniqueIndicesAndFurthestDistances();

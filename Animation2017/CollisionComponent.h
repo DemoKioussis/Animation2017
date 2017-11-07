@@ -11,10 +11,20 @@
 class CollisionComponent : public Component
 {
 	friend class CollisionEngine;
-	//ColliderType colliderType;
+	
+	int mesh;
+
 public:
 	CollisionComponent() : Component() //,colliderType(_colliderType)
 	{
 		componentType = COLLISION_COMPONENT;
 	}
+
+	const int getMeshID() {
+		return mesh;
+	};
+
+	void setMeshID(int _i) {
+		mesh = _i;
+	};
 };

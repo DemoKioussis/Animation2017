@@ -1,10 +1,8 @@
 #pragma once
 
 #include <unordered_set>
-#include "RenderEngine.h"
 #include "CollisionComponent.h"
 #include "Entity.h"
-#include "RenderComponent.h"
 #include "CollisionEngine.h"
 #include "EPA.h"
 
