@@ -59,7 +59,7 @@ int main()
 
 #pragma endregion
 
-	Mesh* mesh = new Mesh("sphere.obj", MeshType::SPHERE);
+	Mesh* mesh = new Mesh("cube.obj", MeshType::VERTICES);
 	Mesh* mesh2 = new Mesh("cube.obj", MeshType::VERTICES);
 	//mesh->makeMesh("cube.obj"); //dynamically change mesh
  	RenderEngine::getInstance()->addRenderReference(mesh);

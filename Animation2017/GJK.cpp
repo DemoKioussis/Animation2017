@@ -54,8 +54,13 @@ bool GJK::areColliding()
 		if (simplex(direction))
 		{
 			EPA epa(*this);
-			vec3 t = epa.getPenetrationVector();
-			cout << "Penetration vector : " << t.x << ", " << t.y << ", " << t.z << endl;
+			vec3 penetrationVector = epa.getPenetrationVector();
+			CollisionResult* collisionResult = new CollisionResult;
+			collisionResult->c1 = &c1;
+			collisionResult->c2 = &c2;
+			collisionResult->penetrationVector = penetrationVector;
+
+			CollisionEngine::getInstance()->addCollisionResult(collisionResult);
 			return true;
 		}
 	}

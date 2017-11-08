@@ -48,7 +48,7 @@ void CollisionComponent::updateBoundingShapes()
 		boundingBox.y = max(abs(smallest.y), biggest.y);
 		boundingBox.z = max(abs(smallest.z), biggest.z);
 
-		boundingRadius = max(boundingBox.x, max(boundingBox.y, boundingBox.z));
+		boundingRadius = glm::length(boundingBox);
 	}
 	else // MeshType is SPHERE
 	{

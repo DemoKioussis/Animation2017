@@ -88,10 +88,14 @@ void CollisionEngine::step()
 		return;
 	}
 
+	clearCollisionResults();
+
 	createVonNeumannGrid();
 	checkCollisionsVonNeumannGrid();
 	clearVonNeumannGrid();
 
+	checkStaticCollisions();
+		
 	// Just for testing the areSpheresColliding() method
 	/*bool colliding = areColliding((CollisionComponent*)targetComponents[0], (CollisionComponent*)targetComponents[1]);
 	cout << "Are colliding: " << (colliding ? "true" : "false") << endl;*/
@@ -137,12 +141,17 @@ void CollisionEngine::clearVonNeumannGrid()
 void CollisionEngine::checkCollisionsVonNeumannGrid()
 {
 	#pragma omp parallel for
-	for (int targetComponentIndex = 0; targetComponentIndex < targetComponents.size(); targetComponentIndex++)
+	for (int dynamicComponentIndex = 0; dynamicComponentIndex < targetComponents.size(); dynamicComponentIndex++)
 	{
+		CollisionComponent* cc = reinterpret_cast<CollisionComponent*>(targetComponents[dynamicComponentIndex]);
+
+		if (cc->entity->isStatic())
+		{
+			continue;
+		}
+
 		static const int neigboursCount = 14;
 		std::vector<CollisionComponent*>* neigbours[neigboursCount];
-
-		CollisionComponent* cc = reinterpret_cast<CollisionComponent*>(targetComponents[targetComponentIndex]);
 
 		neigbours[0] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(0, 0, 0));
 		neigbours[1] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(0, 1, -1));
@@ -168,7 +177,7 @@ void CollisionEngine::checkCollisionsVonNeumannGrid()
 				{
 					if (cc->uid != neigboursSameCell[i]->uid)
 					{
-						areColliding(cc, neigboursSameCell[i]);
+						areCollidingDynamic(cc, neigboursSameCell[i]);
 					}
 				}
 			}						
@@ -205,20 +214,78 @@ std::vector<CollisionComponent*>* CollisionEngine::getAtVonNeumannPosition(glm::
 	return vonNeumannGrid.find(hashedPosition) != vonNeumannGrid.end() ? vonNeumannGrid[hashPosition(position)] : nullptr;
 }
 
-bool CollisionEngine::areColliding(CollisionComponent * c1, CollisionComponent * c2)
+void CollisionEngine::checkStaticCollisions()
+{
+	for (int staticComponentIndex = 0; staticComponentIndex < targetComponents.size(); staticComponentIndex++)
+	{
+		CollisionComponent* sc = reinterpret_cast<CollisionComponent*>(targetComponents[staticComponentIndex]);
+
+		if (!sc->entity->isStatic())
+		{
+			continue;
+		}
+
+		for (int dynamicComponentIndex = 0; dynamicComponentIndex < targetComponents.size(); dynamicComponentIndex++)
+		{
+			CollisionComponent* dc = reinterpret_cast<CollisionComponent*>(targetComponents[dynamicComponentIndex]);
+
+			if (dc->entity->isStatic())
+			{
+				continue;
+			}
+
+			areCollidingStatic(sc, dc);
+		}
+	}
+}
+
+bool CollisionEngine::areCollidingDynamic(CollisionComponent * c1, CollisionComponent * c2)
 {
 	Mesh* m1 = meshes[c1->getMeshID()];
 	Mesh* m2 = meshes[c2->getMeshID()];
 
-	if (m1->getMeshType() == MeshType::SPHERE && m2->getMeshType() == MeshType::SPHERE)
+	if (m1->getMeshType() == MeshType::SPHERE && m2->getMeshType() == MeshType::SPHERE && !c1->isNotPureSphere && !c1->isNotPureSphere)
 	{
 		// Sphere collides with sphere
 		return areSpheresColliding(c1, c2); 
 	}
 	else // Any other collisions
 	{
-		return areCollidingGJK(c1, c2); // For testing
+		return areSpheresColliding(c1, c2) ? areCollidingGJK(c1, c2) : false; // For testing
 	}
+}
+
+bool CollisionEngine::areCollidingStatic(CollisionComponent * s, CollisionComponent * d)
+{
+	return areBoundingBoxesColliding(s,d) ? areCollidingGJK(s, d) : false;
+}
+
+bool CollisionEngine::areBoundingBoxesColliding(CollisionComponent* box, CollisionComponent* sphere)
+{
+	vec4 boxCenter = box->getTransform() * vec4(0, 0, 0, 1);
+	vec4 sphereCenter = sphere->getTransform() * vec4(0, 0, 0, 1);
+
+	// Check ifthe closest point of the sphere is inside the box
+	vec4 fromSphereToBox = boxCenter - sphereCenter;
+	vec4 fromSphereToBoxOnSphereSurface = glm::normalize(fromSphereToBox) * (sphere->getBoundingRadius());
+	if (isPointInsideBox(box, sphereCenter + fromSphereToBoxOnSphereSurface))
+	{
+		return true;
+	}
+
+	// Check if the center of the box is inside the sphere
+	if (glm::length(fromSphereToBox) < sphere->getBoundingRadius())
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool CollisionEngine::isPointInsideBox(CollisionComponent* box, glm::vec4 point)
+{
+	vec3& bb = box->getBoundingBox();
+	return abs(point.x) < bb.x  || abs(point.y) < bb.y || abs(point.z) < bb.z;
 }
 
 bool CollisionEngine::areSpheresColliding(CollisionComponent * c1, CollisionComponent * c2)
@@ -301,4 +368,20 @@ std::unordered_map<int, CollisionData>& CollisionEngine::getCollisionData()
 void CollisionEngine::updateMaxRadiusIfBigger(float _maxRadius)
 {
 	maxRadius = max(_maxRadius, maxRadius);
+}
+
+void CollisionEngine::clearCollisionResults()
+{
+	for (size_t i = 0; i < collisionResults.size(); i++)
+	{
+		delete collisionResults[i];
+	}
+	collisionResults.clear();
+}
+
+void CollisionEngine::addCollisionResult(CollisionResult * collisionResult)
+{
+	collisionResultsMutex.lock();
+	collisionResults.push_back(collisionResult);
+	collisionResultsMutex.unlock();
 }
