@@ -66,7 +66,7 @@ int main()
 	RenderEngine::getInstance()->addRenderReference(mesh2);
 	CollisionEngine::getInstance()->addMesh(mesh);
 	CollisionEngine::getInstance()->addMesh(mesh2);
-	int numX = 2;
+	int numX = 4;
 	int numY = 1;
 	int numZ = 1;
 
@@ -81,10 +81,10 @@ int main()
 			for (int z = 0; z < numZ;z++) {
 				Entity* e = new Entity(false);
 				RenderComponent *r = new RenderComponent();
-				r->setMeshID(x);
+				r->setMeshID(x % 2);
 				PhysicsComponent* p = new PhysicsComponent();
 				CollisionComponent* c = new CollisionComponent();
-				c->setMeshID(x);
+				c->setMeshID(x % 2);
 				e->addComponent(p);
 				e->addComponent(r);
 				e->addComponent(c);
@@ -100,8 +100,7 @@ int main()
 	}
 
 	CollisionEngine::getInstance()->calculateUniqueIndices(); // Important for updating the info about the collisions
-
-	CollisionEngine::getInstance()->updateAllBoundingBoxesIfStatic();
+	CollisionEngine::getInstance()->updateAllBoundingBoxes(); // Can only be called after calculating the unique indices
 
 	InputManager::Entities = &entities;
 	glm::mat4 rotation(1.0f), projection;

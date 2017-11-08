@@ -4,6 +4,8 @@
 
 #include <stdexcept>
 #include <iostream>
+#include <cmath>
+#include <omp.h>
 
 using namespace std;
 using namespace glm;
@@ -16,21 +18,13 @@ void CollisionEngine::Initialize()
 		return;
 	CollisionEngine * engine = new CollisionEngine();
 	instance = engine;
+	getInstance()->maxRadius = 0;
 	engine->enable();
 }
 
 CollisionEngine * CollisionEngine::getInstance()
 {
 	return instance;
-}
-
-void CollisionEngine::step()
-{	
-	if (isEnabled()) {
-		// Just for testing the areSpheresColliding() method
-		bool colliding = areColliding((CollisionComponent*)targetComponents[0], (CollisionComponent*)targetComponents[1]);
-		cout << "Are colliding: " << (colliding ? "true" : "false") << endl;
-	}
 }
 
 // Calculate uniqe indices
@@ -42,29 +36,26 @@ void CollisionEngine::calculateUniqueIndices()
 		vector<GLfloat>& vertices = *meshes[meshId]->getVerticies();
 		MeshType meshType = meshes[meshId]->getMeshType();
 
-		//if (meshType == MeshType::VERTICES)
+		// Iterate through all the vertices
+		for (int index = 0; index < vertices.size(); index += 9)
 		{
-			// Iterate through all the vertices
-			for (int index = 0; index < vertices.size(); index += 9)
-			{
-				glm::vec3 vertex(vertices[index], vertices[index + 1], vertices[index + 2]);
+			glm::vec3 vertex(vertices[index], vertices[index + 1], vertices[index + 2]);
 
-				// Store the index for the current vertex if there isn't already a vertex with almsot the same position
-				bool alreadyExists = false;
-				for (int existingIndex : collision.uniqueVerticesIndices)
+			// Store the index for the current vertex if there isn't already a vertex with almsot the same position
+			bool alreadyExists = false;
+			for (int existingIndex : collision.uniqueVerticesIndices)
+			{
+				vec3 alreadyExisting(vertices[existingIndex], vertices[existingIndex + 1], vertices[existingIndex + 2]);
+				float lengthOfDifference = glm::length(vertex - alreadyExisting);
+				if (lengthOfDifference < 0.001f)
 				{
-					vec3 alreadyExisting(vertices[existingIndex], vertices[existingIndex + 1], vertices[existingIndex + 2]);
-					float lengthOfDifference = glm::length(vertex - alreadyExisting);
-					if (lengthOfDifference < 0.001f)
-					{
-						// Difference is too small, we consider them as being the same vertex
-						alreadyExists = true;
-					}
+					// Difference is too small, we consider them as being the same vertex
+					alreadyExists = true;
 				}
-				if (!alreadyExists)
-				{
-					collision.uniqueVerticesIndices.push_back(index);
-				}
+			}
+			if (!alreadyExists)
+			{
+				collision.uniqueVerticesIndices.push_back(index);
 			}
 		}
 
@@ -72,12 +63,12 @@ void CollisionEngine::calculateUniqueIndices()
 	}
 }
 
-void CollisionEngine::updateAllBoundingBoxesIfStatic()
+void CollisionEngine::updateAllBoundingBoxes()
 {
 	for (Component* c : targetComponents)
 	{		
 		CollisionComponent* cc = reinterpret_cast<CollisionComponent*>(c);		
-		cc->updateBoundingShape();
+		cc->updateBoundingShapes();
 	}
 }
 
@@ -89,6 +80,110 @@ void CollisionEngine::addMesh(Mesh * _mesh)
 std::vector<Mesh*>& CollisionEngine::getAllMeshes()
 {
 	return meshes;
+}
+
+void CollisionEngine::step()
+{
+	if (!isEnabled()) {
+		return;
+	}
+
+	createVonNeumannGrid();
+	checkCollisionsVonNeumannGrid();
+
+	// Just for testing the areSpheresColliding() method
+	bool colliding = areColliding((CollisionComponent*)targetComponents[0], (CollisionComponent*)targetComponents[1]);
+	cout << "Are colliding: " << (colliding ? "true" : "false") << endl;
+}
+
+
+void CollisionEngine::createVonNeumannGrid()
+{
+	vonNeumannGrid.clear();
+	for (Component* c : targetComponents)
+	{
+		CollisionComponent* cc = reinterpret_cast<CollisionComponent*>(c);
+		std::vector<int>& indices = collisionData[cc->getMeshID()].uniqueVerticesIndices;
+		vector<GLfloat>& vertices = *meshes[cc->getMeshID()]->getVerticies();
+
+		if (c->entity->isStatic())
+		{
+			continue;
+		}
+
+		vec4 positionWC = c->getTransform() * vec4(0, 0, 0, 1);		
+
+		long long hashed = hashAndWritePosition(positionWC, cc);
+
+		vonNeumannGrid[hashed].push_back(cc);
+	}	
+}
+
+void CollisionEngine::checkCollisionsVonNeumannGrid()
+{
+	//#pragma omp parallel for
+	for (int targetComponentIndex = 0; targetComponentIndex < targetComponents.size(); targetComponentIndex++)
+	{
+		static const int neigboursCount = 14;
+		std::vector<CollisionComponent*>* neigbours[neigboursCount];
+
+		CollisionComponent* cc = reinterpret_cast<CollisionComponent*>(targetComponents[targetComponentIndex]);
+
+		neigbours[0] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(0, 0, 0));
+		neigbours[1] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(0, 1, -1));
+		neigbours[2] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(0, 1, 0));
+		neigbours[3] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(0, 1, 1));
+		neigbours[4] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(0, 0, 1));
+		neigbours[5] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(1, -1, -1));
+		neigbours[6] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(1, -1, 0));
+		neigbours[7] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(1, -1, 1));
+		neigbours[8] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(1, 0, -1));
+		neigbours[9] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(1, 0, 0));
+		neigbours[10] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(1, 0, 1));
+		neigbours[11] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(1, 1, -1));
+		neigbours[12] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(1, 1, 0));
+		neigbours[13] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(1, 1, 1));
+
+		for (size_t cellIndex = 0; cellIndex < neigboursCount; cellIndex++)
+		{
+			std::vector<CollisionComponent*>& neigboursSameCell = *neigbours[cellIndex];
+			for (size_t i = 0; i < neigboursSameCell.size(); i++)
+			{
+				if (cc->uid != neigboursSameCell[i]->uid)
+				{
+					areColliding(cc, neigboursSameCell[i]);
+				}				
+			}			
+		}
+	}
+}
+
+long long CollisionEngine::hashAndWritePosition(vec4 positionWC, CollisionComponent* cc)
+{
+	float cellSize = maxRadius * 2.1;
+
+	ivec3 position;
+	position.x = floor(positionWC.x / cellSize);
+	position.y = floor(positionWC.y / cellSize);
+	position.z = floor(positionWC.z / cellSize);
+
+	cc->vonNeumannPosition = position;
+
+	return hashPosition(position);
+}
+
+long long CollisionEngine::hashPosition(glm::ivec3 position)
+{
+	long long x = position.x << 42;
+	long long y = position.y << 21;
+	long long z = position.z;
+
+	return x | y | z;
+}
+
+std::vector<CollisionComponent*>* CollisionEngine::getAtVonNeumannPosition(glm::ivec3 position)
+{
+	return &vonNeumannGrid[hashPosition(position)];
 }
 
 bool CollisionEngine::areColliding(CollisionComponent * c1, CollisionComponent * c2)
@@ -182,4 +277,9 @@ bool CollisionEngine::areCollidingGJK(CollisionComponent * c1, CollisionComponen
 std::unordered_map<int, CollisionData>& CollisionEngine::getCollisionData()
 {
 	return collisionData;
+}
+
+void CollisionEngine::updateMaxRadiusIfBigger(float _maxRadius)
+{
+	maxRadius = max(_maxRadius, maxRadius);
 }

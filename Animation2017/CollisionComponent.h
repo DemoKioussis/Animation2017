@@ -9,11 +9,19 @@ class CollisionComponent : public Component
 	int meshID;
 	float boundingRadius;
 	glm::vec3 boundingBox;
+	bool updateHasBeenCalledOnce;
+	bool isNotPureSphere;
+	glm::ivec3 vonNeumannPosition;
+	int uid;
+	static int uidCounter;
 
 public:
-	CollisionComponent() : Component() , boundingBox(0,0,0)
+	
+
+	CollisionComponent() : Component() , boundingBox(0,0,0), updateHasBeenCalledOnce(false), isNotPureSphere(false)
 	{
 		componentType = COLLISION_COMPONENT;
+		uid = ++uidCounter;
 	}
 
 	const int getMeshID() {
@@ -34,5 +42,5 @@ public:
 		return boundingBox;
 	}
 
-	void updateBoundingShape();
+	void updateBoundingShapes();
 };

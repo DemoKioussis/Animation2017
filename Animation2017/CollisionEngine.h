@@ -17,11 +17,17 @@ struct CollisionData
 class CollisionEngine : public Engine
 {
 	std::vector<Mesh*> meshes;
-	
+	float maxRadius;
 
 	static CollisionEngine* instance;
 	std::unordered_map<int, CollisionData> collisionData; // Maps the mesh with its collision data
+	std::unordered_map<long long, std::vector<CollisionComponent*>> vonNeumannGrid;
 	
+	void createVonNeumannGrid();
+	void checkCollisionsVonNeumannGrid();
+	long long hashAndWritePosition(glm::vec4 positionWC, CollisionComponent* cc);
+	long long hashPosition(glm::ivec3 position);
+	std::vector<CollisionComponent*>* getAtVonNeumannPosition(glm::ivec3 position);
 	bool areColliding(CollisionComponent* c1, CollisionComponent* c2);
 	bool areSpheresColliding(CollisionComponent* c1, CollisionComponent* c2);
 	bool isSphereCollidingWithVertexObject(CollisionComponent* sphere, CollisionComponent* vertexObject);
@@ -33,6 +39,7 @@ public:
 	static CollisionEngine * getInstance();
 	void step();
 	void calculateUniqueIndices();
-	void updateAllBoundingBoxesIfStatic();
+	void updateAllBoundingBoxes();
 	std::unordered_map<int, CollisionData>& getCollisionData();
+	void updateMaxRadiusIfBigger(float _maxRadius);
 };
