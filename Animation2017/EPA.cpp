@@ -28,7 +28,7 @@ glm::vec3 EPA::getPenetrationVector()
 		vec3 supportPoint = gjk.support(normalOfClosest);
 		vec3 projection = projectionOnNormal(supportPoint, normalOfClosest);
 		float projectionLength = glm::length(projection);
-		cout << ++iterations << ", " << closestFaceDistance << endl;
+		//cout << ++iterations << ", " << closestFaceDistance << endl;
 		if (abs(projectionLength - closestFaceDistance) < 0.01f)
 		{
 			for (size_t i = 0; i < faces.size(); i++)

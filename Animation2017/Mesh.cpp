@@ -212,9 +212,13 @@ void Mesh::setBufferData(vector<glm::mat4> & data) {
 		glVertexAttribDivisor(5, 1);
 		glVertexAttribDivisor(6, 1);
 	}
-	else
+	else if (data.size() > 0) {
 		glBufferSubData(GL_ARRAY_BUFFER, 0, data.size() * sizeof(glm::mat4), &data[0]);
-
+	}
+	else
+	{
+		glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(glm::mat4), nullptr, GL_DYNAMIC_DRAW);
+	}
 
 }
 #pragma endregion

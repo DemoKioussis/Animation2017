@@ -81,10 +81,10 @@ int main()
 			for (int z = 0; z < numZ;z++) {
 				Entity* e = new Entity(false);
 				RenderComponent *r = new RenderComponent();
-				r->setMeshID(x % 2);
+				r->setMeshID(0);
 				PhysicsComponent* p = new PhysicsComponent();
 				CollisionComponent* c = new CollisionComponent();
-				c->setMeshID(x % 2);
+				c->setMeshID(0);
 				e->addComponent(p);
 				e->addComponent(r);
 				e->addComponent(c);
