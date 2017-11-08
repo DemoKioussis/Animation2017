@@ -101,6 +101,8 @@ int main()
 
 	CollisionEngine::getInstance()->calculateUniqueIndices(); // Important for updating the info about the collisions
 
+	CollisionEngine::getInstance()->updateAllBoundingBoxesIfStatic();
+
 	InputManager::Entities = &entities;
 	glm::mat4 rotation(1.0f), projection;
 

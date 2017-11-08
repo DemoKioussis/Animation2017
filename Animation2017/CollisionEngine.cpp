@@ -42,10 +42,8 @@ void CollisionEngine::calculateUniqueIndices()
 		vector<GLfloat>& vertices = *meshes[meshId]->getVerticies();
 		MeshType meshType = meshes[meshId]->getMeshType();
 
-		if (meshType == MeshType::VERTICES)
+		//if (meshType == MeshType::VERTICES)
 		{
-			collision.distanceToFurthestPoint = 0;
-
 			// Iterate through all the vertices
 			for (int index = 0; index < vertices.size(); index += 9)
 			{
@@ -67,22 +65,19 @@ void CollisionEngine::calculateUniqueIndices()
 				{
 					collision.uniqueVerticesIndices.push_back(index);
 				}
-
-				// Calculate the distance to the furthest point				
-				float lengthOfVertex = glm::length(vertex);
-				if (lengthOfVertex > collision.distanceToFurthestPoint)
-				{
-					collision.distanceToFurthestPoint = lengthOfVertex;
-				}
 			}
-		}
-		else // Sphere
-		{
-			glm::vec3 vertex(vertices[0], vertices[1], vertices[2]);
-			collision.distanceToFurthestPoint = glm::length(vertex);
 		}
 
 		collisionData[meshId] = std::move(collision);
+	}
+}
+
+void CollisionEngine::updateAllBoundingBoxesIfStatic()
+{
+	for (Component* c : targetComponents)
+	{		
+		CollisionComponent* cc = reinterpret_cast<CollisionComponent*>(c);		
+		cc->updateBoundingShape();
 	}
 }
 
@@ -125,7 +120,7 @@ bool CollisionEngine::areSpheresColliding(CollisionComponent * c1, CollisionComp
 	vec4 centerInWorldCoordinates2 = transformMatrix2 * origin;
 
 	float distanceBetweenOrigins = glm::length(centerInWorldCoordinates2 - centerInWorldCoordinates1);
-	float sumOfRadiuses = collisionData[c1->getMeshID()].distanceToFurthestPoint + collisionData[c2->getMeshID()].distanceToFurthestPoint;
+	float sumOfRadiuses = c1->getBoundingRadius() + c2->getBoundingRadius();
 
 	return sumOfRadiuses > distanceBetweenOrigins;
 }
@@ -143,10 +138,10 @@ bool CollisionEngine::isSphereCollidingWithVertexObject(CollisionComponent * sph
 	vec4 centerInWorldCoordinatesSphere = transformMatrixSphere * origin;
 	vec4 centerInWorldCoordinatesVertex = transformMatrixVertex * origin;
 
-	float sphereRadius = collisionData[sphere->getMeshID()].distanceToFurthestPoint;
+	float sphereRadius = sphere->getBoundingRadius();
 		 
 	float distanceBetweenOrigins = glm::length(centerInWorldCoordinatesVertex - centerInWorldCoordinatesSphere);
-	float sumOfRadiuses = sphereRadius + collisionData[vertexObject->getMeshID()].distanceToFurthestPoint;
+	float sumOfRadiuses = sphereRadius + vertexObject->getBoundingRadius();
 
 	if (sumOfRadiuses <= distanceBetweenOrigins)
 	{

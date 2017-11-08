@@ -1,30 +1,38 @@
 #pragma once
 #include "Component.h"
-#include "CollisionEngine.h"
-
-//enum class ColliderType
-//{
-//	VERTICES,
-//	SPHERE
-//};
+#include "Entity.h"
 
 class CollisionComponent : public Component
 {
 	friend class CollisionEngine;
 	
-	int mesh;
+	int meshID;
+	float boundingRadius;
+	glm::vec3 boundingBox;
 
 public:
-	CollisionComponent() : Component() //,colliderType(_colliderType)
+	CollisionComponent() : Component() , boundingBox(0,0,0)
 	{
 		componentType = COLLISION_COMPONENT;
 	}
 
 	const int getMeshID() {
-		return mesh;
+		return meshID;
 	};
 
 	void setMeshID(int _i) {
-		mesh = _i;
+		meshID = _i;
 	};
+
+	float getBoundingRadius()
+	{
+		return boundingRadius;
+	}
+
+	glm::vec3 getBoundingBox()
+	{
+		return boundingBox;
+	}
+
+	void updateBoundingShape();
 };

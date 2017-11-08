@@ -72,8 +72,8 @@ glm::vec3 GJK::support(glm::vec3& directionWC)
 	vec3 directionOC2 = transform2I * vec4(-directionWC, 0);
 	vec3 directionOC2normalized = glm::normalize(directionOC2);
 
-	vec3 furthestOC1 = (meshType1 == MeshType::VERTICES) ? furthestPointInDirectionVertex(directionOC1normalized, *vertices1, *indices1) : furthestPointInDirectionSphere(directionOC1normalized, collisionData1);
-	vec3 furthestOC2 = (meshType2 == MeshType::VERTICES) ? furthestPointInDirectionVertex(directionOC2normalized, *vertices2, *indices2) : furthestPointInDirectionSphere(directionOC2normalized, collisionData2);
+	vec3 furthestOC1 = (meshType1 == MeshType::VERTICES) ? furthestPointInDirectionVertex(directionOC1normalized, *vertices1, *indices1) : furthestPointInDirectionSphere(directionOC1normalized,  c1);
+	vec3 furthestOC2 = (meshType2 == MeshType::VERTICES) ? furthestPointInDirectionVertex(directionOC2normalized, *vertices2, *indices2) : furthestPointInDirectionSphere(directionOC2normalized, c2);
 
 	vec3 furthestWC1 = transform1 * vec4(furthestOC1, 1);
 	vec3 furthestWC2 = transform2 * vec4(furthestOC2, 1);
@@ -103,9 +103,9 @@ glm::vec3 GJK::furthestPointInDirectionVertex(glm::vec3& directionOCnormalized, 
 	return mostSimilarVectorOC;
 }
 
-glm::vec3 GJK::furthestPointInDirectionSphere(glm::vec3& directionOCnormalized, CollisionData* collisionData)
+glm::vec3 GJK::furthestPointInDirectionSphere(glm::vec3& directionOCnormalized, CollisionComponent& collisionComponent)
 {
-	return directionOCnormalized * collisionData->distanceToFurthestPoint;
+	return directionOCnormalized * collisionComponent.getBoundingRadius();
 }
 
 bool GJK::simplex(vec3& direction)

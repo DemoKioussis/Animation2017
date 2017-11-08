@@ -152,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CollisionComponent.cpp" />
     <ClCompile Include="CollisionEngine.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="Entity.cpp" />

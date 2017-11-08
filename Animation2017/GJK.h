@@ -43,7 +43,7 @@ class GJK
 
 	glm::vec3 support(glm::vec3& directionWC);
 	glm::vec3 furthestPointInDirectionVertex(glm::vec3& directionOCnormalized, std::vector<GLfloat>& vertices, std::vector<int>& indices);
-	glm::vec3 furthestPointInDirectionSphere(glm::vec3& directionOCnormalized, CollisionData* collisionData);
+	glm::vec3 furthestPointInDirectionSphere(glm::vec3& directionOCnormalized, CollisionComponent& collisionComponent);
 	bool simplex(glm::vec3& direction);
 	bool simplex2(glm::vec3 & direction);
 	bool simplex3(glm::vec3 & direction);

@@ -90,6 +90,9 @@
     <ClCompile Include="EPA.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CollisionComponent.cpp">
+      <Filter>Source Files\Entity-Component\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mesh.h">

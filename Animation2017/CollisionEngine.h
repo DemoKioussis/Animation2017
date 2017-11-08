@@ -10,9 +10,8 @@ class GJK;
 
 struct CollisionData
 {
-	float distanceToFurthestPoint;
+	//float distanceToFurthestPoint;
 	std::vector<int> uniqueVerticesIndices; // Unique vertices indices with the corresponding furthest direction corresponding to that point
-	//MeshType meshType;
 };
 
 class CollisionEngine : public Engine
@@ -34,5 +33,6 @@ public:
 	static CollisionEngine * getInstance();
 	void step();
 	void calculateUniqueIndices();
+	void updateAllBoundingBoxesIfStatic();
 	std::unordered_map<int, CollisionData>& getCollisionData();
 };
