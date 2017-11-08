@@ -21,9 +21,10 @@ class CollisionEngine : public Engine
 
 	static CollisionEngine* instance;
 	std::unordered_map<int, CollisionData> collisionData; // Maps the mesh with its collision data
-	std::unordered_map<long long, std::vector<CollisionComponent*>> vonNeumannGrid;
+	std::unordered_map<long long, std::vector<CollisionComponent*>*> vonNeumannGrid;
 	
 	void createVonNeumannGrid();
+	void clearVonNeumannGrid();
 	void checkCollisionsVonNeumannGrid();
 	long long hashAndWritePosition(glm::vec4 positionWC, CollisionComponent* cc);
 	long long hashPosition(glm::ivec3 position);

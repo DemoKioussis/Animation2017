@@ -90,16 +90,16 @@ void CollisionEngine::step()
 
 	createVonNeumannGrid();
 	checkCollisionsVonNeumannGrid();
+	clearVonNeumannGrid();
 
 	// Just for testing the areSpheresColliding() method
-	bool colliding = areColliding((CollisionComponent*)targetComponents[0], (CollisionComponent*)targetComponents[1]);
-	cout << "Are colliding: " << (colliding ? "true" : "false") << endl;
+	/*bool colliding = areColliding((CollisionComponent*)targetComponents[0], (CollisionComponent*)targetComponents[1]);
+	cout << "Are colliding: " << (colliding ? "true" : "false") << endl;*/
 }
 
 
 void CollisionEngine::createVonNeumannGrid()
-{
-	vonNeumannGrid.clear();
+{	
 	for (Component* c : targetComponents)
 	{
 		CollisionComponent* cc = reinterpret_cast<CollisionComponent*>(c);
@@ -115,13 +115,28 @@ void CollisionEngine::createVonNeumannGrid()
 
 		long long hashed = hashAndWritePosition(positionWC, cc);
 
-		vonNeumannGrid[hashed].push_back(cc);
+		if (vonNeumannGrid.find(hashed) == vonNeumannGrid.end())
+		{
+			vonNeumannGrid[hashed] = new std::vector<CollisionComponent*>;
+		}
+
+		vonNeumannGrid[hashed]->push_back(cc);
 	}	
+}
+
+void CollisionEngine::clearVonNeumannGrid()
+{
+	for (auto iterator : vonNeumannGrid)
+	{
+		delete iterator.second;
+	}
+
+	vonNeumannGrid.clear();
 }
 
 void CollisionEngine::checkCollisionsVonNeumannGrid()
 {
-	//#pragma omp parallel for
+	#pragma omp parallel for
 	for (int targetComponentIndex = 0; targetComponentIndex < targetComponents.size(); targetComponentIndex++)
 	{
 		static const int neigboursCount = 14;
@@ -146,14 +161,17 @@ void CollisionEngine::checkCollisionsVonNeumannGrid()
 
 		for (size_t cellIndex = 0; cellIndex < neigboursCount; cellIndex++)
 		{
-			std::vector<CollisionComponent*>& neigboursSameCell = *neigbours[cellIndex];
-			for (size_t i = 0; i < neigboursSameCell.size(); i++)
+			if (neigbours[cellIndex] != nullptr)
 			{
-				if (cc->uid != neigboursSameCell[i]->uid)
+				std::vector<CollisionComponent*>& neigboursSameCell = *neigbours[cellIndex];
+				for (size_t i = 0; i < neigboursSameCell.size(); i++)
 				{
-					areColliding(cc, neigboursSameCell[i]);
-				}				
-			}			
+					if (cc->uid != neigboursSameCell[i]->uid)
+					{
+						areColliding(cc, neigboursSameCell[i]);
+					}
+				}
+			}						
 		}
 	}
 }
@@ -183,7 +201,8 @@ long long CollisionEngine::hashPosition(glm::ivec3 position)
 
 std::vector<CollisionComponent*>* CollisionEngine::getAtVonNeumannPosition(glm::ivec3 position)
 {
-	return &vonNeumannGrid[hashPosition(position)];
+	long long hashedPosition = hashPosition(position);
+	return vonNeumannGrid.find(hashedPosition) != vonNeumannGrid.end() ? vonNeumannGrid[hashPosition(position)] : nullptr;
 }
 
 bool CollisionEngine::areColliding(CollisionComponent * c1, CollisionComponent * c2)
