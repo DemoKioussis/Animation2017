@@ -20,16 +20,24 @@ EPA::EPA(GJK& gjkWithCollision) : gjk(gjkWithCollision)
 
 glm::vec3 EPA::getPenetrationVector()
 {
+	const float thresholdToStop = (gjk.meshType1 == MeshType::SPHERE || gjk.meshType2 == MeshType::SPHERE) ? 0.02 : 0.01;	
+
 	for (size_t iterations = 0; iterations < 100; iterations++)
 	{		
 		float closestFaceDistance;
-		Face& closestFace = getClosestFaceToOrigin(closestFaceDistance);
-		vec3 normalOfClosest = closestFace.getNormal();
+		Face* closestFace = getClosestFaceToOrigin(closestFaceDistance);
+
+		if (closestFace == nullptr)
+		{
+			break;
+		}
+
+		vec3 normalOfClosest = closestFace->getNormal();
 		vec3 supportPoint = gjk.support(normalOfClosest);
 		vec3 projection = projectionOnNormal(supportPoint, normalOfClosest);
 		float projectionLength = glm::length(projection);
 		//cout << ++iterations << ", " << closestFaceDistance << endl;
-		if (abs(projectionLength - closestFaceDistance) < 0.01f)
+		if (abs(projectionLength - closestFaceDistance) < thresholdToStop)
 		{
 			for (size_t i = 0; i < faces.size(); i++)
 			{
@@ -51,7 +59,7 @@ float EPA::distanceFromFaceToOrigin(Face & face)
 	return abs(glm::dot(face.getNormal(), face.a));
 }
 
-Face & EPA::getClosestFaceToOrigin(float& closestFaceDistance)
+Face* EPA::getClosestFaceToOrigin(float& closestFaceDistance)
 {
 	const vec3 origin(0,0,0);
 	closestFaceDistance = 1e30f;
@@ -68,7 +76,7 @@ Face & EPA::getClosestFaceToOrigin(float& closestFaceDistance)
 		}
 	}
 
-	return *closestFace;
+	return closestFace;
 }
 
 vec3 EPA::projectionOnNormal(glm::vec3 supportPoint, glm::vec3 normal)

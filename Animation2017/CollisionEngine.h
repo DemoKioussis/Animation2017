@@ -21,6 +21,12 @@ struct CollisionResult
 	CollisionComponent* c1;
 	CollisionComponent* c2;
 	glm::vec3 penetrationVector;
+
+	std::vector<glm::vec4> pointsC1;
+	std::vector<float> distancesToPointsFromOriginC1;
+
+	std::vector<glm::vec4> pointsC2;	
+	std::vector<float> distancesToPointsFromOriginC2;
 };
 
 class CollisionEngine : public Engine
@@ -60,7 +66,7 @@ public:
 	void calculateUniqueIndices();
 	void updateAllBoundingBoxes();
 	std::unordered_map<int, CollisionData>& getCollisionData();
-	void updateMaxRadiusIfBigger(float _maxRadius);
+	void updateMaxRadius();
 	void clearCollisionResults();
 	void addCollisionResult(CollisionResult* collisionResult);
 };

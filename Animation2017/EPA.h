@@ -33,7 +33,7 @@ class EPA
 	std::vector<Face*> faces;
 
 	float distanceFromFaceToOrigin(Face& face);
-	Face& getClosestFaceToOrigin(float& closestFaceDistance);
+	Face* getClosestFaceToOrigin(float& closestFaceDistance);
 	glm::vec3 projectionOnNormal(glm::vec3 supportPoint, glm::vec3 normal);
 	void extendPolytope(glm::vec3 extendPoint);
 	bool canSeeFaceFromPoint(Face& face, glm::vec3& point);

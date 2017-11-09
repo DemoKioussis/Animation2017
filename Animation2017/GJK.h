@@ -8,6 +8,7 @@
 
 class CollisionData;
 class EPA;
+class CollisionResult;
 
 class GJK
 {
@@ -41,9 +42,10 @@ class GJK
 	glm::vec3 d;
 	int pointsCount = 0;
 
-	glm::vec3 support(glm::vec3& directionWC);
-	glm::vec3 furthestPointInDirectionVertex(glm::vec3& directionOCnormalized, std::vector<GLfloat>& vertices, std::vector<int>& indices);
+	glm::vec3 support(const glm::vec3& directionWC);
+	glm::vec3 furthestPointInDirectionVertex(glm::vec3& directionOCnormalized, std::vector<GLfloat>& vertices, std::vector<int>& indices, std::vector<glm::vec4>* pointsForResult = nullptr);  //, std::vector<float>* distancesForResult = nullptr);
 	glm::vec3 furthestPointInDirectionSphere(glm::vec3& directionOCnormalized, CollisionComponent& collisionComponent);
+	void supportForResult(glm::vec3& penetrationVectorWC, CollisionResult& collisionResult);
 	bool simplex(glm::vec3& direction);
 	bool simplex2(glm::vec3 & direction);
 	bool simplex3(glm::vec3 & direction);

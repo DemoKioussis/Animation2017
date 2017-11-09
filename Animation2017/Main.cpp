@@ -60,18 +60,27 @@ int main()
 #pragma endregion
 
 	Mesh* mesh = new Mesh("cube.obj", MeshType::VERTICES);
-	Mesh* mesh2 = new Mesh("cube.obj", MeshType::VERTICES);
-	//mesh->makeMesh("cube.obj"); //dynamically change mesh
+	Mesh* mesh2 = new Mesh("cylinder.obj", MeshType::VERTICES);
+	Mesh* mesh3 = new Mesh("sphereLR.obj", MeshType::SPHERE);
+	Mesh* mesh4 = new Mesh("cube.obj", MeshType::VERTICES);
  	RenderEngine::getInstance()->addRenderReference(mesh);
 	RenderEngine::getInstance()->addRenderReference(mesh2);
+	RenderEngine::getInstance()->addRenderReference(mesh3);
+	RenderEngine::getInstance()->addRenderReference(mesh4);
 	CollisionEngine::getInstance()->addMesh(mesh);
 	CollisionEngine::getInstance()->addMesh(mesh2);
-	int numX = 5;
-	int numY = 1;
-	int numZ = 1;
+	CollisionEngine::getInstance()->addMesh(mesh3);
+	CollisionEngine::getInstance()->addMesh(mesh4);
+	int numX = 10;
+	int numY = 10;
+	int numZ = 10;
+
+	glCullFace(GL_BACK);
 
 	float disp = 1.0f;
 	std::vector<Entity*> entities(0);
+
+	float fieldSize = 30.f;
 
 	/*for (int x = -numX / 2; x < numX / 2; x++) {
 		for (int y = -numY / 2; y < numY / 2; y++) {
@@ -79,12 +88,17 @@ int main()
 	for (int x = 0; x < numX; x++) {
 		for (int y = 0; y < numY;y++) {
 			for (int z = 0; z < numZ;z++) {
+
+				float randomX = ((float(rand()) / float(RAND_MAX)) - 0.5f) * fieldSize;
+				float randomY = ((float(rand()) / float(RAND_MAX)) - 0.5f) * fieldSize;
+				float randomZ = ((float(rand()) / float(RAND_MAX)) - 0.5f) * fieldSize;
+
 				Entity* e = new Entity(false);
 				RenderComponent *r = new RenderComponent();
-				r->setMeshID(0);
+				r->setMeshID((x + y + z) % 3);
 				PhysicsComponent* p = new PhysicsComponent();
 				CollisionComponent* c = new CollisionComponent();
-				c->setMeshID(0);
+				c->setMeshID((x + y + z) % 3);
 				e->addComponent(p);
 				e->addComponent(r);
 				e->addComponent(c);
@@ -92,7 +106,7 @@ int main()
 				moment*(1.0f / 12.0f) * (2.0f);
 				RenderEngine::getInstance()->addComponent(r);
 				PhysicsEngine::getInstance()->addComponent(p);
-				e->translation = glm::translate(e->translation, glm::vec3(x*disp, y*disp + float(x), z*disp + float(x)));
+				e->translation = glm::translate(e->translation, glm::vec3(randomX, randomY, randomZ));
 				CollisionEngine::getInstance()->addComponent(c);
 				entities.push_back(e);
 			}

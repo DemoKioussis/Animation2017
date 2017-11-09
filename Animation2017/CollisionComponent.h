@@ -42,5 +42,15 @@ public:
 		return boundingBox;
 	}
 
+	bool getIsNotPureSphere()
+	{
+		return isNotPureSphere;
+	}
+
+	int getUid()
+	{
+		return uid;
+	}
+
 	void updateBoundingShapes();
 };

@@ -59,7 +59,7 @@ void CollisionComponent::updateBoundingShapes()
 
 	if (!entity->isStatic())
 	{
-		CollisionEngine::getInstance()->updateMaxRadiusIfBigger(boundingRadius);
+		CollisionEngine::getInstance()->updateMaxRadius();
 	}
 
 	updateHasBeenCalledOnce = true;

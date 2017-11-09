@@ -67,7 +67,7 @@ void CollisionEngine::updateAllBoundingBoxes()
 {
 	for (Component* c : targetComponents)
 	{		
-		CollisionComponent* cc = reinterpret_cast<CollisionComponent*>(c);		
+		CollisionComponent* cc = (CollisionComponent*)c;		
 		cc->updateBoundingShapes();
 	}
 }
@@ -95,10 +95,8 @@ void CollisionEngine::step()
 	clearVonNeumannGrid();
 
 	checkStaticCollisions();
-		
-	// Just for testing the areSpheresColliding() method
-	/*bool colliding = areColliding((CollisionComponent*)targetComponents[0], (CollisionComponent*)targetComponents[1]);
-	cout << "Are colliding: " << (colliding ? "true" : "false") << endl;*/
+
+	//std::cout << "Number of collisions on this step: " << collisionResults.size() << endl;
 }
 
 
@@ -106,7 +104,7 @@ void CollisionEngine::createVonNeumannGrid()
 {	
 	for (Component* c : targetComponents)
 	{
-		CollisionComponent* cc = reinterpret_cast<CollisionComponent*>(c);
+		CollisionComponent* cc = (CollisionComponent*)c;
 		std::vector<int>& indices = collisionData[cc->getMeshID()].uniqueVerticesIndices;
 		vector<GLfloat>& vertices = *meshes[cc->getMeshID()]->getVerticies();
 
@@ -143,7 +141,7 @@ void CollisionEngine::checkCollisionsVonNeumannGrid()
 	#pragma omp parallel for
 	for (int dynamicComponentIndex = 0; dynamicComponentIndex < targetComponents.size(); dynamicComponentIndex++)
 	{
-		CollisionComponent* cc = reinterpret_cast<CollisionComponent*>(targetComponents[dynamicComponentIndex]);
+		CollisionComponent* cc = (CollisionComponent*)targetComponents[dynamicComponentIndex];
 
 		if (cc->entity->isStatic())
 		{
@@ -221,9 +219,10 @@ std::vector<CollisionComponent*>* CollisionEngine::getAtVonNeumannPosition(glm::
 
 void CollisionEngine::checkStaticCollisions()
 {
+	#pragma omp parallel for
 	for (int staticComponentIndex = 0; staticComponentIndex < targetComponents.size(); staticComponentIndex++)
 	{
-		CollisionComponent* sc = reinterpret_cast<CollisionComponent*>(targetComponents[staticComponentIndex]);
+		CollisionComponent* sc = (CollisionComponent*)targetComponents[staticComponentIndex];
 
 		if (!sc->entity->isStatic())
 		{
@@ -232,7 +231,7 @@ void CollisionEngine::checkStaticCollisions()
 
 		for (int dynamicComponentIndex = 0; dynamicComponentIndex < targetComponents.size(); dynamicComponentIndex++)
 		{
-			CollisionComponent* dc = reinterpret_cast<CollisionComponent*>(targetComponents[dynamicComponentIndex]);
+			CollisionComponent* dc = (CollisionComponent*)targetComponents[dynamicComponentIndex];
 
 			if (dc->entity->isStatic())
 			{
@@ -273,7 +272,7 @@ bool CollisionEngine::areBoundingBoxesColliding(CollisionComponent* box, Collisi
 	// Check ifthe closest point of the sphere is inside the box
 	vec4 fromSphereToBox = boxCenter - sphereCenter;
 	vec4 fromSphereToBoxOnSphereSurface = glm::normalize(fromSphereToBox) * (sphere->getBoundingRadius());
-	if (isPointInsideBox(box, sphereCenter + fromSphereToBoxOnSphereSurface))
+	if (isPointInsideBox(box, sphereCenter + fromSphereToBoxOnSphereSurface - boxCenter))
 	{
 		return true;
 	}
@@ -305,10 +304,28 @@ bool CollisionEngine::areSpheresColliding(CollisionComponent * c1, CollisionComp
 	vec4 centerInWorldCoordinates1 = transformMatrix1 * origin;
 	vec4 centerInWorldCoordinates2 = transformMatrix2 * origin;
 
-	float distanceBetweenOrigins = glm::length(centerInWorldCoordinates2 - centerInWorldCoordinates1);
+	vec4 from1To2(centerInWorldCoordinates2 - centerInWorldCoordinates1);
+	vec4 from2To1(centerInWorldCoordinates1 - centerInWorldCoordinates2);
+
+	float distanceBetweenOrigins = glm::length(from1To2);
 	float sumOfRadiuses = c1->getBoundingRadius() + c2->getBoundingRadius();
 
-	return sumOfRadiuses > distanceBetweenOrigins;
+	if (sumOfRadiuses > distanceBetweenOrigins)
+	{
+		CollisionResult* collisionResult = new CollisionResult;
+		collisionResult->c1 = c1;
+		collisionResult->c2 = c2;
+		collisionResult->penetrationVector = glm::normalize(vec3(from1To2)) * (sumOfRadiuses - distanceBetweenOrigins);
+		collisionResult->pointsC1.push_back(glm::normalize(from1To2) * c1->getBoundingRadius());
+		collisionResult->pointsC2.push_back(glm::normalize(from2To1) * c1->getBoundingRadius());
+		collisionResult->distancesToPointsFromOriginC1.push_back(glm::length(vec3(from1To2)));
+		collisionResult->distancesToPointsFromOriginC2.push_back(glm::length(vec3(from1To2)));
+
+		CollisionEngine::getInstance()->addCollisionResult(collisionResult);
+		return true;
+	}
+
+	return false;
 }
 
 bool CollisionEngine::areCollidingGJK(CollisionComponent * c1, CollisionComponent * c2)
@@ -322,13 +339,25 @@ std::unordered_map<int, CollisionData>& CollisionEngine::getCollisionData()
 	return collisionData;
 }
 
-void CollisionEngine::updateMaxRadiusIfBigger(float _maxRadius)
+void CollisionEngine::updateMaxRadius()
 {
-	maxRadius = max(_maxRadius, maxRadius);
+	float currentMax = 0;
+
+	for (Component* c : targetComponents)
+	{
+		CollisionComponent* sc = (CollisionComponent*)c;
+
+		if (sc->boundingRadius > currentMax)
+		{
+			currentMax = sc->boundingRadius;
+		}
+	}
+
+	maxRadius = currentMax;
 }
 
 void CollisionEngine::clearCollisionResults()
-{
+{	
 	for (size_t i = 0; i < collisionResults.size(); i++)
 	{
 		delete collisionResults[i];
