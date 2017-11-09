@@ -5,6 +5,7 @@
 #include "Mesh.h"
 #include "GJK.h"
 #include <mutex>
+#include <vector>
 
 class CollisionComponent;
 class GJK;
@@ -29,7 +30,7 @@ class CollisionEngine : public Engine
 
 	static CollisionEngine* instance;
 	std::unordered_map<int, CollisionData> collisionData; // Maps the mesh with its collision data
-	std::unordered_map<long long, std::vector<CollisionComponent*>*> vonNeumannGrid;
+	std::unordered_map<unsigned long long, std::vector<CollisionComponent*>*> vonNeumannGrid;
 	std::vector<CollisionResult*> collisionResults;
 	std::mutex collisionResultsMutex;
 	
@@ -37,8 +38,8 @@ class CollisionEngine : public Engine
 	void createVonNeumannGrid();
 	void clearVonNeumannGrid();
 	void checkCollisionsVonNeumannGrid();
-	long long hashAndWritePosition(glm::vec4 positionWC, CollisionComponent* cc);
-	long long hashPosition(glm::ivec3 position);
+	unsigned long long hashAndWritePosition(glm::vec4 positionWC, CollisionComponent* cc);
+	unsigned long long hashPosition(glm::ivec3 position);
 	std::vector<CollisionComponent*>* getAtVonNeumannPosition(glm::ivec3 position);
 	bool areCollidingDynamic(CollisionComponent* c1, CollisionComponent* c2);
 
@@ -49,7 +50,6 @@ class CollisionEngine : public Engine
 	bool areBoundingBoxesColliding(CollisionComponent* box, CollisionComponent* sphere);
 	bool isPointInsideBox(CollisionComponent* box, glm::vec4 point);
 	bool areSpheresColliding(CollisionComponent* c1, CollisionComponent* c2);
-	bool isSphereCollidingWithVertexObject(CollisionComponent* sphere, CollisionComponent* vertexObject);
 	bool areCollidingGJK(CollisionComponent* c1, CollisionComponent* c2);
 public:
 	static void Initialize();

@@ -66,7 +66,7 @@ int main()
 	RenderEngine::getInstance()->addRenderReference(mesh2);
 	CollisionEngine::getInstance()->addMesh(mesh);
 	CollisionEngine::getInstance()->addMesh(mesh2);
-	int numX = 4;
+	int numX = 5;
 	int numY = 1;
 	int numZ = 1;
 
@@ -92,7 +92,7 @@ int main()
 				moment*(1.0f / 12.0f) * (2.0f);
 				RenderEngine::getInstance()->addComponent(r);
 				PhysicsEngine::getInstance()->addComponent(p);
-				e->translation = glm::translate(e->translation, glm::vec3(x*disp, y*disp + float(x), z*disp + float(x) * 1.8));
+				e->translation = glm::translate(e->translation, glm::vec3(x*disp, y*disp + float(x), z*disp + float(x)));
 				CollisionEngine::getInstance()->addComponent(c);
 				entities.push_back(e);
 			}

@@ -117,7 +117,7 @@ void CollisionEngine::createVonNeumannGrid()
 
 		vec4 positionWC = c->getTransform() * vec4(0, 0, 0, 1);		
 
-		long long hashed = hashAndWritePosition(positionWC, cc);
+		unsigned long long hashed = hashAndWritePosition(positionWC, cc);
 
 		if (vonNeumannGrid.find(hashed) == vonNeumannGrid.end())
 		{
@@ -175,7 +175,10 @@ void CollisionEngine::checkCollisionsVonNeumannGrid()
 				std::vector<CollisionComponent*>& neigboursSameCell = *neigbours[cellIndex];
 				for (size_t i = 0; i < neigboursSameCell.size(); i++)
 				{
-					if (cc->uid != neigboursSameCell[i]->uid)
+					CollisionComponent* cc2 = neigboursSameCell[i];
+
+					// Important to avoid calculating the collision twice for the same pair of objects
+					if (cc->vonNeumannPosition != cc2->vonNeumannPosition || cc->uid > cc2->uid) 
 					{
 						areCollidingDynamic(cc, neigboursSameCell[i]);
 					}
@@ -185,7 +188,7 @@ void CollisionEngine::checkCollisionsVonNeumannGrid()
 	}
 }
 
-long long CollisionEngine::hashAndWritePosition(vec4 positionWC, CollisionComponent* cc)
+unsigned long long CollisionEngine::hashAndWritePosition(vec4 positionWC, CollisionComponent* cc)
 {
 	float cellSize = maxRadius * 2.1;
 
@@ -199,11 +202,13 @@ long long CollisionEngine::hashAndWritePosition(vec4 positionWC, CollisionCompon
 	return hashPosition(position);
 }
 
-long long CollisionEngine::hashPosition(glm::ivec3 position)
+unsigned long long CollisionEngine::hashPosition(glm::ivec3 position)
 {
-	long long x = position.x << 42;
-	long long y = position.y << 21;
-	long long z = position.z;
+	static const unsigned long long mask = 2097151; // 2^21 - 1
+
+	long long x = (*reinterpret_cast<unsigned*>(&position.x) & mask) << 42 ;
+	long long y = (*reinterpret_cast<unsigned*>(&position.y) & mask) << 21;
+	long long z = (*reinterpret_cast<unsigned*>(&position.z) & mask);
 
 	return x | y | z;
 }
@@ -304,54 +309,6 @@ bool CollisionEngine::areSpheresColliding(CollisionComponent * c1, CollisionComp
 	float sumOfRadiuses = c1->getBoundingRadius() + c2->getBoundingRadius();
 
 	return sumOfRadiuses > distanceBetweenOrigins;
-}
-
-bool CollisionEngine::isSphereCollidingWithVertexObject(CollisionComponent * sphere, CollisionComponent * vertexObject)
-{
-
-	mat4& transformMatrixSphere = sphere->entity->transform;
-	mat4& transformMatrixVertex = vertexObject->entity->transform;
-
-	// Assuming that the origin of both of the entities is at (0,0,0)
-	vec4 origin(0, 0, 0, 1);
-
-	// Calculate the positions of the origins of both entities in world coordinates
-	vec4 centerInWorldCoordinatesSphere = transformMatrixSphere * origin;
-	vec4 centerInWorldCoordinatesVertex = transformMatrixVertex * origin;
-
-	float sphereRadius = sphere->getBoundingRadius();
-		 
-	float distanceBetweenOrigins = glm::length(centerInWorldCoordinatesVertex - centerInWorldCoordinatesSphere);
-	float sumOfRadiuses = sphereRadius + vertexObject->getBoundingRadius();
-
-	if (sumOfRadiuses <= distanceBetweenOrigins)
-	{
-		// Bounding spheres are not colliding, so we know that the two objects are not colliding
-		return false;
-	}
-
-	Mesh* currentMesh = meshes[vertexObject->getMeshID()];
-
-	// Check if any of the vertices are inside the sphere
-	std::vector<int>& indices = collisionData[vertexObject->getMeshID()].uniqueVerticesIndices;
-	vector<GLfloat>& vertices = *currentMesh->getVerticies();
-	for (size_t i = 0; i < indices.size(); i++)
-	{
-		vec4 vertexObjectCoordiantes(vertices[indices[i]], vertices[indices[i] + 1], vertices[indices[i] + 2] , 1);
-		vec4 vertexWorldCoordiantes = transformMatrixVertex * vertexObjectCoordiantes;
-		float distanceToVertexFromSphereCenter = glm::length(vertexWorldCoordiantes - centerInWorldCoordinatesSphere);
-
-		if (distanceToVertexFromSphereCenter < sphereRadius)
-		{
-			// A vetex is inside the sphere, so we know that the two object are colliding
-			return true;
-		}
-	}
-
-	// Check the center of the sphere is inside the vertex object
-	//// GJK ??????????????????????????????
-
-	return false;
 }
 
 bool CollisionEngine::areCollidingGJK(CollisionComponent * c1, CollisionComponent * c2)

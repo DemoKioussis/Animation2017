@@ -21,7 +21,7 @@ public:
 	CollisionComponent() : Component() , boundingBox(0,0,0), updateHasBeenCalledOnce(false), isNotPureSphere(false)
 	{
 		componentType = COLLISION_COMPONENT;
-		uid = ++uidCounter;
+		uid = uidCounter++;
 	}
 
 	const int getMeshID() {
