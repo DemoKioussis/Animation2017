@@ -80,7 +80,7 @@ int main()
 	float disp = 1.0f;
 	std::vector<Entity*> entities(0);
 
-	float fieldSize = 30.f;
+	float fieldSize = 25.f;
 
 	/*for (int x = -numX / 2; x < numX / 2; x++) {
 		for (int y = -numY / 2; y < numY / 2; y++) {

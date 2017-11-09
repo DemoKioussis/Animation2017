@@ -317,7 +317,7 @@ bool CollisionEngine::areSpheresColliding(CollisionComponent * c1, CollisionComp
 		collisionResult->c2 = c2;
 		collisionResult->penetrationVector = glm::normalize(vec3(from1To2)) * (sumOfRadiuses - distanceBetweenOrigins);
 		collisionResult->pointsC1.push_back(glm::normalize(from1To2) * c1->getBoundingRadius());
-		collisionResult->pointsC2.push_back(glm::normalize(from2To1) * c1->getBoundingRadius());
+		collisionResult->pointsC2.push_back(glm::normalize(from2To1) * c2->getBoundingRadius());
 		collisionResult->distancesToPointsFromOriginC1.push_back(glm::length(vec3(from1To2)));
 		collisionResult->distancesToPointsFromOriginC2.push_back(glm::length(vec3(from1To2)));
 

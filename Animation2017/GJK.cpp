@@ -167,7 +167,7 @@ void GJK::supportForResult(glm::vec3& penetrationVectorWC, CollisionResult& coll
 	for (size_t i = 0; i < collisionResult.pointsC1.size(); i++)
 	{
 		vec4 point1OC = transform1 * collisionResult.pointsC1[i];
-		collisionResult.pointsC1[i] = point1OC;
+		//collisionResult.pointsC1[i] = point1OC;
 		vec3 s = support(vec3(point1OC) - center1);
 		collisionResult.distancesToPointsFromOriginC1.push_back(glm::length(s));
 	}
@@ -176,7 +176,7 @@ void GJK::supportForResult(glm::vec3& penetrationVectorWC, CollisionResult& coll
 	for (size_t i = 0; i < collisionResult.pointsC2.size(); i++)
 	{
 		vec4 point2OC = transform2 * collisionResult.pointsC2[i];
-		collisionResult.pointsC2[i] = point2OC;
+		//collisionResult.pointsC2[i] = point2OC;
 		vec3 s = support(-(vec3(point2OC) - center2));
 		collisionResult.distancesToPointsFromOriginC2.push_back(glm::length(s));
 	}
