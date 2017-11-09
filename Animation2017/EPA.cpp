@@ -20,9 +20,9 @@ EPA::EPA(GJK& gjkWithCollision) : gjk(gjkWithCollision)
 
 glm::vec3 EPA::getPenetrationVector()
 {
-	const float thresholdToStop = (gjk.meshType1 == MeshType::SPHERE || gjk.meshType2 == MeshType::SPHERE) ? 0.02 : 0.01;	
+	const float thresholdToStop = (gjk.meshType1 == MeshType::SPHERE || gjk.meshType2 == MeshType::SPHERE) ? 0.05 : 0.01;	
 
-	for (size_t iterations = 0; iterations < 100; iterations++)
+	for (size_t iterations = 0; iterations < 40; iterations++)
 	{		
 		float closestFaceDistance;
 		Face* closestFace = getClosestFaceToOrigin(closestFaceDistance);

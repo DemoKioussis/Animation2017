@@ -34,7 +34,7 @@ bool GJK::areColliding()
 
 	vec3 direction = -furthestPoint;
 
-	for (size_t i = 0; i < 40; i++) // Limit of iterations to avoid looping forever in an unlucky case
+	for (size_t i = 0; i < 25; i++) // Limit of iterations to avoid looping forever in an unlucky case
 	{
 		vec3 nextPoint = support(direction);
 
