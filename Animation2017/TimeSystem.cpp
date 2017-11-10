@@ -32,7 +32,7 @@ void TimeSystem::update() {
 };
 
 float TimeSystem::physicsCheck() {
-	return elapsedTime - lastPhysicsStep;;
+	return elapsedTime - lastPhysicsStep;
 };
 
 void TimeSystem::physicsStep() {

@@ -3,13 +3,14 @@
 #include "PhysicsComponent.h"
 #include "Entity.h"
 #include "TimeSystem.h"
+#include "CollisionEngine.h"
 
 #include <glm\gtx\matrix_operation.hpp>
 #include <glm\gtc\matrix_transform.hpp>
 #include <omp.h>
 #include <iostream>
 
-#define updateTime 1.0f/60.0f
+#define updateTime 1.0f/240.0f
 PhysicsEngine* PhysicsEngine::instance = 0;
 
 #pragma region initialization
@@ -40,9 +41,10 @@ PhysicsEngine* PhysicsEngine::instance = 0;
  void PhysicsEngine::step() {
 	 if (isEnabled()) {
 		 if (TimeSystem::physicsCheck() >= updateTime) {
-			 TimeSystem::physicsStep();
+			 TimeSystem::physicsStep();			 
 			 updatePhysics();
 			 applyPhysics();
+			 CollisionEngine::getInstance()->step(); // Collision detection should only happen at the physical step
 		 }
 	 }
 

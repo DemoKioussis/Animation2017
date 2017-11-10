@@ -4,7 +4,9 @@
 #include <glm\glm.hpp>
 #include "TimeSystem.h"
 #include "RenderEngine.h"
+#include "InputManager.h"
 
+class InputManager;
 
 /*
 	This class will handle all window operations
@@ -106,6 +108,7 @@ public:
 
 	void frameTick() {
 		if (TimeSystem::frameCheck() >= refreshRate) {
+			InputManager::processInput(); // Not sure if this should be here. Might aswell be inside the physical step tick.
 			refreshWindow();
 			TimeSystem::frameStep();
 		}

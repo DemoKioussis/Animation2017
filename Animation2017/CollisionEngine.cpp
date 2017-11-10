@@ -1,10 +1,11 @@
 #include "CollisionEngine.h"
-#include "RenderComponent.h"
-#include "RenderEngine.h"
 #include "Entity.h"
+#include "GJK.h"
 
 #include <stdexcept>
-#include <algorithm>
+#include <iostream>
+#include <cmath>
+#include <omp.h>
 
 using namespace std;
 using namespace glm;
@@ -17,6 +18,7 @@ void CollisionEngine::Initialize()
 		return;
 	CollisionEngine * engine = new CollisionEngine();
 	instance = engine;
+	getInstance()->maxRadius = 0;
 	engine->enable();
 }
 
@@ -25,114 +27,273 @@ CollisionEngine * CollisionEngine::getInstance()
 	return instance;
 }
 
-void CollisionEngine::step()
+// Calculate uniqe indices
+void CollisionEngine::calculateUniqueIndices()
 {
-	// Just for testing the areSpheresColliding() method
-	//areColliding((CollisionComponent*)targetComponents[0], (CollisionComponent*)targetComponents[1]);
-}
-
-void CollisionEngine::calculateUniqueIndicesAndFurthestDistances()
-{
-	std::vector<Mesh*>& allRenderables = RenderEngine::getInstance()->getAllRenderReferences();
-
-	for (int i = 0; i < targetComponents.size(); i++)
+	for (int meshId = 0; meshId < meshes.size(); meshId++)
 	{
-		// Get the required components for the current entity
-		CollisionComponent* collisionComponent = (CollisionComponent*)targetComponents[i];
-		
-		RenderComponent* renderComponent = (RenderComponent*)collisionComponent->entity->getComponent(RENDER_COMPONENT); // Get the render component	
-		
-		// Obtain the current mesh
-		int currentMeshId = renderComponent->getMeshID();
+		CollisionData collision;
+		vector<GLfloat>& vertices = *meshes[meshId]->getVerticies();
+		MeshType meshType = meshes[meshId]->getMeshType();
 
-		if (collisionData.find(currentMeshId) != collisionData.end())
+		// Iterate through all the vertices
+		for (int index = 0; index < vertices.size(); index += 9)
 		{
-			continue; // Collision info already exists in this mesh, so we skip it
-		}
+			glm::vec3 vertex(vertices[index], vertices[index + 1], vertices[index + 2]);
 
-		Mesh* currentMesh = dynamic_cast<Mesh*>(allRenderables[currentMeshId]);
-
-		if (currentMesh == nullptr)
-		{
-			throw runtime_error("An entity having a collider component has a render component that doesn't countain a Mesh");
-		}
-
-		updateCollisionDataForMesh(currentMesh, currentMeshId);
-	}
-}
-
-// Update the collision data for the current mesh
-void CollisionEngine::updateCollisionDataForMesh(Mesh * mesh, int meshId)
-{
-	CollisionData collision;
-	vector<GLfloat>& vertices = *mesh->getVerticies();
-
-	collision.distanceToFurthestPoint = 0;
-
-	// Iterate through all the vertices
-	for (int index = 0; index < vertices.size(); index += 9)
-	{
-		glm::vec3 vertex(vertices[index], vertices[index + 1], vertices[index + 2]);
-
-		// Store the index for the current vertex if there isn't already a vertex with almsot the same position
-		bool alreadyExists = false;
-		for (int existingIndex : collision.uniqueVerticesIndices)
-		{
-			vec3 alreadyExisting(vertices[existingIndex], vertices[existingIndex + 1], vertices[existingIndex + 2]);
-			float lengthOfDifference = glm::length(vertex - alreadyExisting);
-			if (lengthOfDifference < 0.001f)
+			// Store the index for the current vertex if there isn't already a vertex with almsot the same position
+			bool alreadyExists = false;
+			for (int existingIndex : collision.uniqueVerticesIndices)
 			{
-				// Difference is too small, we consider them as being the same vertex
-				alreadyExists = true;
+				vec3 alreadyExisting(vertices[existingIndex], vertices[existingIndex + 1], vertices[existingIndex + 2]);
+				float lengthOfDifference = glm::length(vertex - alreadyExisting);
+				if (lengthOfDifference < 0.001f)
+				{
+					// Difference is too small, we consider them as being the same vertex
+					alreadyExists = true;
+				}
+			}
+			if (!alreadyExists)
+			{
+				collision.uniqueVerticesIndices.push_back(index);
 			}
 		}
-		if (!alreadyExists)
-		{
-			collision.uniqueVerticesIndices.push_back(index);
-		}
 
-		// Calculate the distance to the furthest point				
-		float lengthOfVertex = glm::length(vertex);
-		if (lengthOfVertex > collision.distanceToFurthestPoint)
-		{
-			collision.distanceToFurthestPoint = lengthOfVertex;
-		}
+		collisionData[meshId] = std::move(collision);
 	}
-
-	collisionData[meshId] = std::move(collision);
 }
 
-bool CollisionEngine::areColliding(CollisionComponent * c1, CollisionComponent * c2)
+void CollisionEngine::updateAllBoundingBoxes()
 {
-	if (c1->colliderType == ColliderType::SPHERE && c2->colliderType == ColliderType::SPHERE)
+	for (Component* c : targetComponents)
+	{		
+		CollisionComponent* cc = (CollisionComponent*)c;		
+		cc->updateBoundingShapes();
+	}
+}
+
+void CollisionEngine::addMesh(Mesh * _mesh)
+{
+	meshes.push_back(_mesh);
+}
+
+std::vector<Mesh*>& CollisionEngine::getAllMeshes()
+{
+	return meshes;
+}
+
+void CollisionEngine::step()
+{
+	if (!isEnabled()) {
+		return;
+	}
+
+	clearCollisionResults();
+
+	createVonNeumannGrid();
+	checkCollisionsVonNeumannGrid();
+	clearVonNeumannGrid();
+
+	checkStaticCollisions();
+
+	//std::cout << "Number of collisions on this step: " << collisionResults.size() << endl;
+}
+
+
+void CollisionEngine::createVonNeumannGrid()
+{	
+	for (Component* c : targetComponents)
+	{
+		CollisionComponent* cc = (CollisionComponent*)c;
+		std::vector<int>& indices = collisionData[cc->getMeshID()].uniqueVerticesIndices;
+		vector<GLfloat>& vertices = *meshes[cc->getMeshID()]->getVerticies();
+
+		if (c->entity->isStatic())
+		{
+			continue;
+		}
+
+		vec4 positionWC = c->getTransform() * vec4(0, 0, 0, 1);		
+
+		unsigned long long hashed = hashAndWritePosition(positionWC, cc);
+
+		if (vonNeumannGrid.find(hashed) == vonNeumannGrid.end())
+		{
+			vonNeumannGrid[hashed] = new std::vector<CollisionComponent*>;
+		}
+
+		vonNeumannGrid[hashed]->push_back(cc);
+	}	
+}
+
+void CollisionEngine::clearVonNeumannGrid()
+{
+	for (auto iterator : vonNeumannGrid)
+	{
+		delete iterator.second;
+	}
+
+	vonNeumannGrid.clear();
+}
+
+void CollisionEngine::checkCollisionsVonNeumannGrid()
+{
+	#pragma omp parallel for
+	for (int dynamicComponentIndex = 0; dynamicComponentIndex < targetComponents.size(); dynamicComponentIndex++)
+	{
+		CollisionComponent* cc = (CollisionComponent*)targetComponents[dynamicComponentIndex];
+
+		if (cc->entity->isStatic())
+		{
+			continue;
+		}
+
+		static const int neigboursCount = 14;
+		std::vector<CollisionComponent*>* neigbours[neigboursCount];
+
+		neigbours[0] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(0, 0, 0));
+		neigbours[1] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(0, 1, -1));
+		neigbours[2] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(0, 1, 0));
+		neigbours[3] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(0, 1, 1));
+		neigbours[4] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(0, 0, 1));
+		neigbours[5] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(1, -1, -1));
+		neigbours[6] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(1, -1, 0));
+		neigbours[7] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(1, -1, 1));
+		neigbours[8] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(1, 0, -1));
+		neigbours[9] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(1, 0, 0));
+		neigbours[10] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(1, 0, 1));
+		neigbours[11] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(1, 1, -1));
+		neigbours[12] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(1, 1, 0));
+		neigbours[13] = getAtVonNeumannPosition(cc->vonNeumannPosition + ivec3(1, 1, 1));
+
+		for (size_t cellIndex = 0; cellIndex < neigboursCount; cellIndex++)
+		{
+			if (neigbours[cellIndex] != nullptr)
+			{
+				std::vector<CollisionComponent*>& neigboursSameCell = *neigbours[cellIndex];
+				for (size_t i = 0; i < neigboursSameCell.size(); i++)
+				{
+					CollisionComponent* cc2 = neigboursSameCell[i];
+
+					// Important to avoid calculating the collision twice for the same pair of objects
+					if (cc->vonNeumannPosition != cc2->vonNeumannPosition || cc->uid > cc2->uid) 
+					{
+						areCollidingDynamic(cc, neigboursSameCell[i]);
+					}
+				}
+			}						
+		}
+	}
+}
+
+unsigned long long CollisionEngine::hashAndWritePosition(vec4 positionWC, CollisionComponent* cc)
+{
+	float cellSize = maxRadius * 2.1;
+
+	ivec3 position;
+	position.x = floor(positionWC.x / cellSize);
+	position.y = floor(positionWC.y / cellSize);
+	position.z = floor(positionWC.z / cellSize);
+
+	cc->vonNeumannPosition = position;
+
+	return hashPosition(position);
+}
+
+unsigned long long CollisionEngine::hashPosition(glm::ivec3 position)
+{
+	static const unsigned long long mask = 2097151; // 2^21 - 1
+
+	long long x = (*reinterpret_cast<unsigned*>(&position.x) & mask) << 42 ;
+	long long y = (*reinterpret_cast<unsigned*>(&position.y) & mask) << 21;
+	long long z = (*reinterpret_cast<unsigned*>(&position.z) & mask);
+
+	return x | y | z;
+}
+
+std::vector<CollisionComponent*>* CollisionEngine::getAtVonNeumannPosition(glm::ivec3 position)
+{
+	long long hashedPosition = hashPosition(position);
+	return vonNeumannGrid.find(hashedPosition) != vonNeumannGrid.end() ? vonNeumannGrid[hashPosition(position)] : nullptr;
+}
+
+void CollisionEngine::checkStaticCollisions()
+{
+	#pragma omp parallel for
+	for (int staticComponentIndex = 0; staticComponentIndex < targetComponents.size(); staticComponentIndex++)
+	{
+		CollisionComponent* sc = (CollisionComponent*)targetComponents[staticComponentIndex];
+
+		if (!sc->entity->isStatic())
+		{
+			continue;
+		}
+
+		for (int dynamicComponentIndex = 0; dynamicComponentIndex < targetComponents.size(); dynamicComponentIndex++)
+		{
+			CollisionComponent* dc = (CollisionComponent*)targetComponents[dynamicComponentIndex];
+
+			if (dc->entity->isStatic())
+			{
+				continue;
+			}
+
+			areCollidingStatic(sc, dc);
+		}
+	}
+}
+
+bool CollisionEngine::areCollidingDynamic(CollisionComponent * c1, CollisionComponent * c2)
+{
+	Mesh* m1 = meshes[c1->getMeshID()];
+	Mesh* m2 = meshes[c2->getMeshID()];
+
+	if (m1->getMeshType() == MeshType::SPHERE && m2->getMeshType() == MeshType::SPHERE && !c1->isNotPureSphere && !c1->isNotPureSphere)
 	{
 		// Sphere collides with sphere
 		return areSpheresColliding(c1, c2); 
 	}
-	else if (c1->colliderType == ColliderType::SPHERE && c2->colliderType == ColliderType::VERTICES)
+	else // Any other collisions
 	{
-		// Sphere collides with vertex object
-		return isSphereCollidingWithVertexObject(c1, c2);
+		return areSpheresColliding(c1, c2) ? areCollidingGJK(c1, c2) : false; // For testing
 	}
-	else if (c1->colliderType == ColliderType::VERTICES && c2->colliderType == ColliderType::SPHERE)
-	{
-		// Vertex object collides with sphere
-		return isSphereCollidingWithVertexObject(c2, c1); 
-	}
-	else if (c1->colliderType == ColliderType::VERTICES && c2->colliderType == ColliderType::VERTICES)
-	{
-		//Vertex object collides with vertex object
-		//return areSpheresColliding(c1, c2) ? areCollidingGJK(c1, c2) : false;
+}
 
-		return areCollidingGJK(c1, c2); // For testing
+bool CollisionEngine::areCollidingStatic(CollisionComponent * s, CollisionComponent * d)
+{
+	return areBoundingBoxesColliding(s,d) ? areCollidingGJK(s, d) : false;
+}
+
+bool CollisionEngine::areBoundingBoxesColliding(CollisionComponent* box, CollisionComponent* sphere)
+{
+	vec4 boxCenter = box->getTransform() * vec4(0, 0, 0, 1);
+	vec4 sphereCenter = sphere->getTransform() * vec4(0, 0, 0, 1);
+
+	// Check ifthe closest point of the sphere is inside the box
+	vec4 fromSphereToBox = boxCenter - sphereCenter;
+	vec4 fromSphereToBoxOnSphereSurface = glm::normalize(fromSphereToBox) * (sphere->getBoundingRadius());
+	if (isPointInsideBox(box, sphereCenter + fromSphereToBoxOnSphereSurface - boxCenter))
+	{
+		return true;
 	}
+
+	// Check if the center of the box is inside the sphere
+	if (glm::length(fromSphereToBox) < sphere->getBoundingRadius())
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool CollisionEngine::isPointInsideBox(CollisionComponent* box, glm::vec4 point)
+{
+	vec3& bb = box->getBoundingBox();
+	return abs(point.x) < bb.x  || abs(point.y) < bb.y || abs(point.z) < bb.z;
 }
 
 bool CollisionEngine::areSpheresColliding(CollisionComponent * c1, CollisionComponent * c2)
 {
-	RenderComponent* r1 = (RenderComponent*)c1->entity->getComponent(RENDER_COMPONENT);
-	RenderComponent* r2 = (RenderComponent*)c2->entity->getComponent(RENDER_COMPONENT);
-
 	mat4& transformMatrix1 = c1->entity->transform;
 	mat4& transformMatrix2 = c2->entity->transform;
 
@@ -143,256 +304,70 @@ bool CollisionEngine::areSpheresColliding(CollisionComponent * c1, CollisionComp
 	vec4 centerInWorldCoordinates1 = transformMatrix1 * origin;
 	vec4 centerInWorldCoordinates2 = transformMatrix2 * origin;
 
-	float distanceBetweenOrigins = glm::length(centerInWorldCoordinates2 - centerInWorldCoordinates1);
-	float sumOfRadiuses = collisionData[r1->getMeshID()].distanceToFurthestPoint + collisionData[r2->getMeshID()].distanceToFurthestPoint;
+	vec4 from1To2(centerInWorldCoordinates2 - centerInWorldCoordinates1);
+	vec4 from2To1(centerInWorldCoordinates1 - centerInWorldCoordinates2);
 
-	return sumOfRadiuses > distanceBetweenOrigins;
-}
+	float distanceBetweenOrigins = glm::length(from1To2);
+	float sumOfRadiuses = c1->getBoundingRadius() + c2->getBoundingRadius();
 
-bool CollisionEngine::isSphereCollidingWithVertexObject(CollisionComponent * sphere, CollisionComponent * vertexObject)
-{
-	RenderComponent* sphereRender = (RenderComponent*)sphere->entity->getComponent(RENDER_COMPONENT);
-	RenderComponent* vertexObjectRender = (RenderComponent*)vertexObject->entity->getComponent(RENDER_COMPONENT);
-
-	mat4& transformMatrixSphere = sphere->entity->transform;
-	mat4& transformMatrixVertex = vertexObject->entity->transform;
-
-	// Assuming that the origin of both of the entities is at (0,0,0)
-	vec4 origin(0, 0, 0, 1);
-
-	// Calculate the positions of the origins of both entities in world coordinates
-	vec4 centerInWorldCoordinatesSphere = transformMatrixSphere * origin;
-	vec4 centerInWorldCoordinatesVertex = transformMatrixVertex * origin;
-
-	float sphereRadius = collisionData[sphereRender->getMeshID()].distanceToFurthestPoint;
-		 
-	float distanceBetweenOrigins = glm::length(centerInWorldCoordinatesVertex - centerInWorldCoordinatesSphere);
-	float sumOfRadiuses = sphereRadius + collisionData[vertexObjectRender->getMeshID()].distanceToFurthestPoint;
-
-	if (sumOfRadiuses <= distanceBetweenOrigins)
+	if (sumOfRadiuses > distanceBetweenOrigins)
 	{
-		// Bounding spheres are not colliding, so we know that the two objects are not colliding
-		return false;
+		CollisionResult* collisionResult = new CollisionResult;
+		collisionResult->c1 = c1;
+		collisionResult->c2 = c2;
+		collisionResult->penetrationVector = glm::normalize(vec3(from1To2)) * (sumOfRadiuses - distanceBetweenOrigins);
+		collisionResult->pointsC1.push_back(glm::normalize(from1To2) * c1->getBoundingRadius());
+		collisionResult->pointsC2.push_back(glm::normalize(from2To1) * c2->getBoundingRadius());
+		collisionResult->distancesToPointsFromOriginC1.push_back(glm::length(vec3(from1To2)));
+		collisionResult->distancesToPointsFromOriginC2.push_back(glm::length(vec3(from1To2)));
+
+		CollisionEngine::getInstance()->addCollisionResult(collisionResult);
+		return true;
 	}
-
-	std::vector<Mesh*>& allRenderables = RenderEngine::getInstance()->getAllRenderReferences();
-	Mesh* currentMesh = dynamic_cast<Mesh*>(allRenderables[vertexObjectRender->getMeshID()]);
-
-	if (currentMesh == nullptr)
-	{
-		throw runtime_error("An entity having a collider component has a render component that doesn't countain a Mesh");
-	}
-
-	// Check if any of the vertices are inside the sphere
-	std::vector<int>& indices = collisionData[vertexObjectRender->getMeshID()].uniqueVerticesIndices;
-	vector<GLfloat>& vertices = *currentMesh->getVerticies();
-	for (size_t i = 0; i < indices.size(); i++)
-	{
-		vec4 vertexObjectCoordiantes(vertices[indices[i]], vertices[indices[i] + 1], vertices[indices[i] + 2] , 1);
-		vec4 vertexWorldCoordiantes = transformMatrixVertex * vertexObjectCoordiantes;
-		float distanceToVertexFromSphereCenter = glm::length(vertexWorldCoordiantes - centerInWorldCoordinatesSphere);
-
-		if (distanceToVertexFromSphereCenter < sphereRadius)
-		{
-			// A vetex is inside the sphere, so we know that the two object are colliding
-			return true;
-		}
-	}
-
-	// Check the center of the sphere is inside the vertex object
-	//// GJK ??????????????????????????????
 
 	return false;
 }
 
 bool CollisionEngine::areCollidingGJK(CollisionComponent * c1, CollisionComponent * c2)
 {
-	//using namespace glm::gtx::random;
+	GJK gjk(*c1, *c2);
+	return gjk.areColliding();
+}
 
-	// Preparation for GJK
-	std::vector<Mesh*>& allRenderables = RenderEngine::getInstance()->getAllRenderReferences();
+std::unordered_map<int, CollisionData>& CollisionEngine::getCollisionData()
+{
+	return collisionData;
+}
 
-	RenderComponent* renderC1 = (RenderComponent*)c1->entity->getComponent(RENDER_COMPONENT);
-	RenderComponent* renderC2 = (RenderComponent*)c2->entity->getComponent(RENDER_COMPONENT);
+void CollisionEngine::updateMaxRadius()
+{
+	float currentMax = 0;
 
-	mat4& transformMatrixC1 = c1->entity->transform;
-	mat4& transformMatrixC2 = c2->entity->transform;
-
-	mat4 transformMatrixC1Inverse = glm::inverse(c1->entity->transform);
-	mat4 transformMatrixC2Inverse = glm::inverse(c2->entity->transform);	
-
-	Mesh* meshC1 = dynamic_cast<Mesh*>(allRenderables[renderC1->getMeshID()]);
-	std::vector<int>& indicesC1 = collisionData[renderC1->getMeshID()].uniqueVerticesIndices;	
-	vector<GLfloat>& verticesC1 = *meshC1->getVerticies();
-
-	Mesh* meshC2 = dynamic_cast<Mesh*>(allRenderables[renderC2->getMeshID()]);
-	std::vector<int>& indicesC2 = collisionData[renderC2->getMeshID()].uniqueVerticesIndices;
-	vector<GLfloat>& verticesC2 = *meshC2->getVerticies();
-
-	// Actual start of the algorithm
-
-	deque<vec3> currentListOfPoints;
-
-	// Use a random direction to get the furthest point of that direction
-	vec3 furthestPoint = gjkSupport(vec3(1, 1, 1), transformMatrixC1, transformMatrixC1Inverse, indicesC1, verticesC1, transformMatrixC2, transformMatrixC2Inverse, indicesC2, verticesC2);
-
-	currentListOfPoints.push_front(furthestPoint);
-
-	vec3 direction = -furthestPoint;
-
-	while (true)
+	for (Component* c : targetComponents)
 	{
-		vec3 nextPoint = gjkSupport(direction, transformMatrixC1, transformMatrixC1Inverse, indicesC1, verticesC1, transformMatrixC2, transformMatrixC2Inverse, indicesC2, verticesC2);
+		CollisionComponent* sc = (CollisionComponent*)c;
 
-		// No collision check
+		if (sc->boundingRadius > currentMax)
 		{
-			float dotProductPointAndDirection = glm::dot(nextPoint, direction);
-
-			if (dotProductPointAndDirection < 0)
-			{
-				return false; // No intersection
-			}
-		}
-
-		currentListOfPoints.push_front(nextPoint);
-
-		// Collision check
-		if (gjkSimplex(currentListOfPoints, direction));
-		{
-			return true;
+			currentMax = sc->boundingRadius;
 		}
 	}
 
-	return false;
+	maxRadius = currentMax;
 }
 
-glm::vec3 CollisionEngine::gjkSupport(glm::vec3& directionInWorldCoordinates, glm::mat4& modelC1, glm::mat4& inverseModelC1, std::vector<int>& indicesC1, vector<GLfloat>& verticesC1, glm::mat4& modelC2, glm::mat4& inverseModelC2, std::vector<int>& indicesC2, vector<GLfloat>& verticesC2)
-{
-	vec3 directionInObjectCoordinates = inverseModelC1 * vec4(directionInWorldCoordinates, 0);
-	vec3 directionInObjectCoordinatesNormalized = glm::normalize(directionInObjectCoordinates);
-
-	vec3 furthestC1ObjectCoordinates = gjkGetFurthestPointInDirection(modelC1, directionInObjectCoordinatesNormalized, indicesC1, verticesC1);
-	vec3 furthestC2ObjectCoordinates = gjkGetFurthestPointInDirection(modelC2, -directionInObjectCoordinatesNormalized, indicesC2, verticesC2);
-
-	vec3 furthestC1WorldCoordinates = modelC1 * vec4(furthestC1ObjectCoordinates,1);
-	vec3 furthestC2WorldCoordinates = modelC2 * vec4(furthestC2ObjectCoordinates, 1);
-
-	return  furthestC1WorldCoordinates - furthestC2WorldCoordinates;
-}
-
-glm::vec3 CollisionEngine::gjkGetFurthestPointInDirection(glm::mat4& model, glm::vec3& directionInObjectCoordinatesNormalized, std::vector<int>& indices, vector<GLfloat>& vertices)
-{
-	float dotProductMax = -1;
-	vec3 biggestVector(0,0,0);
-
-	for (size_t i = 0; i < indices.size(); i++)
+void CollisionEngine::clearCollisionResults()
+{	
+	for (size_t i = 0; i < collisionResults.size(); i++)
 	{
-		vec3 vertexInObjectCoordiantes(vertices[indices[i]], vertices[indices[i] + 1], vertices[indices[i] + 2]);
-		vec3 vertexInObjectCoordiantesNormalized = glm::normalize(vertexInObjectCoordiantes);
-
-		float dotProduct = glm::dot(directionInObjectCoordinatesNormalized, vertexInObjectCoordiantesNormalized);
-
-		if (dotProduct > dotProductMax)
-		{
-			dotProductMax = dotProduct;
-			biggestVector = vertexInObjectCoordiantes;
-		}
+		delete collisionResults[i];
 	}
-	vec4 furthestPoint = model * vec4(biggestVector, 0);
-
-	return furthestPoint;
+	collisionResults.clear();
 }
 
-bool CollisionEngine::gjkSimplex(deque<vec3>& points, vec3& direction)
+void CollisionEngine::addCollisionResult(CollisionResult * collisionResult)
 {
-	switch (points.size())
-	{
-	case 2:
-		return simplex2(points, direction);
-	case 3:
-		return simplex3(points, direction);
-	case 4:
-		return simplex4(points, direction);
-	}
-
-	return false;
-}
-
-bool CollisionEngine::simplex2(std::deque<glm::vec3>& points, glm::vec3 & direction)
-{
-	vec3& a = points[0];
-	vec3& b = points[1];
-
-	vec3 ab = b - a;
-	vec3 ao = -a;
-	if (sameDirection(ab, ao))
-	{
-		// Origin is between A and B
-		direction = cross(cross(ab, ao), ab);
-	}
-	else
-	{
-		// Origin is near A
-		points.erase(points.begin() + 1); // Remove B
-		direction = ao;
-	}
-	return false;
-}
-
-bool CollisionEngine::simplex3(std::deque<glm::vec3>& points, glm::vec3 & direction)
-{
-	vec3& a = points[0];
-	vec3& b = points[1];
-	vec3& c = points[2];
-
-	vec3 ab = b - a;
-	vec3 ac = c - a;
-	vec3 abc = cross(ab,ac);
-	vec3 ao = -a;
-
-	if (sameDirection(cross(abc, ac), ao))
-	{
-		if (sameDirection(ac, ao))
-		{
-			points.erase(points.begin() + 1); // Remove B
-			direction = cross(cross(ac, ao), ac);
-		}
-		else
-		{
-			points.erase(points.begin() + 2); // Remove C
-			return simplex2(points, direction);
-		}
-	}
-	else
-	{
-		if (sameDirection(cross(ab, abc), ao))
-		{
-			points.erase(points.begin() + 2); // Remove C
-			return simplex2(points, direction);
-		}
-		else
-		{
-			if (sameDirection(abc, ao))
-			{
-				direction = abc;
-			}
-			else
-			{
-				iter_swap(points.begin() + 1, points.begin() + 2);
-				direction = -abc;
-			}
-		}
-	}
-
-	return false;
-}
-
-bool CollisionEngine::simplex4(std::deque<glm::vec3>& points, glm::vec3 & direction)
-{
-	return false;
-}
-
-bool CollisionEngine::sameDirection(glm::vec3 & vec1, glm::vec3 & vec2)
-{
-	return dot(vec1, vec2) > 0;
+	collisionResultsMutex.lock();
+	collisionResults.push_back(collisionResult);
+	collisionResultsMutex.unlock();
 }

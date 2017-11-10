@@ -111,7 +111,7 @@ void InputManager::processInput() {
 
 		}
 	}
-	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_8) == GLFW_PRESS) {
+	if ((glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_8) == GLFW_PRESS) || (glfwGetKey(windowManager->getWindow(), GLFW_KEY_8) == GLFW_PRESS)) {
 		for (int i = 0; i < Entities->size();i++) {
 			auto e = (Entities->at(i));
 			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
@@ -153,24 +153,24 @@ void InputManager::processInput() {
 }
 
 void InputManager::processCameraInput() {
-
+	float deltaT = TimeSystem::getFrameDeltaTime();
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_W) == GLFW_PRESS) {
-		camera->ProcessKeyboard(DIRECTION::FORWARD, TimeSystem::getFrameDeltaTime());
+		camera->ProcessKeyboard(DIRECTION::FORWARD, deltaT);
 	}
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_S) == GLFW_PRESS) {
-		camera->ProcessKeyboard(DIRECTION::BACKWARD, TimeSystem::getFrameDeltaTime());
+		camera->ProcessKeyboard(DIRECTION::BACKWARD, deltaT);
 	}
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_A) == GLFW_PRESS) {
-		camera->ProcessKeyboard(DIRECTION::LEFT, TimeSystem::getFrameDeltaTime());
+		camera->ProcessKeyboard(DIRECTION::LEFT, deltaT);
 	}
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_D) == GLFW_PRESS) {
-		camera->ProcessKeyboard(DIRECTION::RIGHT, TimeSystem::getFrameDeltaTime());
+		camera->ProcessKeyboard(DIRECTION::RIGHT, deltaT);
 	}
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS) {
-		camera->ProcessKeyboard(DIRECTION::UP, TimeSystem::getFrameDeltaTime());
+		camera->ProcessKeyboard(DIRECTION::UP, deltaT);
 	}
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-		camera->ProcessKeyboard(DIRECTION::DOWN, TimeSystem::getFrameDeltaTime());
+		camera->ProcessKeyboard(DIRECTION::DOWN, deltaT);
 	}
 
 }

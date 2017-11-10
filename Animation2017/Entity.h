@@ -13,13 +13,15 @@ public:
 	glm::mat4 rotation;
 	glm::mat4 inverseRotation;
 
-	Entity();
+	Entity(bool _isStatic);
 	~Entity();
 	void addComponent(Component *_component);
 	Component* getComponent(int _componentType);
 	void removeComponent(int _componentType);
 	const int getID();
+	bool isStatic();
 private:
 	static int idCounter;
 	int id;
+	bool isStaticEntity;
 };

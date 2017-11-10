@@ -3,37 +3,70 @@
 #include "CollisionComponent.h"
 #include <unordered_map>
 #include "Mesh.h"
-#include <deque>
+#include "GJK.h"
+#include <mutex>
+#include <vector>
 
+class CollisionComponent;
+class GJK;
 
 struct CollisionData
 {
-	float distanceToFurthestPoint;
+	//float distanceToFurthestPoint;
 	std::vector<int> uniqueVerticesIndices; // Unique vertices indices with the corresponding furthest direction corresponding to that point
+};
+
+struct CollisionResult
+{
+	CollisionComponent* c1;
+	CollisionComponent* c2;
+	glm::vec3 penetrationVector;
+
+	std::vector<glm::vec4> pointsC1;
+	std::vector<float> distancesToPointsFromOriginC1;
+
+	std::vector<glm::vec4> pointsC2;	
+	std::vector<float> distancesToPointsFromOriginC2;
 };
 
 class CollisionEngine : public Engine
 {
+	std::vector<Mesh*> meshes;
+	float maxRadius;
+
 	static CollisionEngine* instance;
 	std::unordered_map<int, CollisionData> collisionData; // Maps the mesh with its collision data
-
-	void updateCollisionDataForMesh(Mesh* mesh, int meshId);
+	std::unordered_map<unsigned long long, std::vector<CollisionComponent*>*> vonNeumannGrid;
+	std::vector<CollisionResult*> collisionResults;
+	std::mutex collisionResultsMutex;
 	
-	bool areColliding(CollisionComponent* c1, CollisionComponent* c2);
+	// Dynamic collisions with Von Neumann neighbourhood 
+	void createVonNeumannGrid();
+	void clearVonNeumannGrid();
+	void checkCollisionsVonNeumannGrid();
+	unsigned long long hashAndWritePosition(glm::vec4 positionWC, CollisionComponent* cc);
+	unsigned long long hashPosition(glm::ivec3 position);
+	std::vector<CollisionComponent*>* getAtVonNeumannPosition(glm::ivec3 position);
+	bool areCollidingDynamic(CollisionComponent* c1, CollisionComponent* c2);
+
+	// Static collisions using bounding boxes
+	void checkStaticCollisions();	
+	bool areCollidingStatic(CollisionComponent* s, CollisionComponent* d);
+	
+	bool areBoundingBoxesColliding(CollisionComponent* box, CollisionComponent* sphere);
+	bool isPointInsideBox(CollisionComponent* box, glm::vec4 point);
 	bool areSpheresColliding(CollisionComponent* c1, CollisionComponent* c2);
-	bool isSphereCollidingWithVertexObject(CollisionComponent* sphere, CollisionComponent* vertexObject);
 	bool areCollidingGJK(CollisionComponent* c1, CollisionComponent* c2);
-	glm::vec3 gjkSupport(glm::vec3& directionInWorldCoordinates, glm::mat4& modelC1, glm::mat4& inverseModelC1, std::vector<int>& indicesC1, vector<GLfloat>& verticesC1, glm::mat4& modelC2, glm::mat4& inverseModelC2, std::vector<int>& indicesC2, vector<GLfloat>& verticesC2); // GJK support function
-	glm::vec3 gjkGetFurthestPointInDirection(glm::mat4& model, glm::vec3& directionInObjectCoordinatesNormalized, std::vector<int>& indices, vector<GLfloat>& vertices);
-	bool gjkSimplex(std::deque<glm::vec3>& points, glm::vec3& direction);
-	bool simplex2(std::deque<glm::vec3>& points, glm::vec3& direction);
-	bool simplex3(std::deque<glm::vec3>& points, glm::vec3& direction);
-	bool simplex4(std::deque<glm::vec3>& points, glm::vec3& direction);
-	bool sameDirection(glm::vec3& vec1, glm::vec3& vec2);
 public:
 	static void Initialize();
+	void addMesh(Mesh *_mesh);
+	std::vector<Mesh*>& getAllMeshes();
 	static CollisionEngine * getInstance();
 	void step();
-	void calculateUniqueIndicesAndFurthestDistances();
-	
+	void calculateUniqueIndices();
+	void updateAllBoundingBoxes();
+	std::unordered_map<int, CollisionData>& getCollisionData();
+	void updateMaxRadius();
+	void clearCollisionResults();
+	void addCollisionResult(CollisionResult* collisionResult);
 };
