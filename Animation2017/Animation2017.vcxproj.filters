@@ -46,6 +46,12 @@
     <Filter Include="Source Files\Entity-Component\Components">
       <UniqueIdentifier>{1c85c5ea-b14f-4a7c-a2fb-b4cb7c251370}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Loading">
+      <UniqueIdentifier>{9d1afe08-745e-440e-b02c-833ec13593de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Loading">
+      <UniqueIdentifier>{05faec20-ecdc-4895-ba02-b9bf360a4722}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Mesh.cpp">
@@ -59,9 +65,6 @@
     </ClCompile>
     <ClCompile Include="TimeSystem.cpp">
       <Filter>Source Files\MainSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderEngine.cpp">
-      <Filter>Source Files\Engines</Filter>
     </ClCompile>
     <ClCompile Include="glad.c">
       <Filter>Source Files\MainSystem</Filter>
@@ -81,9 +84,6 @@
     <ClCompile Include="CollisionEngine.cpp">
       <Filter>Source Files\Engines</Filter>
     </ClCompile>
-    <ClCompile Include="objloader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GJK.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -92,6 +92,18 @@
     </ClCompile>
     <ClCompile Include="CollisionComponent.cpp">
       <Filter>Source Files\Entity-Component\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="splitstring.cpp">
+      <Filter>Source Files\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneLoading.cpp">
+      <Filter>Source Files\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="objloader.cpp">
+      <Filter>Source Files\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderEngine.cpp">
+      <Filter>Source Files\Engines</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -109,9 +121,6 @@
     </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderEngine.h">
-      <Filter>Header Files\Engines</Filter>
     </ClInclude>
     <ClInclude Include="WindowManager.h">
       <Filter>Header Files\MainSystem</Filter>
@@ -149,14 +158,23 @@
     <ClInclude Include="CollisionEngine.h">
       <Filter>Header Files\Engines</Filter>
     </ClInclude>
-    <ClInclude Include="objloader.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GJK.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EPA.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="objloader.hpp">
+      <Filter>Header Files\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneLoading.h">
+      <Filter>Header Files\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="splitstring.h">
+      <Filter>Header Files\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderEngine.h">
+      <Filter>Header Files\Engines</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

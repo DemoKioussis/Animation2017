@@ -1,7 +1,6 @@
 #include "RenderEngine.h"
 #include "Mesh.h"
 #include "RenderComponent.h"
-#include "Shader.h"
 
 //bool RenderEngine::enabled = true;
 
@@ -13,11 +12,23 @@ void RenderEngine::Initialize() {
 	RenderEngine * engine = new RenderEngine();
 	instance = engine;
 }
+void RenderEngine::Clear() {
+	for (int i = 0; i < instance->sortedRenderCompoents.size(); i++) {
+		if (instance->sortedRenderCompoents[i] != nullptr) {
+			instance->sortedRenderCompoents[i]->clear();
+		}
+	}
+	instance->targetComponents.clear();
+}
+
 void RenderEngine::setShader(Shader* _shader) {
 	shader = _shader;
 	projLoc = glGetUniformLocation(shader->ID, "projection");
 	viewLoc = glGetUniformLocation(shader->ID, "view");
 	modelLoc = glGetUniformLocation(shader->ID, "model");
+}
+Shader* RenderEngine::getShader() {
+	return instance->shader;
 }
 void RenderEngine::addComponent(Component* _renderComponent) {
 	Engine::addComponent(_renderComponent);

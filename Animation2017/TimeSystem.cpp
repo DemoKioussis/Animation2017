@@ -17,6 +17,7 @@ float TimeSystem::timeScale = 1;
 
 int TimeSystem::fpsCounter = 0;
 float TimeSystem::fpsTracker = 0;
+
 void TimeSystem::begin() {
 
 	elapsedTime = glfwGetTime();
@@ -27,10 +28,18 @@ void TimeSystem::begin() {
 };
 
 void TimeSystem::update() {
-
-	elapsedTime = glfwGetTime();
+		elapsedTime = glfwGetTime();
 };
 
+void TimeSystem::resetTime() {
+	glfwSetTime(0);
+	elapsedTime = glfwGetTime();
+	lastFrameStep = elapsedTime;
+	lastPhysicsStep = elapsedTime;
+	frameDeltaTime = 0;
+	physicsDeltaTime = 0;
+	std::cout << "reset time" << std::endl;
+}
 float TimeSystem::physicsCheck() {
 	return elapsedTime - lastPhysicsStep;
 };

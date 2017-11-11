@@ -5,13 +5,14 @@
 #include "PhysicsComponent.h"
 #include "PhysicsEngine.h"
 #include "Entity.h"
+#include "SceneLoading.h"
 
 Camera* InputManager::camera = nullptr;
 WindowManager* InputManager::windowManager = nullptr;
 GLboolean InputManager::firstMouse = false;
 GLfloat InputManager::lastX = 0;
 GLfloat InputManager::lastY = 0;
-std::vector<Entity*> *InputManager::Entities = nullptr;
+std::vector<Entity*> *InputManager::Entities =new std::vector<Entity*>();
 
 void InputManager::initialize() {
 	if (windowManager != nullptr) {
@@ -149,6 +150,14 @@ void InputManager::processInput() {
 			PhysicsEngine::getInstance()->addForce(p, -x*force*(float)( 1), z);
 
 		}
+	}
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_L) == GLFW_PRESS) {
+		//load
+		std::cout << "Enter scene name you want to load (no extensions)" << std::endl;
+		char* sceneName= new char[100];
+		std::cin >> sceneName;
+		SceneLoading::getInstance()->loadScene(sceneName);
+
 	}
 }
 

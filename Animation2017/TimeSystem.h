@@ -19,6 +19,7 @@ class TimeSystem {
 public:
 	static void begin();
 	static void update();
+	static void resetTime();
 	static float physicsCheck();
 	static void physicsStep();
 

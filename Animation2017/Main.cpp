@@ -17,6 +17,8 @@
 
 #include "CollisionEngine.h"
 #include "CollisionComponent.h"
+
+#include "SceneLoading.h"
 /**
 This class right now just sets thigns up, ideally by the end of this it would be a list of settings and nothing else
 */
@@ -49,6 +51,8 @@ int main()
 	InputManager::setCamera(camera);
 	InputManager::initialize();
 
+	
+
 	RenderEngine::Initialize();
 	RenderEngine::getInstance()->setShader(&shaderProg);
 
@@ -57,35 +61,25 @@ int main()
 
 	CollisionEngine::Initialize();
 
+	SceneLoading::Initialize();
 #pragma endregion
 
-	Mesh* mesh = new Mesh("cube.obj", MeshType::VERTICES);
-	Mesh* mesh2 = new Mesh("cylinder.obj", MeshType::VERTICES);
-	Mesh* mesh3 = new Mesh("sphereLR.obj", MeshType::SPHERE);
-	Mesh* mesh4 = new Mesh("cube.obj", MeshType::VERTICES);
- 	RenderEngine::getInstance()->addRenderReference(mesh);
-	RenderEngine::getInstance()->addRenderReference(mesh2);
-	RenderEngine::getInstance()->addRenderReference(mesh3);
-	RenderEngine::getInstance()->addRenderReference(mesh4);
-	CollisionEngine::getInstance()->addMesh(mesh);
-	CollisionEngine::getInstance()->addMesh(mesh2);
-	CollisionEngine::getInstance()->addMesh(mesh3);
-	CollisionEngine::getInstance()->addMesh(mesh4);
-	int numX = 10;
-	int numY = 10;
-	int numZ = 10;
+
+	int numX = 1;
+	int numY = 1;
+	int numZ = 1;
 
 	glCullFace(GL_BACK);
 
 	float disp = 1.0f;
-	std::vector<Entity*> entities(0);
+	//std::vector<Entity*> entities(0);
 
 	float fieldSize = 25.f;
 
 	/*for (int x = -numX / 2; x < numX / 2; x++) {
 		for (int y = -numY / 2; y < numY / 2; y++) {
 			for (int z = -numZ / 2; z < numZ / 2; z++) {*/
-	for (int x = 0; x < numX; x++) {
+	/*for (int x = 0; x < numX; x++) {
 		for (int y = 0; y < numY;y++) {
 			for (int z = 0; z < numZ;z++) {
 
@@ -116,7 +110,11 @@ int main()
 	CollisionEngine::getInstance()->calculateUniqueIndices(); // Important for updating the info about the collisions
 	CollisionEngine::getInstance()->updateAllBoundingBoxes(); // Can only be called after calculating the unique indices
 
-	InputManager::Entities = &entities;
+	InputManager::Entities = &entities;*/
+	
+
+	SceneLoading::getInstance()->loadScene("scene_1");
+
 	glm::mat4 rotation(1.0f), projection;
 
 	GLuint projLoc = glGetUniformLocation(shaderProg.ID, "projection");
