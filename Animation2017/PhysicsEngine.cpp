@@ -23,6 +23,14 @@ PhysicsEngine* PhysicsEngine::instance = 0;
 	// instance->updateTime = 1.0f / 60.0f;
 	 engine->enable();
 }
+void PhysicsEngine::Refresh(glm::vec3 gravity) {
+	//delete instance;
+	//Initialize();
+	//instance->setGravity(gravity, glm::length(gravity));
+	instance->targetComponents.clear();
+
+}
+
  PhysicsEngine * PhysicsEngine::getInstance() {
 	 return instance;
  }
@@ -34,7 +42,9 @@ PhysicsEngine* PhysicsEngine::instance = 0;
  void PhysicsEngine::setGravity(glm::vec3 _dir, float _mag) {
 	 gravity = glm::normalize(_dir)*_mag;
  }
-
+ glm::vec3 PhysicsEngine::getGravity() {
+	 return gravity;
+ }
 #pragma endregion
 
 #pragma region mainLoop

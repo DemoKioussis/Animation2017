@@ -21,7 +21,12 @@ void CollisionEngine::Initialize()
 	getInstance()->maxRadius = 0;
 	engine->enable();
 }
+void CollisionEngine::Refresh() {
+	//delete instance;
+	//Initialize();
+	instance->targetComponents.clear();
 
+}
 CollisionEngine * CollisionEngine::getInstance()
 {
 	return instance;

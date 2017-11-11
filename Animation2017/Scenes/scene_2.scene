@@ -1,0 +1,11 @@
+3|0
+render
+physics|10|0|0|0
+collider
+position|20|0|0
+2|0
+render
+physics|2|0|0|-0.1
+collider
+position|-25|0|0
+

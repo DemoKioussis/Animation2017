@@ -13,6 +13,14 @@ enum class MeshType
 	SPHERE,
 };
 
+enum class MeshShape {
+	CUBE,
+	CYLINDER,
+	ELLIPSOID,
+	SPHERE,
+	SPHERELR,
+	SPHEREHD,
+};
 
 using namespace std;
 class RenderEngine;

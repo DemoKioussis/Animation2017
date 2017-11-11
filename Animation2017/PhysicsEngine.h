@@ -11,12 +11,14 @@ class PhysicsEngine : public Engine {
 
 public:
 	static void Initialize();
+	static void Refresh(glm::vec3 gravity);
 	static PhysicsEngine * getInstance();
 	void updatePhysics();
 	void applyPhysics();
 
 	void addAttractor(PhysicsComponent* _component);
 	void setGravity(glm::vec3 _dir, float _mag);
+	glm::vec3 getGravity();
 	void step();
 	void addForce(PhysicsComponent* _component, glm::vec3 _force, glm::vec3 _position);
 	float updateTime;

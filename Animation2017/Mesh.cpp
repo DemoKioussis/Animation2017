@@ -267,7 +267,7 @@ void Mesh::makeMesh(char* objName) {
 
 	//m->setVerticies(positions, colors, normals);
 	//m->setIndices(inds);
-	;
+	
 }
 
 MeshType Mesh::getMeshType()

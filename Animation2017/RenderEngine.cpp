@@ -13,11 +13,28 @@ void RenderEngine::Initialize() {
 	RenderEngine * engine = new RenderEngine();
 	instance = engine;
 }
+void RenderEngine::Refresh(Shader* shaderProg) {
+	//delete instance;
+	//instance = new RenderEngine();
+	//Initialize();
+	//instance->setShader(shaderProg);
+	//instance->renderReferences.clear();
+	for (int i = 0; i < instance->sortedRenderCompoents.size(); i++) {
+		if (instance->sortedRenderCompoents[i] != nullptr) {
+			instance->sortedRenderCompoents[i]->clear();
+		}
+	}
+	instance->targetComponents.clear();
+}
+
 void RenderEngine::setShader(Shader* _shader) {
 	shader = _shader;
 	projLoc = glGetUniformLocation(shader->ID, "projection");
 	viewLoc = glGetUniformLocation(shader->ID, "view");
 	modelLoc = glGetUniformLocation(shader->ID, "model");
+}
+Shader* RenderEngine::getShader() {
+	return instance->shader;
 }
 void RenderEngine::addComponent(Component* _renderComponent) {
 	Engine::addComponent(_renderComponent);
