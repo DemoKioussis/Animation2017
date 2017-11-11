@@ -31,7 +31,7 @@ void SceneLoading::Initialize() {
 
 void SceneLoading::loadScene(char * sceneName) {
 	
-	//float elapsedTime = glfwGetTime();
+	float elapsedTime = glfwGetTime();
 	char pathfile[100];
 	strcpy_s(pathfile, "Scenes/");
 	strcat_s(pathfile, sceneName);
@@ -111,7 +111,10 @@ void SceneLoading::loadScene(char * sceneName) {
 	CollisionEngine::getInstance()->calculateUniqueIndices(); // Important for updating the info about the collisions
 	CollisionEngine::getInstance()->updateAllBoundingBoxes(); // Can only be called after calculating the unique indices
 	//TimeSystem::resetTime();
-	//glfwSetTime(elapsedTime);
+	glfwSetTime(elapsedTime);
+	TimeSystem::update();
+	PhysicsEngine::getInstance()->step();
+
 }
 SceneLoading* SceneLoading::getInstance() {
 	return instance;
