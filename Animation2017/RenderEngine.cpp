@@ -1,7 +1,6 @@
 #include "RenderEngine.h"
 #include "Mesh.h"
 #include "RenderComponent.h"
-#include "Shader.h"
 
 //bool RenderEngine::enabled = true;
 
@@ -13,12 +12,7 @@ void RenderEngine::Initialize() {
 	RenderEngine * engine = new RenderEngine();
 	instance = engine;
 }
-void RenderEngine::Refresh(Shader* shaderProg) {
-	//delete instance;
-	//instance = new RenderEngine();
-	//Initialize();
-	//instance->setShader(shaderProg);
-	//instance->renderReferences.clear();
+void RenderEngine::Clear() {
 	for (int i = 0; i < instance->sortedRenderCompoents.size(); i++) {
 		if (instance->sortedRenderCompoents[i] != nullptr) {
 			instance->sortedRenderCompoents[i]->clear();

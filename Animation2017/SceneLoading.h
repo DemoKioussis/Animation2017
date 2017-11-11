@@ -34,7 +34,5 @@ private:
 	 Mesh* sphere;
 	 Mesh* sphereLR;
 	//Mesh* sphereHD 
-	 void setRenderCollisionMeshes();
-
 };
 

@@ -9,7 +9,7 @@ class RenderEngine : public Engine{
 
 public:
 	static void Initialize();
-	static void Refresh(Shader* shaderProg);
+	static void Clear();
 	void setShader(Shader* _shader);
 	Shader* getShader();
 	void addRenderReference(Mesh *_renderReference);

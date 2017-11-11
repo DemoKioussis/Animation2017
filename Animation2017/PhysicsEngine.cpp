@@ -23,12 +23,8 @@ PhysicsEngine* PhysicsEngine::instance = 0;
 	// instance->updateTime = 1.0f / 60.0f;
 	 engine->enable();
 }
-void PhysicsEngine::Refresh(glm::vec3 gravity) {
-	//delete instance;
-	//Initialize();
-	//instance->setGravity(gravity, glm::length(gravity));
+void PhysicsEngine::Clear() {
 	instance->targetComponents.clear();
-
 }
 
  PhysicsEngine * PhysicsEngine::getInstance() {

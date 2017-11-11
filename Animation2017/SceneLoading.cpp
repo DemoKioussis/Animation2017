@@ -28,20 +28,7 @@ void SceneLoading::Initialize() {
 	CollisionEngine::getInstance()->addMesh(sphereLR);
 	//CollisionEngine::getInstance()->addMesh(sphereHD);
 }
-void SceneLoading::setRenderCollisionMeshes() {
-	RenderEngine::getInstance()->addRenderReference(cube);
-	RenderEngine::getInstance()->addRenderReference(cylinder);
-	RenderEngine::getInstance()->addRenderReference(ellipsoid);
-	RenderEngine::getInstance()->addRenderReference(sphere);
-	RenderEngine::getInstance()->addRenderReference(sphereLR);
-	//RenderEngine::getInstance()->addRenderReference(sphereHD);
-	CollisionEngine::getInstance()->addMesh(cube);
-	CollisionEngine::getInstance()->addMesh(cylinder);
-	CollisionEngine::getInstance()->addMesh(ellipsoid);
-	CollisionEngine::getInstance()->addMesh(sphere);
-	CollisionEngine::getInstance()->addMesh(sphereLR);
-	//CollisionEngine::getInstance()->addMesh(sphereHD);
-}
+
 void SceneLoading::loadScene(char * sceneName) {
 	
 	//float elapsedTime = glfwGetTime();
@@ -59,11 +46,9 @@ void SceneLoading::loadScene(char * sceneName) {
 		exit(1);
 	}
 	InputManager::Entities->clear();
-	RenderEngine::Refresh(RenderEngine::getInstance()->getShader());
-	PhysicsEngine::Refresh(PhysicsEngine::getInstance()->getGravity());
-	CollisionEngine::Refresh();
-	//setRenderCollisionMeshes();
-
+	RenderEngine::Clear();
+	PhysicsEngine::Clear();
+	CollisionEngine::Clear();
 
 	string line;
 	int currentMeshIndex;

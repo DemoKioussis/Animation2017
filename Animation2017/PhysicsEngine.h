@@ -11,7 +11,7 @@ class PhysicsEngine : public Engine {
 
 public:
 	static void Initialize();
-	static void Refresh(glm::vec3 gravity);
+	static void Clear();
 	static PhysicsEngine * getInstance();
 	void updatePhysics();
 	void applyPhysics();
