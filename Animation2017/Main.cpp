@@ -72,46 +72,8 @@ int main()
 	glCullFace(GL_BACK);
 
 	float disp = 1.0f;
-	//std::vector<Entity*> entities(0);
 
 	float fieldSize = 25.f;
-
-	/*for (int x = -numX / 2; x < numX / 2; x++) {
-		for (int y = -numY / 2; y < numY / 2; y++) {
-			for (int z = -numZ / 2; z < numZ / 2; z++) {*/
-	/*for (int x = 0; x < numX; x++) {
-		for (int y = 0; y < numY;y++) {
-			for (int z = 0; z < numZ;z++) {
-
-				float randomX = ((float(rand()) / float(RAND_MAX)) - 0.5f) * fieldSize;
-				float randomY = ((float(rand()) / float(RAND_MAX)) - 0.5f) * fieldSize;
-				float randomZ = ((float(rand()) / float(RAND_MAX)) - 0.5f) * fieldSize;
-
-				Entity* e = new Entity(false);
-				RenderComponent *r = new RenderComponent();
-				r->setMeshID((x + y + z) % 3);
-				PhysicsComponent* p = new PhysicsComponent();
-				CollisionComponent* c = new CollisionComponent();
-				c->setMeshID((x + y + z) % 3);
-				e->addComponent(p);
-				e->addComponent(r);
-				e->addComponent(c);
-				glm::mat4 moment(1.0f);
-				moment*(1.0f / 12.0f) * (2.0f);
-				RenderEngine::getInstance()->addComponent(r);
-				PhysicsEngine::getInstance()->addComponent(p);
-				e->translation = glm::translate(e->translation, glm::vec3(randomX, randomY, randomZ));
-				CollisionEngine::getInstance()->addComponent(c);
-				entities.push_back(e);
-			}
-		}
-	}
-
-	CollisionEngine::getInstance()->calculateUniqueIndices(); // Important for updating the info about the collisions
-	CollisionEngine::getInstance()->updateAllBoundingBoxes(); // Can only be called after calculating the unique indices
-
-	InputManager::Entities = &entities;*/
-	
 
 	SceneLoading::getInstance()->loadScene("scene_1");
 
@@ -129,8 +91,7 @@ int main()
 	shaderProg.setVec3("ambientLight", glm::vec3(1.0f, 1.0f, 1.0f));
 	float cosT = 0, sinT = 0;
 
-	 
-
+	TimeSystem::resetTime();
 #pragma region mainLoop
 	while (windowManager->windowHasClosed())
 	{
@@ -138,7 +99,6 @@ int main()
 		glm::mat4 view = camera->GetViewMatrix();
 		glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(1,1,1));
 		shaderProg.setMat4(viewLoc, view);
-	//	shaderProg.setMat4(modelLoc, model);
 
 		TimeSystem::update();				
 		

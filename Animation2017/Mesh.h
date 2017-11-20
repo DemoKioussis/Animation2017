@@ -28,6 +28,8 @@ class Mesh {
 	friend class RenderEngine;
 private:
 	vector<GLfloat>* vertices;
+	vector<glm::vec3> uniqueVertices;
+
 	vector<GLuint>* indices;
 	GLuint VBO, VAO, EBO, transformBuffer;
 	int numPrims;
@@ -37,9 +39,9 @@ public:
 	Mesh();
 	Mesh(char* objName, MeshType type);
 	~Mesh();
-
 	void setVerticies(vector<GLfloat>& p, vector<GLfloat>& c, vector<GLfloat>& n);
 	void setVerticiesStaticColour(std::vector<GLfloat> &p, std::vector<GLfloat> &c, std::vector<GLfloat> &n);
+	void setUniqueVerts(vector<GLfloat>& p);
 	//void setVerticiesStaticColour(std::vector<GLfloat>& p, std::vector<GLfloat>& c);
 	void setVerticies(vector<GLfloat>* v);
 	void setIndices(vector<GLuint>* i);
@@ -47,5 +49,6 @@ public:
 	vector<GLfloat>* getVerticies();
 	void draw();
 	void Mesh::makeMesh(char* objName);
+	const vector<glm::vec3>* Mesh::getUniqueVerts();
 	MeshType getMeshType();
 };

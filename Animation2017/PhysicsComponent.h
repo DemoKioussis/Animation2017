@@ -7,23 +7,29 @@ class PhysicsComponent : public Component {
 	friend class PhysicsEngine;
 private:
 
-	
+	// shouldnt change dynamically
 	glm::vec3 centerOfMass;
+	float mass;
+
 
 	glm::vec3 velocity;
-	glm::vec3 acceleration;
+
+
 	glm::vec3 netForce;
-	float mass;
+	glm::vec3 netTorque;
+
+	glm::vec3 dP; // dP = netForce
+	glm::vec3 dL; // dL = netTorque
 
 	glm::vec3 angularVelocity;
 	glm::vec3 angularAcceleration;
-	glm::vec3 torque;
 	glm::mat4 momentOfInertia;
+	glm::mat4 momentOfInertiaInverse;
 
 
 	float kineticEnergy; // 1/2 mv^2
-	glm::vec3 momentum;		// mv
-	glm::vec3 angularMomentum;
+	glm::vec3 P;		// angular velocity
+	glm::vec3 L;		// angular momentum
 
 	float friction;
 	glm::vec3 rotationLock;
@@ -37,6 +43,18 @@ public:
 		mass = 1;
 		gravityMultiplyer = 1;
 		setMomentOfInertia(glm::mat4(1.0f));
+		velocity = glm::vec3();
+		netForce = glm::vec3();
+		dP		 = glm::vec3();
+		P		 = glm::vec3();
+		L		 = glm::vec3();
+
+		angularVelocity = glm::vec3();
+		angularAcceleration = glm::vec3();
+		netTorque = glm::vec3();
+		momentOfInertia = glm::mat4();
+		momentOfInertiaInverse = glm::mat4();
+
 	};
 	~PhysicsComponent() {};
 
@@ -45,6 +63,7 @@ public:
 	}
 	void setMomentOfInertia(glm::mat4 _moment) {
 		momentOfInertia = _moment;
+		momentOfInertiaInverse = glm::inverse(_moment);
 	}
 	void setGravityMultiply(float _multiplyer) {
 		gravityMultiplyer = _multiplyer;
@@ -68,6 +87,7 @@ public:
 		
 		angularVelocity += glm::vec3(r.x, r.y, r.z);
 	}
+
 	void addAngularVelocity2(glm::vec3 _axis, float _vel) {
 		glm::vec4 w = glm::vec4(glm::normalize(_axis) * _vel, 0);
 		glm::vec4 r = glm::inverse(getRotation())*w;

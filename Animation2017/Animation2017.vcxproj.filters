@@ -52,6 +52,9 @@
     <Filter Include="Source Files\Loading">
       <UniqueIdentifier>{05faec20-ecdc-4895-ba02-b9bf360a4722}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Builders">
+      <UniqueIdentifier>{f1addbfe-a820-4d00-9d3e-0b8abd89becb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Mesh.cpp">
@@ -175,6 +178,9 @@
     </ClInclude>
     <ClInclude Include="RenderEngine.h">
       <Filter>Header Files\Engines</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsBuilder.h">
+      <Filter>Header Files\Builders</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

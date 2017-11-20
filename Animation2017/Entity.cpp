@@ -7,6 +7,9 @@ Entity::Entity(bool _isStatic) : isStaticEntity(_isStatic)
 {
 	id = idCounter++;
 	transform = glm::mat4(1.0f);
+	scale = glm::mat4(1.0f);
+	rotation = glm::mat4(1.0f);
+	translation = glm::mat4(1.0f);
 }
 Entity::~Entity() {
 	//delete all components;

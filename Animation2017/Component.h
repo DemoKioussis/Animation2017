@@ -26,6 +26,7 @@ public:
 	glm::mat4 & getRotation();
 	glm::mat4 & getInverseRotation();
 	glm::mat4 & getTranslation();
+	glm::mat4 & getScale();
 
 
 };

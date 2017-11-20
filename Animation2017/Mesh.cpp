@@ -1,6 +1,7 @@
 #include "Mesh.h"
 #include "Renderable.h"
 #include <iostream>
+#include <glm\glm.hpp>
 /* The mesh class will hold data about rendering an object. Ideally physical properties would be stored in a 
 	rigid body class or something (think unity if you've used it). 
 */
@@ -73,6 +74,7 @@ void Mesh::setVerticies(std::vector<GLfloat>& p, std::vector<GLfloat>& c, std::v
 	assert(p.size() == c.size());
 	assert(p.size() == n.size());
 	assert(p.size() % 3 == 0);
+
 	std::vector<GLfloat> *v = new std::vector<GLfloat>(0);
 	for (int i = 0; i < p.size();i+=3) {
 		int index0 = i;
@@ -83,6 +85,9 @@ void Mesh::setVerticies(std::vector<GLfloat>& p, std::vector<GLfloat>& c, std::v
 		v->push_back(p[index1]);
 		v->push_back(p[index2]);
 
+
+
+
 		v->push_back(c[index0]);
 		v->push_back(c[index1]);
 		v->push_back(c[index2]);
@@ -91,7 +96,31 @@ void Mesh::setVerticies(std::vector<GLfloat>& p, std::vector<GLfloat>& c, std::v
 		v->push_back(n[index1]);
 		v->push_back(n[index2]);
 	}
+
+
+
+	for (int i = 0; i < p.size();i+=3) {
+		int index0 = i;
+		int index1 = i + 1;
+		int index2 = i + 2;
+
+		glm::vec3 v(p[index0], p[index1], p[index2]);
+		bool unique = true;
+		for (int j = 0; j < uniqueVertices.size();j++) {
+			if (glm::distance(v, uniqueVertices[j]) == 0) {
+				unique = false;
+				break;
+			}
+		}
+		if (unique) {
+			uniqueVertices.push_back(v);
+		}
+		
+	}
+
+	setUniqueVerts(p);
 	setVerticies(v);
+
 }
 void Mesh::setVerticiesStaticColour(std::vector<GLfloat>& p, std::vector<GLfloat>& c, std::vector<GLfloat>& n) {
 	assert(p.size() == n.size());
@@ -115,60 +144,13 @@ void Mesh::setVerticiesStaticColour(std::vector<GLfloat>& p, std::vector<GLfloat
 		v->push_back(n[index2]);
 
 		}
-	
+
+	setUniqueVerts(p);
+
 	setVerticies(v);
+
 }
 
-//void Mesh::setVerticiesStaticColour(std::vector<GLfloat>& p, std::vector<GLfloat>& c) {
-//	//assert(p.size() == n.size());
-//	std::cout << "size: " << p.size() << endl;
-//	assert(p.size() % 3 == 0);
-//	std::vector<GLfloat> *v = new std::vector<GLfloat>(0);
-//	for (int i = 0; i < p.size(); i += 6) {
-//		int index0 = i;
-//		int index1 = i + 1;
-//		int index2 = i + 2;
-//		int index3 = i + 3;
-//		int index4 = i + 4;
-//		int index5 = i + 5;
-//		v->push_back(p[index0]);
-//		v->push_back(p[index1]);
-//		v->push_back(p[index2]);
-//
-//		v->push_back(c[0]);
-//		v->push_back(c[1]);
-//		v->push_back(c[2]);
-//
-//		//v->push_back(p[index3]);
-//		//v->push_back(p[index4]);
-//		//v->push_back(p[index5]);
-//
-//		//v.push_back(p[index0]);
-//		//v.push_back(p[index1]);
-//		//v.push_back(p[index2]);
-//
-//		//v.push_back(c[0]);
-//		//v.push_back(c[1]);
-//		//v.push_back(c[2]);
-//
-//		//v.push_back(n[index0]);
-//		//v.push_back(n[index1]);
-//		//v.push_back(n[index2]);
-//
-//
-//		if (i == 0) {
-//			vector<GLfloat> &vr = *v;
-//			//GLfloat te[] = v->front();
-//			for (int j = 0; j < vr.size(); j++) {
-//				std::cout << vr[j] << std::endl;
-//			}
-//		}
-//	}
-//	cout << "size after "<<v->size() << endl;
-//	setVerticies(v);
-//
-//
-//}
 void Mesh::setVerticies(std::vector<GLfloat>* v) {
 
 	glBindVertexArray(VAO);
@@ -270,7 +252,38 @@ void Mesh::makeMesh(char* objName) {
 	
 }
 
+
+void Mesh::setUniqueVerts(std::vector<GLfloat>& p) {
+
+	for (int i = 0; i < p.size();i += 3) {
+		int index0 = i;
+		int index1 = i + 1;
+		int index2 = i + 2;
+
+		glm::vec3 v(p[index0], p[index1], p[index2]);
+		bool unique = true;
+		for (int j = 0; j < uniqueVertices.size();j++) {
+			if (glm::distance(v, uniqueVertices[j]) == 0) {
+				unique = false;
+				break;
+			}
+		}
+		if (unique) {
+			uniqueVertices.push_back(v);
+		}
+	}
+
+	int done = 0;
+
+}
+
+const vector<glm::vec3>* Mesh::getUniqueVerts() {
+	return &uniqueVertices;
+
+}
+
 MeshType Mesh::getMeshType()
 {
 	return meshType;
 }
+

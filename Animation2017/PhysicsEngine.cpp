@@ -9,8 +9,9 @@
 #include <glm\gtc\matrix_transform.hpp>
 #include <omp.h>
 #include <iostream>
+#define stepsPerSecond  240
+#define updateTime 1.0f/stepsPerSecond
 
-#define updateTime 1.0f/240.0f
 PhysicsEngine* PhysicsEngine::instance = 0;
 
 #pragma region initialization
@@ -20,7 +21,6 @@ PhysicsEngine* PhysicsEngine::instance = 0;
 	 PhysicsEngine * engine = new PhysicsEngine();
 	 instance = engine;
 	 instance->gravityEnabled = true;
-	// instance->updateTime = 1.0f / 60.0f;
 	 engine->enable();
 }
 void PhysicsEngine::Clear() {
@@ -63,6 +63,7 @@ void PhysicsEngine::updatePhysics() {
 		PhysicsComponent* component = (PhysicsComponent*)targetComponents[i];
 		addGravity(component);
 		setAcceleration(component);
+		setMomentum(component);
 		setVelocity(component);
 	}
 }
@@ -72,10 +73,14 @@ void PhysicsEngine::applyPhysics() {
 	for (int i = 0; i < targetComponents.size();i++) {
 		PhysicsComponent* component = (PhysicsComponent*)targetComponents[i];
 		energy(component);
-		momentum(component);
 		rotate(component);
 		translate(component);
-		component->getTransform() = component->getTranslation()*component->getRotation();
+		component->getTransform() = component->getTranslation()*component->getRotation()*component->getScale();
+		std::cout << "Time: "<<TimeSystem::getTimeSinceStart()<<"\n";
+		std::cout << "Pos: " << component->getTranslation()[3][0] << ", " << component->getTranslation()[3][1] << ", " << component->getTranslation()[3][2] << "\n";
+		std::cout << "Vel: " << component->velocity.x << ", " << component->velocity.y << ", " << component->velocity.z << "\n\n";
+
+
 		reset(component);
 	}
 }
@@ -84,7 +89,7 @@ void PhysicsEngine::applyPhysics() {
 #pragma region calculations
 void PhysicsEngine::addForce(PhysicsComponent* _component, glm::vec3 force,glm::vec3 position) {
 	_component->netForce += force;
-	_component->torque = glm::cross(position, force);
+	_component->netTorque += glm::cross(position, force);
 }
 void PhysicsEngine::addGravity(PhysicsComponent* _component) {
 	_component->netForce += gravity*_component->gravityMultiplyer*_component->mass;
@@ -95,16 +100,24 @@ void PhysicsEngine::addAttractiveForces(PhysicsComponent* _component) {
 }
 
 void PhysicsEngine::setAcceleration(PhysicsComponent* _component) {
-	_component->acceleration = _component->netForce/_component->mass;
-	glm::mat4 inertia = _component->getRotation()*_component->momentOfInertia*_component->getInverseRotation();
-	_component->angularMomentum += TimeSystem::getPhysicsDeltaTime()*_component->torque;
-	_component->angularVelocity = _component->getInverseRotation()*glm::inverse(inertia)*glm::vec4(_component->angularMomentum, 0);
+	_component->dP = _component->netForce;
+	_component->dL = _component->netTorque;
 
+	
+}
+void PhysicsEngine::setMomentum(PhysicsComponent* _component) {
+	_component->P += _component->dP;
+	_component->L += _component->dL;
 }
 
 void PhysicsEngine::setVelocity(PhysicsComponent* _component) {
-	_component->velocity += _component->acceleration*TimeSystem::getPhysicsDeltaTime();
-	
+
+	_component->velocity = _component->P*TimeSystem::getPhysicsDeltaTime() / _component->mass;
+	glm::mat4 inertia2 = _component->getRotation()*_component->momentOfInertia*glm::transpose(_component->getRotation());
+	glm::mat4 inertia = _component->getRotation()*_component->momentOfInertiaInverse*glm::transpose(_component->getRotation());
+	_component->angularVelocity = inertia*glm::vec4(_component->L, 0)*TimeSystem::getPhysicsDeltaTime();
+
+
 	if (glm::length(_component->velocity) > MAX_SPEED ) {
 		_component->velocity = glm::normalize(_component->velocity)*MAX_SPEED;
 	}	
@@ -132,14 +145,12 @@ void PhysicsEngine::energy(PhysicsComponent* _component) {
 	float speed = glm::length(_component->velocity);
 	_component->kineticEnergy = (_component->mass*speed*speed/2.0f);
 }
-void PhysicsEngine::momentum(PhysicsComponent* _component) {
-	_component->momentum = _component->mass*_component->velocity;
-}
-void PhysicsEngine::reset(PhysicsComponent* _component) {
-		_component->acceleration = glm::vec3();
-		_component->netForce = glm::vec3();
-		_component->torque = glm::vec3();
 
+void PhysicsEngine::reset(PhysicsComponent* _component) {
+		_component->dP = glm::vec3();
+		_component->dL = glm::vec3();
+		_component->netForce = glm::vec3();
+		_component->netTorque = glm::vec3();
 }
 
 #pragma endregion

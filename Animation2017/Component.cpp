@@ -38,3 +38,6 @@ glm::mat4 & Component::getInverseRotation() {
 glm::mat4 & Component::getTranslation() {
 	return entity->translation;
 }
+glm::mat4 & Component::getScale() {
+	return entity->scale;
+}

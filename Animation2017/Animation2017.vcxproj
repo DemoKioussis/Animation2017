@@ -182,6 +182,7 @@
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="objloader.hpp" />
+    <ClInclude Include="PhysicsBuilder.h" />
     <ClInclude Include="PhysicsComponent.h" />
     <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="RenderComponent.h" />

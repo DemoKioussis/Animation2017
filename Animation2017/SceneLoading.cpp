@@ -1,4 +1,5 @@
 #include "SceneLoading.h"
+#include "PhysicsBuilder.h"
 SceneLoading* SceneLoading::instance=nullptr;
 
 void SceneLoading::Initialize() {
@@ -26,6 +27,13 @@ void SceneLoading::Initialize() {
 	CollisionEngine::getInstance()->addMesh(ellipsoid);
 	CollisionEngine::getInstance()->addMesh(sphere);
 	CollisionEngine::getInstance()->addMesh(sphereLR);
+	//CollisionEngine::getInstance()->addMesh(sphereHD);
+
+	PhysicsEngine::getInstance()->meshes.push_back(cube);
+	PhysicsEngine::getInstance()->meshes.push_back(cylinder);
+	PhysicsEngine::getInstance()->meshes.push_back(ellipsoid);
+	PhysicsEngine::getInstance()->meshes.push_back(sphere);
+	PhysicsEngine::getInstance()->meshes.push_back(sphereLR);
 	//CollisionEngine::getInstance()->addMesh(sphereHD);
 }
 
@@ -87,7 +95,10 @@ void SceneLoading::loadScene(char * sceneName) {
 			if (sVec[0] == "physics") {
 				//std::cout << "physics" << std::endl;
 				PhysicsComponent* p = new PhysicsComponent();
-				p->setMass(stof(sVec[1]));
+		//		p->setMass(stof(sVec[1]));
+				float density = stof(sVec[1]);
+				p->setMomentOfInertia(PhysicsBuilder::getMomentOfInertia(currentMeshIndex, glm::mat4(),density));
+				p->setMass(density* PhysicsEngine::getInstance()->meshes[currentMeshIndex]->getUniqueVerts()->size());
 				e->addComponent(p);
 				PhysicsEngine::getInstance()->addComponent(p);
 				PhysicsEngine::getInstance()->addForce(p, glm::vec3(stof(sVec[2]), stof(sVec[3]), stof(sVec[4])), glm::vec3(e->translation[0][3], e->translation[1][3], e->translation[2][3]));

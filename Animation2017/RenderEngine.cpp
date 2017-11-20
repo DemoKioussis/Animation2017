@@ -70,8 +70,6 @@ void RenderEngine::addRenderReference(Mesh * _renderReference) {
 	renderReferences.push_back(_renderReference);
 	std::vector<RenderComponent*> *vec = new std::vector<RenderComponent*>();
 	sortedRenderCompoents.push_back(vec);
-
-
 }
 
 std::vector<Mesh*>& RenderEngine::getAllRenderReferences()

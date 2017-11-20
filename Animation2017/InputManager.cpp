@@ -65,12 +65,12 @@ void InputManager::key_callback(GLFWwindow* window, int key, int scancode, int a
 	}
 
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_P) == GLFW_PRESS) {
-//		TimeSystem::setTimeScale(abs(1 - TimeSystem::getTimeScale()));
 		if(PhysicsEngine::getInstance()->isEnabled())
 			PhysicsEngine::getInstance()->disable();
-		else
+		else {
+			TimeSystem::resetTime();
 			PhysicsEngine::getInstance()->enable();
-
+		}
 	}
 
 }
@@ -100,10 +100,12 @@ void InputManager::processInput() {
 	}
 	else
 		std::cout << "Cannot process input - no window" << std::endl;
-	float force = 0.010f;
-	glm::vec3 x(10, 0, 0);
-	glm::vec3 y(0, 10, 0);
-	glm::vec3 z(0, 0, 10);
+
+	float force = 10.0f;
+	glm::vec3 x(1, 0, 0);
+	glm::vec3 y(0, 1, 0);
+	glm::vec3 z(0, 0, 1);
+
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_5) == GLFW_PRESS) {
 		for (int i = 0; i < Entities->size();i++) {
 			auto e = (Entities->at(i));
