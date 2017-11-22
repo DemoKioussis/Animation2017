@@ -76,9 +76,9 @@ void PhysicsEngine::applyPhysics() {
 		rotate(component);
 		translate(component);
 		component->getTransform() = component->getTranslation()*component->getRotation()*component->getScale();
-		std::cout << "Time: "<<TimeSystem::getTimeSinceStart()<<"\n";
-		std::cout << "Pos: " << component->getTranslation()[3][0] << ", " << component->getTranslation()[3][1] << ", " << component->getTranslation()[3][2] << "\n";
-		std::cout << "Vel: " << component->velocity.x << ", " << component->velocity.y << ", " << component->velocity.z << "\n\n";
+//		std::cout << "Time: "<<TimeSystem::getTimeSinceStart()<<"\n";
+//		std::cout << "Pos: " << component->getTranslation()[3][0] << ", " << component->getTranslation()[3][1] << ", " << component->getTranslation()[3][2] << "\n";
+//		std::cout << "Vel: " << component->velocity.x << ", " << component->velocity.y << ", " << component->velocity.z << "\n\n";
 
 
 		reset(component);
@@ -113,7 +113,6 @@ void PhysicsEngine::setMomentum(PhysicsComponent* _component) {
 void PhysicsEngine::setVelocity(PhysicsComponent* _component) {
 
 	_component->velocity = _component->P*TimeSystem::getPhysicsDeltaTime() / _component->mass;
-	glm::mat4 inertia2 = _component->getRotation()*_component->momentOfInertia*glm::transpose(_component->getRotation());
 	glm::mat4 inertia = _component->getRotation()*_component->momentOfInertiaInverse*glm::transpose(_component->getRotation());
 	_component->angularVelocity = inertia*glm::vec4(_component->L, 0)*TimeSystem::getPhysicsDeltaTime();
 

@@ -8,9 +8,9 @@ using namespace std;
 class PhysicsBuilder {
 
 public:
-	static glm::mat4 getMomentOfInertia(int shape, glm::mat4 scale,float density) {
-		const vector<glm::vec3> * uniqueVertices = PhysicsEngine::getInstance()->meshes[0]->getUniqueVerts();
-	
+	static glm::mat4 getMomentOfInertia(int shape, glm::mat4 scale,float mass) {
+		const vector<glm::vec3> * uniqueVertices = PhysicsEngine::getInstance()->meshes[shape]->getUniqueVerts();
+		float density = mass / uniqueVertices->size();
 		glm::mat4 sum(1.0f);
 
 		for (int i = 0; i < 4;i++) {

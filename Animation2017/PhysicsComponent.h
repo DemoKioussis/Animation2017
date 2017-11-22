@@ -1,5 +1,6 @@
 #pragma once
 #include "Component.h"
+#include <iostream>
 #include "glm\gtx\matrix_operation.hpp"
 class Entity;
 class PhysicsEngine;
@@ -42,7 +43,6 @@ public:
 		componentType = PHYSICS_COMPONENT;
 		mass = 1;
 		gravityMultiplyer = 1;
-		setMomentOfInertia(glm::mat4(1.0f));
 		velocity = glm::vec3();
 		netForce = glm::vec3();
 		dP		 = glm::vec3();
@@ -64,6 +64,17 @@ public:
 	void setMomentOfInertia(glm::mat4 _moment) {
 		momentOfInertia = _moment;
 		momentOfInertiaInverse = glm::inverse(_moment);
+		std::cout << "Inetia" << std::endl;
+
+		for (int i = 0; i < 4;i++) {
+			for (int j = 0; j < 4;j++) {
+				std::cout << momentOfInertia[j][i] << " ";
+			}
+			std::cout << std::endl;
+		}
+		std::cout << std::endl;
+		std::cout << std::endl;
+
 	}
 	void setGravityMultiply(float _multiplyer) {
 		gravityMultiplyer = _multiplyer;

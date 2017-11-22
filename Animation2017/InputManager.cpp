@@ -101,7 +101,7 @@ void InputManager::processInput() {
 	else
 		std::cout << "Cannot process input - no window" << std::endl;
 
-	float force = 10.0f;
+	float force = 100.0f;
 	glm::vec3 x(1, 0, 0);
 	glm::vec3 y(0, 1, 0);
 	glm::vec3 z(0, 0, 1);
@@ -152,6 +152,12 @@ void InputManager::processInput() {
 			PhysicsEngine::getInstance()->addForce(p, -x*force*(float)( 1), z);
 
 		}
+	}
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_0) == GLFW_PRESS) {
+		TimeSystem::setTimeScale(TimeSystem::getTimeScale() - 0.01f);
+	}
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_2) == GLFW_PRESS) {
+		TimeSystem::setTimeScale(TimeSystem::getTimeScale() + 0.01f);
 	}
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_L) == GLFW_PRESS) {
 		//load

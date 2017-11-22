@@ -79,6 +79,11 @@ const float TimeSystem::getTimeSinceStart() {
 
 void TimeSystem::setTimeScale(float t) {
 	timeScale = t;
+	if (timeScale < 0)
+		timeScale = 0;
+
+	std::cout << "Time scale = " << timeScale << std::endl;
+	
 };
 
 const float TimeSystem::getTimeScale() {
