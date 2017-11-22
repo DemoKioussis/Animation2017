@@ -163,18 +163,27 @@ void PhysicsEngine::resolveCollisions() {
 		float vRel;
 		Entity & entA = *collision.c1->entity;
 		Entity & entB = *collision.c2->entity;
-
+		glm::vec3 normalizedPenVector = glm::normalize(-collision.penetrationVector);
 		PhysicsComponent & physA = (PhysicsComponent&)(*entA.getComponent(PHYSICS_COMPONENT));
 		PhysicsComponent & physB = (PhysicsComponent&)(*entB.getComponent(PHYSICS_COMPONENT));
-		vRel = glm::dot(glm::normalize(collision.penetrationVector) ,(physA.velocity - physB.velocity));
+		vRel = glm::dot(normalizedPenVector,(physA.velocity - physB.velocity));
 
 		if (vRel >epsilon)
 			std::cout << "AWAY " << std::endl;
 		if (abs(vRel) <=epsilon)
 			std::cout << "RESTING " << std::endl;
-		if(vRel < epsilon)
-			std::cout << "COLLIDING " << std::endl;
-		std::cout << "vrel: " << vRel << std::endl;
+		if (vRel < -epsilon)
+		{
+			float impulse;
+			float coeffOfRestitution = 0.5f*(physA.coeffOfRestitution + physB.coeffOfRestitution);
+			coeffOfRestitution = -(1 + coeffOfRestitution)*vRel;
+		
+			float massInverseSum = physA.massInverse + physB.massInverse;
+		
+			glm::vec3 rA = collision.pointsC1[0];
+			glm::vec3 rB = collision.pointsC2[0];
+
+		}
 
 	}
 }

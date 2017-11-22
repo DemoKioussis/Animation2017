@@ -11,6 +11,7 @@ private:
 	// shouldnt change dynamically
 	glm::vec3 centerOfMass;
 	float mass;
+	float massInverse;
 
 
 	glm::vec3 velocity;
@@ -44,6 +45,7 @@ public:
 	PhysicsComponent() {
 		componentType = PHYSICS_COMPONENT;
 		mass = 1;
+		massInverse = 1;
 		gravityMultiplyer = 1;
 		velocity = glm::vec3();
 		netForce = glm::vec3();
@@ -63,6 +65,7 @@ public:
 
 	void setMass(float _mass) {
 		mass = _mass;
+		massInverse = 1 / _mass;
 	}
 	void setMomentOfInertia(glm::mat4 _moment) {
 		momentOfInertia = _moment;
