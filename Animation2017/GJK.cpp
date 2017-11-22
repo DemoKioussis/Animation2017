@@ -13,15 +13,11 @@ GJK::GJK(CollisionComponent & cc1, CollisionComponent & cc2) : c1(cc1), c2(cc2),
 	transform2I = glm::inverse(transform2);
 
 	Mesh* mesh1 = meshes[cc1.getMeshID()];
-	collisionData1 = &CollisionEngine::getInstance()->getCollisionData()[cc1.getMeshID()];
-	indices1 = &collisionData1->uniqueVerticesIndices;
-	vertices1 = mesh1->getVerticies();
+	vertices1 = mesh1->getUniqueVerts();
 	meshType1 = mesh1->getMeshType();
 
 	Mesh* mesh2 = meshes[cc2.getMeshID()];
-	collisionData2 = &CollisionEngine::getInstance()->getCollisionData()[cc2.getMeshID()];
-	indices2 = &collisionData2->uniqueVerticesIndices;
-	vertices2 = mesh2->getVerticies();
+	vertices2 = mesh2->getUniqueVerts();
 	meshType2 = mesh2->getMeshType();
 }
 
@@ -78,8 +74,8 @@ glm::vec3 GJK::support(const glm::vec3& directionWC)
 	vec3 directionOC2 = transform2I * vec4(-directionWC, 0);
 	vec3 directionOC2normalized = glm::normalize(directionOC2);
 
-	vec3 furthestOC1 = (meshType1 == MeshType::SPHERE && !c1.getIsNotPureSphere()) ? furthestPointInDirectionSphere(directionOC1normalized, c1) : furthestPointInDirectionVertex(directionOC1normalized, *vertices1, *indices1);
-	vec3 furthestOC2 = (meshType2 == MeshType::SPHERE && !c2.getIsNotPureSphere()) ? furthestPointInDirectionSphere(directionOC2normalized, c2) : furthestPointInDirectionVertex(directionOC2normalized, *vertices2, *indices2);
+	vec3 furthestOC1 = (meshType1 == MeshType::SPHERE && !c1.getIsNotPureSphere()) ? furthestPointInDirectionSphere(directionOC1normalized, c1) : furthestPointInDirectionVertex(directionOC1normalized, *vertices1);
+	vec3 furthestOC2 = (meshType2 == MeshType::SPHERE && !c2.getIsNotPureSphere()) ? furthestPointInDirectionSphere(directionOC2normalized, c2) : furthestPointInDirectionVertex(directionOC2normalized, *vertices2);
 
 	vec3 furthestWC1 = transform1 * vec4(furthestOC1, 1);
 	vec3 furthestWC2 = transform2 * vec4(furthestOC2, 1);	
@@ -87,14 +83,14 @@ glm::vec3 GJK::support(const glm::vec3& directionWC)
 	return  furthestWC1 - furthestWC2;
 }
 
-glm::vec3 GJK::furthestPointInDirectionVertex(glm::vec3& directionOCnormalized, std::vector<GLfloat>& vertices, std::vector<int>& indices, std::vector<glm::vec4>* pointsForResult)
+glm::vec3 GJK::furthestPointInDirectionVertex(glm::vec3& directionOCnormalized, const std::vector<glm::vec3>& vertices, std::vector<glm::vec4>* pointsForResult)
 {
 	float dotProductMax = -1;
 	vec3 mostSimilarVectorOC(0, 0, 0);
 
-	for (size_t i = 0; i < indices.size(); i++)
+	for (size_t i = 0; i < vertices.size(); i++)
 	{
-		vec3 vertexOC(vertices[indices[i]], vertices[indices[i] + 1], vertices[indices[i] + 2]);
+		const vec3& vertexOC = vertices[i];
 		vec3 vertexOCnormalized = glm::normalize(vertexOC);
 
 		float dotProduct = glm::dot(directionOCnormalized, vertexOCnormalized);
@@ -108,9 +104,9 @@ glm::vec3 GJK::furthestPointInDirectionVertex(glm::vec3& directionOCnormalized, 
 
 	if (pointsForResult != nullptr)
 	{
-		for (size_t i = 0; i < indices.size(); i++)
+		for (size_t i = 0; i < vertices.size(); i++)
 		{
-			vec3 vertexOC(vertices[indices[i]], vertices[indices[i] + 1], vertices[indices[i] + 2]);
+			const vec3& vertexOC = vertices[i];
 			vec3 vertexOCnormalized = glm::normalize(vertexOC);
 
 			float dotProduct = glm::dot(directionOCnormalized, vertexOCnormalized);
@@ -147,7 +143,7 @@ void GJK::supportForResult(glm::vec3& penetrationVectorWC, CollisionResult& coll
 	}
 	else
 	{
-		furthestPointInDirectionVertex(directionOC1normalized, *vertices1, *indices1, &collisionResult.pointsC1);
+		furthestPointInDirectionVertex(directionOC1normalized, *vertices1, &collisionResult.pointsC1);
 	}
 
 	if (meshType2 == MeshType::SPHERE && !c2.getIsNotPureSphere())
@@ -158,7 +154,7 @@ void GJK::supportForResult(glm::vec3& penetrationVectorWC, CollisionResult& coll
 	}
 	else
 	{
-		furthestPointInDirectionVertex(directionOC2normalized, *vertices2, *indices2, &collisionResult.pointsC2);
+		furthestPointInDirectionVertex(directionOC2normalized, *vertices2, &collisionResult.pointsC2);
 	}
 
 	vec3 minkowskiDiffPoint = support(penetrationVectorWC);

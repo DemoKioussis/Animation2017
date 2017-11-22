@@ -117,8 +117,7 @@ void SceneLoading::loadScene(char * sceneName) {
 
 		InputManager::Entities->push_back(e);
 	}
-
-	CollisionEngine::getInstance()->calculateUniqueIndices(); // Important for updating the info about the collisions
+	
 	CollisionEngine::getInstance()->updateAllBoundingBoxes(); // Can only be called after calculating the unique indices
 	//TimeSystem::resetTime();
 	glfwSetTime(elapsedTime);

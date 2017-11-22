@@ -29,42 +29,6 @@ CollisionEngine * CollisionEngine::getInstance()
 	return instance;
 }
 
-// Calculate uniqe indices
-void CollisionEngine::calculateUniqueIndices()
-{
-	for (int meshId = 0; meshId < meshes.size(); meshId++)
-	{
-		CollisionData collision;
-		vector<GLfloat>& vertices = *meshes[meshId]->getVerticies();
-		MeshType meshType = meshes[meshId]->getMeshType();
-
-		// Iterate through all the vertices
-		for (int index = 0; index < vertices.size(); index += 9)
-		{
-			glm::vec3 vertex(vertices[index], vertices[index + 1], vertices[index + 2]);
-
-			// Store the index for the current vertex if there isn't already a vertex with almsot the same position
-			bool alreadyExists = false;
-			for (int existingIndex : collision.uniqueVerticesIndices)
-			{
-				vec3 alreadyExisting(vertices[existingIndex], vertices[existingIndex + 1], vertices[existingIndex + 2]);
-				float lengthOfDifference = glm::length(vertex - alreadyExisting);
-				if (lengthOfDifference < 0.001f)
-				{
-					// Difference is too small, we consider them as being the same vertex
-					alreadyExists = true;
-				}
-			}
-			if (!alreadyExists)
-			{
-				collision.uniqueVerticesIndices.push_back(index);
-			}
-		}
-
-		collisionData[meshId] = std::move(collision);
-	}
-}
-
 void CollisionEngine::updateAllBoundingBoxes()
 {
 	for (Component* c : targetComponents)
@@ -107,8 +71,6 @@ void CollisionEngine::createVonNeumannGrid()
 	for (Component* c : targetComponents)
 	{
 		CollisionComponent* cc = (CollisionComponent*)c;
-		std::vector<int>& indices = collisionData[cc->getMeshID()].uniqueVerticesIndices;
-		vector<GLfloat>& vertices = *meshes[cc->getMeshID()]->getVerticies();
 
 		if (c->entity->isStatic())
 		{
@@ -337,11 +299,6 @@ bool CollisionEngine::areCollidingGJK(CollisionComponent * c1, CollisionComponen
 {
 	GJK gjk(*c1, *c2);
 	return gjk.areColliding();
-}
-
-std::unordered_map<int, CollisionData>& CollisionEngine::getCollisionData()
-{
-	return collisionData;
 }
 
 void CollisionEngine::updateMaxRadius()
