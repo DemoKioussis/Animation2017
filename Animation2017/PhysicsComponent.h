@@ -33,10 +33,12 @@ private:
 	glm::vec3 L;		// angular momentum
 
 	float friction;
+	float coeffOfRestitution;
 	glm::vec3 rotationLock;
 
 	bool isStatic;
 	float gravityMultiplyer;
+
 
 public:
 	PhysicsComponent() {
@@ -54,6 +56,7 @@ public:
 		netTorque = glm::vec3();
 		momentOfInertia = glm::mat4();
 		momentOfInertiaInverse = glm::mat4();
+		coeffOfRestitution = 0.85f;
 
 	};
 	~PhysicsComponent() {};

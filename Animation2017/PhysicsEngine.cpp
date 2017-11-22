@@ -51,9 +51,7 @@ void PhysicsEngine::Clear() {
 			 updatePhysics();
 			 applyPhysics();
 			 CollisionEngine::getInstance()->step(); // Collision detection should only happen at the physical step
-			 std::cout << "\nCOLLISION THIS STEP: " << CollisionEngine::getInstance()->collisionResults.size() << std::endl;
-
-		
+			 resolveCollisions();
 		 }
 	 }
 
@@ -153,6 +151,32 @@ void PhysicsEngine::reset(PhysicsComponent* _component) {
 		_component->dL = glm::vec3();
 		_component->netForce = glm::vec3();
 		_component->netTorque = glm::vec3();
+}
+
+#pragma endregion
+
+#pragma region collision_resolution
+void PhysicsEngine::resolveCollisions() {
+	for (int i = 0; i < CollisionEngine::getInstance()->collisionResults.size();i++) {
+		float epsilon = 1E-6;
+		CollisionResult & collision = *CollisionEngine::getInstance()->collisionResults[i];
+		float vRel;
+		Entity & entA = *collision.c1->entity;
+		Entity & entB = *collision.c2->entity;
+
+		PhysicsComponent & physA = (PhysicsComponent&)(*entA.getComponent(PHYSICS_COMPONENT));
+		PhysicsComponent & physB = (PhysicsComponent&)(*entB.getComponent(PHYSICS_COMPONENT));
+		vRel = glm::dot(glm::normalize(collision.penetrationVector) ,(physA.velocity - physB.velocity));
+
+		if (vRel >epsilon)
+			std::cout << "AWAY " << std::endl;
+		if (abs(vRel) <=epsilon)
+			std::cout << "RESTING " << std::endl;
+		if(vRel < epsilon)
+			std::cout << "COLLIDING " << std::endl;
+		std::cout << "vrel: " << vRel << std::endl;
+
+	}
 }
 
 #pragma endregion

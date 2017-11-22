@@ -73,6 +73,11 @@ void InputManager::key_callback(GLFWwindow* window, int key, int scancode, int a
 		}
 	}
 
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+		camera->ToggleSpeed();
+		
+	}
+
 }
 
 void InputManager::setCamera(Camera* c) {
