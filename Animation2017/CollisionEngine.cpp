@@ -253,11 +253,11 @@ bool CollisionEngine::areCollidingDynamic(CollisionComponent * c1, CollisionComp
 	if (m1->getMeshType() == MeshType::SPHERE && m2->getMeshType() == MeshType::SPHERE && !c1->isNotPureSphere && !c1->isNotPureSphere)
 	{
 		// Sphere collides with sphere
-		return areSpheresColliding(c1, c2); 
+		return areSpheresColliding(c1, c2, true); 
 	}
 	else // Any other collisions
 	{
-		return areSpheresColliding(c1, c2) ? areCollidingGJK(c1, c2) : false; // For testing
+		return areSpheresColliding(c1, c2, false) ? areCollidingGJK(c1, c2) : false; // For testing
 	}
 }
 
@@ -294,7 +294,7 @@ bool CollisionEngine::isPointInsideBox(CollisionComponent* box, glm::vec4 point)
 	return abs(point.x) < bb.x  || abs(point.y) < bb.y || abs(point.z) < bb.z;
 }
 
-bool CollisionEngine::areSpheresColliding(CollisionComponent * c1, CollisionComponent * c2)
+bool CollisionEngine::areSpheresColliding(CollisionComponent * c1, CollisionComponent * c2, bool saveResult)
 {
 	mat4& transformMatrix1 = c1->entity->transform;
 	mat4& transformMatrix2 = c2->entity->transform;
@@ -314,16 +314,19 @@ bool CollisionEngine::areSpheresColliding(CollisionComponent * c1, CollisionComp
 
 	if (sumOfRadiuses > distanceBetweenOrigins)
 	{
-		CollisionResult* collisionResult = new CollisionResult;
-		collisionResult->c1 = c1;
-		collisionResult->c2 = c2;
-		collisionResult->penetrationVector = glm::normalize(vec3(from1To2)) * (sumOfRadiuses - distanceBetweenOrigins);
-		collisionResult->pointsC1.push_back(glm::normalize(from1To2) * c1->getBoundingRadius());
-		collisionResult->pointsC2.push_back(glm::normalize(from2To1) * c2->getBoundingRadius());
-		collisionResult->distancesToPointsFromOriginC1.push_back(glm::length(vec3(from1To2)));
-		collisionResult->distancesToPointsFromOriginC2.push_back(glm::length(vec3(from1To2)));
+		if (saveResult)
+		{		
+			CollisionResult* collisionResult = new CollisionResult;
+			collisionResult->c1 = c1;
+			collisionResult->c2 = c2;
+			collisionResult->penetrationVector = glm::normalize(vec3(from1To2)) * (sumOfRadiuses - distanceBetweenOrigins);
+			collisionResult->pointsC1.push_back(glm::normalize(from1To2) * c1->getBoundingRadius());
+			collisionResult->pointsC2.push_back(glm::normalize(from2To1) * c2->getBoundingRadius());
+			collisionResult->distancesToPointsFromOriginC1.push_back(glm::length(vec3(from1To2)));
+			collisionResult->distancesToPointsFromOriginC2.push_back(glm::length(vec3(from1To2)));
 
-		CollisionEngine::getInstance()->addCollisionResult(collisionResult);
+			CollisionEngine::getInstance()->addCollisionResult(collisionResult);
+		}
 		return true;
 	}
 
