@@ -51,6 +51,9 @@ void PhysicsEngine::Clear() {
 			 updatePhysics();
 			 applyPhysics();
 			 CollisionEngine::getInstance()->step(); // Collision detection should only happen at the physical step
+			 std::cout << "\nCOLLISION THIS STEP: " << CollisionEngine::getInstance()->collisionResults.size() << std::endl;
+
+		
 		 }
 	 }
 

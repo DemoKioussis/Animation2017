@@ -75,7 +75,7 @@ int main()
 
 	float fieldSize = 25.f;
 
-	SceneLoading::getInstance()->loadScene("scene_1");
+	SceneLoading::getInstance()->loadScene("scene_2");
 
 	glm::mat4 rotation(1.0f), projection;
 

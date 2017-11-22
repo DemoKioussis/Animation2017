@@ -37,7 +37,6 @@ class CollisionEngine : public Engine
 	static CollisionEngine* instance;
 	std::unordered_map<int, CollisionData> collisionData; // Maps the mesh with its collision data
 	std::unordered_map<unsigned long long, std::vector<CollisionComponent*>*> vonNeumannGrid;
-	std::vector<CollisionResult*> collisionResults;
 	std::mutex collisionResultsMutex;
 	
 	// Dynamic collisions with Von Neumann neighbourhood 
@@ -58,6 +57,7 @@ class CollisionEngine : public Engine
 	bool areSpheresColliding(CollisionComponent* c1, CollisionComponent* c2);
 	bool areCollidingGJK(CollisionComponent* c1, CollisionComponent* c2);
 public:
+	std::vector<CollisionResult*> collisionResults;
 	static void Initialize();
 	static void Clear();
 	void addMesh(Mesh *_mesh);
