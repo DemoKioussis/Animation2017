@@ -34,7 +34,7 @@ private:
 	void setAcceleration(PhysicsComponent* _component);
 	void setMomentum(PhysicsComponent* _component);
 	void setVelocity(PhysicsComponent* _component);
-
+	void resolveCollisions();
 	void energy(PhysicsComponent* _component);
 	void translate(PhysicsComponent* _component);
 	void rotate(PhysicsComponent* _component);
