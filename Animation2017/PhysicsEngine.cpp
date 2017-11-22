@@ -167,12 +167,14 @@ void PhysicsEngine::resolveCollisions() {
 		PhysicsComponent & physA = (PhysicsComponent&)(*entA.getComponent(PHYSICS_COMPONENT));
 		PhysicsComponent & physB = (PhysicsComponent&)(*entB.getComponent(PHYSICS_COMPONENT));
 		vRel = glm::dot(glm::normalize(collision.penetrationVector) ,(physA.velocity - physB.velocity));
+
 		if (vRel >epsilon)
 			std::cout << "AWAY " << std::endl;
 		if (abs(vRel) <=epsilon)
 			std::cout << "RESTING " << std::endl;
 		if(vRel < epsilon)
 			std::cout << "COLLIDING " << std::endl;
+		std::cout << "vrel: " << vRel << std::endl;
 
 	}
 }
