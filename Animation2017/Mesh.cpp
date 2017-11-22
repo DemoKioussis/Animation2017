@@ -263,7 +263,7 @@ void Mesh::setUniqueVerts(std::vector<GLfloat>& p) {
 		glm::vec3 v(p[index0], p[index1], p[index2]);
 		bool unique = true;
 		for (int j = 0; j < uniqueVertices.size();j++) {
-			if (glm::distance(v, uniqueVertices[j]) == 0) {
+			if (glm::distance(v, uniqueVertices[j]) <= 1E-5) {
 				unique = false;
 				break;
 			}
