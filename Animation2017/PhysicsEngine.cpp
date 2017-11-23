@@ -157,6 +157,7 @@ void PhysicsEngine::reset(PhysicsComponent* _component) {
 
 #pragma region collision_resolution
 void PhysicsEngine::resolveCollisions() {
+
 	for (int i = 0; i < CollisionEngine::getInstance()->collisionResults.size();i++) {
 		float epsilon = 1E-6;
 		CollisionResult & collision = *CollisionEngine::getInstance()->collisionResults[i];
@@ -164,6 +165,8 @@ void PhysicsEngine::resolveCollisions() {
 		Entity & entA = *collision.c1->entity;
 		Entity & entB = *collision.c2->entity;
 		glm::vec3 normalizedPenVector = glm::normalize(-collision.penetrationVector);
+		glm::vec3 penVector = -collision.penetrationVector;
+
 		PhysicsComponent & physA = (PhysicsComponent&)(*entA.getComponent(PHYSICS_COMPONENT));
 		PhysicsComponent & physB = (PhysicsComponent&)(*entB.getComponent(PHYSICS_COMPONENT));
 		vRel = glm::dot(normalizedPenVector,(physA.velocity - physB.velocity));
@@ -174,14 +177,32 @@ void PhysicsEngine::resolveCollisions() {
 			std::cout << "RESTING " << std::endl;
 		if (vRel < -epsilon)
 		{
+
 			float impulse;
 			float coeffOfRestitution = 0.5f*(physA.coeffOfRestitution + physB.coeffOfRestitution);
 			coeffOfRestitution = -(1 + coeffOfRestitution)*vRel;
 		
 			float massInverseSum = physA.massInverse + physB.massInverse;
 		
-			glm::vec3 rA = collision.pointsC1[0];
-			glm::vec3 rB = collision.pointsC2[0];
+			glm::vec3 rA = penVector;// collision.pointsC1[0];
+			glm::vec3 rB = -penVector;//collision.pointsC2[0];
+
+			glm::vec4 IrAXN = physA.momentOfInertiaInverse*glm::vec4(glm::cross(rA, normalizedPenVector),0);
+			glm::vec4 IrBXN = physB.momentOfInertiaInverse*glm::vec4(glm::cross(rB, normalizedPenVector),0);
+			
+			glm::vec3 rAX = glm::cross(glm::vec3(IrAXN.x, IrAXN.y, IrAXN.z), rA);
+			glm::vec3 rBX = glm::cross(glm::vec3(IrBXN.x, IrBXN.y, IrBXN.z), rB);
+
+			float dotA = glm::dot(normalizedPenVector, rAX);
+			float dotB = glm::dot(normalizedPenVector, rBX);
+
+			impulse = coeffOfRestitution / (dotA + dotB + massInverseSum);
+			glm::vec3 impulseVector = glm::normalize(impulse*penVector);
+
+			physA.P = physB.mass*impulseVector*physA.coeffOfRestitution*glm::distance(physA.velocity,glm::vec3());
+			physB.P = physA.mass*impulseVector*physB.coeffOfRestitution*glm::distance(physB.velocity,glm::vec3());
+		std::cout << "CUBE VECTOR " << rA.x << ", " << rA.y << ", " << rA.z << std::endl;
+		std::cout << "CYLINDER VECTOR " << rB.x << ", " << rB.y << ", " << rB.z << std::endl;
 
 		}
 

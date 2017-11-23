@@ -58,7 +58,7 @@ public:
 		netTorque = glm::vec3();
 		momentOfInertia = glm::mat4();
 		momentOfInertiaInverse = glm::mat4();
-		coeffOfRestitution = 0.85f;
+		coeffOfRestitution = 1.0f;
 
 	};
 	~PhysicsComponent() {};
@@ -98,6 +98,7 @@ public:
 	void setAngularVelocity(glm::vec3 _axis, float _vel) {
 		angularVelocity = glm::normalize(_axis) * _vel;
 	}
+
 	void addAngularVelocity(glm::vec3 _axis, float _vel) {
 		glm::vec4 w =glm::vec4( glm::normalize(_axis) * _vel,0);
 		glm::vec4 r = getRotation()*w;
