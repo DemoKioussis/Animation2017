@@ -230,30 +230,30 @@ bool CollisionEngine::areCollidingStatic(CollisionComponent * s, CollisionCompon
 
 bool CollisionEngine::areBoundingBoxesColliding(CollisionComponent* box, CollisionComponent* sphere)
 {
-	vec4 boxCenter = box->getTransform() * vec4(0, 0, 0, 1);
-	vec4 sphereCenter = sphere->getTransform() * vec4(0, 0, 0, 1);
+	vec3 boxCenter = box->getTransform() * vec4(0, 0, 0, 1);
+	vec3 sphereCenter = sphere->getTransform() * vec4(0, 0, 0, 1);
+	float radius = sphere->getBoundingRadius();
 
-	// Check ifthe closest point of the sphere is inside the box
-	vec4 fromSphereToBox = boxCenter - sphereCenter;
-	vec4 fromSphereToBoxOnSphereSurface = glm::normalize(fromSphereToBox) * (sphere->getBoundingRadius());
-	if (isPointInsideBox(box, sphereCenter + fromSphereToBoxOnSphereSurface - boxCenter))
-	{
-		return true;
-	}
+	vec3 aMin = sphereCenter - vec3(radius, radius, radius);
+	vec3 aMax = sphereCenter + vec3(radius, radius, radius);
+	
+	vec3 bMin = boxCenter - box->getBoundingBox();
+	vec3 bMax = boxCenter + box->getBoundingBox();
 
-	// Check if the center of the box is inside the sphere
-	if (glm::length(fromSphereToBox) < sphere->getBoundingRadius())
+	// AABB collision detection
+	if (!(
+		aMax.x < bMin.x ||
+		bMax.x < aMin.x ||
+		aMax.y < bMin.y ||
+		bMax.y < aMin.y ||
+		aMax.z < bMin.z ||
+		bMax.z < aMin.z
+		))
 	{
 		return true;
 	}
 
 	return false;
-}
-
-bool CollisionEngine::isPointInsideBox(CollisionComponent* box, glm::vec4 point)
-{
-	vec3& bb = box->getBoundingBox();
-	return abs(point.x) < bb.x  || abs(point.y) < bb.y || abs(point.z) < bb.z;
 }
 
 bool CollisionEngine::areSpheresColliding(CollisionComponent * c1, CollisionComponent * c2, bool saveResult)

@@ -46,7 +46,6 @@ class CollisionEngine : public Engine
 	bool areCollidingStatic(CollisionComponent* s, CollisionComponent* d);
 	
 	bool areBoundingBoxesColliding(CollisionComponent* box, CollisionComponent* sphere);
-	bool isPointInsideBox(CollisionComponent* box, glm::vec4 point);
 	bool areSpheresColliding(CollisionComponent* c1, CollisionComponent* c2, bool saveResult);
 	bool areCollidingGJK(CollisionComponent* c1, CollisionComponent* c2);
 public:
