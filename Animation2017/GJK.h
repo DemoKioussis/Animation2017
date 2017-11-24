@@ -21,13 +21,10 @@ class GJK
 	glm::mat4& transform2;
 
 	glm::mat4 transform1I;
-	glm::mat4 transform2I;
-	 
-	std::vector<int>* indices1;
-	vector<GLfloat>* vertices1;
-
-	std::vector<int>* indices2;
-	vector<GLfloat>* vertices2;
+	glm::mat4 transform2I;	 
+	
+	const vector<glm::vec3>* vertices1;
+	const vector<glm::vec3>* vertices2;
 
 	CollisionData* collisionData1;
 	CollisionData* collisionData2;
@@ -43,7 +40,7 @@ class GJK
 	int pointsCount = 0;
 
 	glm::vec3 support(const glm::vec3& directionWC);
-	glm::vec3 furthestPointInDirectionVertex(glm::vec3& directionOCnormalized, std::vector<GLfloat>& vertices, std::vector<int>& indices, std::vector<glm::vec4>* pointsForResult = nullptr);  //, std::vector<float>* distancesForResult = nullptr);
+	glm::vec3 furthestPointInDirectionVertex(glm::vec3& directionOCnormalized, const std::vector<glm::vec3>& vertices, std::vector<glm::vec4>* pointsForResult = nullptr);  //, std::vector<float>* distancesForResult = nullptr);
 	glm::vec3 furthestPointInDirectionSphere(glm::vec3& directionOCnormalized, CollisionComponent& collisionComponent);
 	void supportForResult(glm::vec3& penetrationVectorWC, CollisionResult& collisionResult);
 	bool simplex(glm::vec3& direction);

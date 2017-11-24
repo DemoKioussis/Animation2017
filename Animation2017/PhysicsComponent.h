@@ -11,6 +11,7 @@ private:
 	// shouldnt change dynamically
 	glm::vec3 centerOfMass;
 	float mass;
+	float massInverse;
 
 
 	glm::vec3 velocity;
@@ -33,15 +34,18 @@ private:
 	glm::vec3 L;		// angular momentum
 
 	float friction;
+	float coeffOfRestitution;
 	glm::vec3 rotationLock;
 
 	bool isStatic;
 	float gravityMultiplyer;
 
+
 public:
 	PhysicsComponent() {
 		componentType = PHYSICS_COMPONENT;
 		mass = 1;
+		massInverse = 1;
 		gravityMultiplyer = 1;
 		velocity = glm::vec3();
 		netForce = glm::vec3();
@@ -54,12 +58,14 @@ public:
 		netTorque = glm::vec3();
 		momentOfInertia = glm::mat4();
 		momentOfInertiaInverse = glm::mat4();
+		coeffOfRestitution = 1.0f;
 
 	};
 	~PhysicsComponent() {};
 
 	void setMass(float _mass) {
 		mass = _mass;
+		massInverse = 1 / _mass;
 	}
 	void setMomentOfInertia(glm::mat4 _moment) {
 		momentOfInertia = _moment;
@@ -92,6 +98,7 @@ public:
 	void setAngularVelocity(glm::vec3 _axis, float _vel) {
 		angularVelocity = glm::normalize(_axis) * _vel;
 	}
+
 	void addAngularVelocity(glm::vec3 _axis, float _vel) {
 		glm::vec4 w =glm::vec4( glm::normalize(_axis) * _vel,0);
 		glm::vec4 r = getRotation()*w;

@@ -10,12 +10,6 @@
 class CollisionComponent;
 class GJK;
 
-struct CollisionData
-{
-	//float distanceToFurthestPoint;
-	std::vector<int> uniqueVerticesIndices; // Unique vertices indices with the corresponding furthest direction corresponding to that point
-};
-
 struct CollisionResult
 {
 	CollisionComponent* c1;
@@ -35,9 +29,7 @@ class CollisionEngine : public Engine
 	float maxRadius;
 
 	static CollisionEngine* instance;
-	std::unordered_map<int, CollisionData> collisionData; // Maps the mesh with its collision data
 	std::unordered_map<unsigned long long, std::vector<CollisionComponent*>*> vonNeumannGrid;
-	std::vector<CollisionResult*> collisionResults;
 	std::mutex collisionResultsMutex;
 	
 	// Dynamic collisions with Von Neumann neighbourhood 
@@ -54,19 +46,17 @@ class CollisionEngine : public Engine
 	bool areCollidingStatic(CollisionComponent* s, CollisionComponent* d);
 	
 	bool areBoundingBoxesColliding(CollisionComponent* box, CollisionComponent* sphere);
-	bool isPointInsideBox(CollisionComponent* box, glm::vec4 point);
-	bool areSpheresColliding(CollisionComponent* c1, CollisionComponent* c2);
+	bool areSpheresColliding(CollisionComponent* c1, CollisionComponent* c2, bool saveResult);
 	bool areCollidingGJK(CollisionComponent* c1, CollisionComponent* c2);
 public:
+	std::vector<CollisionResult*> collisionResults;
 	static void Initialize();
 	static void Clear();
 	void addMesh(Mesh *_mesh);
 	std::vector<Mesh*>& getAllMeshes();
 	static CollisionEngine * getInstance();
 	void step();
-	void calculateUniqueIndices();
 	void updateAllBoundingBoxes();
-	std::unordered_map<int, CollisionData>& getCollisionData();
 	void updateMaxRadius();
 	void clearCollisionResults();
 	void addCollisionResult(CollisionResult* collisionResult);

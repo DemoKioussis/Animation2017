@@ -18,20 +18,18 @@ void CollisionComponent::updateBoundingShapes()
 
 	std::vector<Mesh*>& meshes = CollisionEngine::getInstance()->getAllMeshes();
 	Mesh* mesh = meshes[getMeshID()];	
-	vector<GLfloat>& vertices = *mesh->getVerticies();
+	const vector<vec3>& vertices = *mesh->getUniqueVerts();
 
 	if (mesh->getMeshType() == MeshType::VERTICES || (mesh->getMeshType() == MeshType::SPHERE && isNotPureSphere))
-	{
-		CollisionData& collisionData = CollisionEngine::getInstance()->getCollisionData()[getMeshID()];
-		std::vector<int>& indices = collisionData.uniqueVerticesIndices;		
+	{		
 		mat4& transform = getTransform();
 
 		vec3 biggest(0, 0, 0);
 		vec3 smallest(0, 0, 0);
 
-		for (size_t index = 0; index < indices.size(); index++)
+		for (size_t index = 0; index < vertices.size(); index++)
 		{
-			vec4 vertexOC(vertices[index], vertices[index + 1], vertices[index + 2], 0);			
+			vec4 vertexOC(vertices[index], 0);			
 
 			vec4 vertexWC = transform * vertexOC;
 
@@ -52,7 +50,7 @@ void CollisionComponent::updateBoundingShapes()
 	}
 	else // MeshType is SPHERE
 	{
-		glm::vec3 vertex(vertices[0], vertices[1], vertices[2]);
+		const glm::vec3& vertex = vertices[0];
 		boundingRadius = glm::length(vertex);
 		boundingBox = vec3(boundingRadius, boundingRadius, boundingRadius);
 	}

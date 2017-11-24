@@ -29,42 +29,6 @@ CollisionEngine * CollisionEngine::getInstance()
 	return instance;
 }
 
-// Calculate uniqe indices
-void CollisionEngine::calculateUniqueIndices()
-{
-	for (int meshId = 0; meshId < meshes.size(); meshId++)
-	{
-		CollisionData collision;
-		vector<GLfloat>& vertices = *meshes[meshId]->getVerticies();
-		MeshType meshType = meshes[meshId]->getMeshType();
-
-		// Iterate through all the vertices
-		for (int index = 0; index < vertices.size(); index += 9)
-		{
-			glm::vec3 vertex(vertices[index], vertices[index + 1], vertices[index + 2]);
-
-			// Store the index for the current vertex if there isn't already a vertex with almsot the same position
-			bool alreadyExists = false;
-			for (int existingIndex : collision.uniqueVerticesIndices)
-			{
-				vec3 alreadyExisting(vertices[existingIndex], vertices[existingIndex + 1], vertices[existingIndex + 2]);
-				float lengthOfDifference = glm::length(vertex - alreadyExisting);
-				if (lengthOfDifference < 0.001f)
-				{
-					// Difference is too small, we consider them as being the same vertex
-					alreadyExists = true;
-				}
-			}
-			if (!alreadyExists)
-			{
-				collision.uniqueVerticesIndices.push_back(index);
-			}
-		}
-
-		collisionData[meshId] = std::move(collision);
-	}
-}
-
 void CollisionEngine::updateAllBoundingBoxes()
 {
 	for (Component* c : targetComponents)
@@ -107,8 +71,6 @@ void CollisionEngine::createVonNeumannGrid()
 	for (Component* c : targetComponents)
 	{
 		CollisionComponent* cc = (CollisionComponent*)c;
-		std::vector<int>& indices = collisionData[cc->getMeshID()].uniqueVerticesIndices;
-		vector<GLfloat>& vertices = *meshes[cc->getMeshID()]->getVerticies();
 
 		if (c->entity->isStatic())
 		{
@@ -253,11 +215,11 @@ bool CollisionEngine::areCollidingDynamic(CollisionComponent * c1, CollisionComp
 	if (m1->getMeshType() == MeshType::SPHERE && m2->getMeshType() == MeshType::SPHERE && !c1->isNotPureSphere && !c1->isNotPureSphere)
 	{
 		// Sphere collides with sphere
-		return areSpheresColliding(c1, c2); 
+		return areSpheresColliding(c1, c2, true); 
 	}
 	else // Any other collisions
 	{
-		return areSpheresColliding(c1, c2) ? areCollidingGJK(c1, c2) : false; // For testing
+		return areSpheresColliding(c1, c2, false) ? areCollidingGJK(c1, c2) : false; // For testing
 	}
 }
 
@@ -268,19 +230,25 @@ bool CollisionEngine::areCollidingStatic(CollisionComponent * s, CollisionCompon
 
 bool CollisionEngine::areBoundingBoxesColliding(CollisionComponent* box, CollisionComponent* sphere)
 {
-	vec4 boxCenter = box->getTransform() * vec4(0, 0, 0, 1);
-	vec4 sphereCenter = sphere->getTransform() * vec4(0, 0, 0, 1);
+	vec3 boxCenter = box->getTransform() * vec4(0, 0, 0, 1);
+	vec3 sphereCenter = sphere->getTransform() * vec4(0, 0, 0, 1);
+	float radius = sphere->getBoundingRadius();
 
-	// Check ifthe closest point of the sphere is inside the box
-	vec4 fromSphereToBox = boxCenter - sphereCenter;
-	vec4 fromSphereToBoxOnSphereSurface = glm::normalize(fromSphereToBox) * (sphere->getBoundingRadius());
-	if (isPointInsideBox(box, sphereCenter + fromSphereToBoxOnSphereSurface - boxCenter))
-	{
-		return true;
-	}
+	vec3 aMin = sphereCenter - vec3(radius, radius, radius);
+	vec3 aMax = sphereCenter + vec3(radius, radius, radius);
+	
+	vec3 bMin = boxCenter - box->getBoundingBox();
+	vec3 bMax = boxCenter + box->getBoundingBox();
 
-	// Check if the center of the box is inside the sphere
-	if (glm::length(fromSphereToBox) < sphere->getBoundingRadius())
+	// AABB collision detection
+	if (!(
+		aMax.x < bMin.x ||
+		bMax.x < aMin.x ||
+		aMax.y < bMin.y ||
+		bMax.y < aMin.y ||
+		aMax.z < bMin.z ||
+		bMax.z < aMin.z
+		))
 	{
 		return true;
 	}
@@ -288,13 +256,7 @@ bool CollisionEngine::areBoundingBoxesColliding(CollisionComponent* box, Collisi
 	return false;
 }
 
-bool CollisionEngine::isPointInsideBox(CollisionComponent* box, glm::vec4 point)
-{
-	vec3& bb = box->getBoundingBox();
-	return abs(point.x) < bb.x  || abs(point.y) < bb.y || abs(point.z) < bb.z;
-}
-
-bool CollisionEngine::areSpheresColliding(CollisionComponent * c1, CollisionComponent * c2)
+bool CollisionEngine::areSpheresColliding(CollisionComponent * c1, CollisionComponent * c2, bool saveResult)
 {
 	mat4& transformMatrix1 = c1->entity->transform;
 	mat4& transformMatrix2 = c2->entity->transform;
@@ -314,16 +276,19 @@ bool CollisionEngine::areSpheresColliding(CollisionComponent * c1, CollisionComp
 
 	if (sumOfRadiuses > distanceBetweenOrigins)
 	{
-		CollisionResult* collisionResult = new CollisionResult;
-		collisionResult->c1 = c1;
-		collisionResult->c2 = c2;
-		collisionResult->penetrationVector = glm::normalize(vec3(from1To2)) * (sumOfRadiuses - distanceBetweenOrigins);
-		collisionResult->pointsC1.push_back(glm::normalize(from1To2) * c1->getBoundingRadius());
-		collisionResult->pointsC2.push_back(glm::normalize(from2To1) * c2->getBoundingRadius());
-		collisionResult->distancesToPointsFromOriginC1.push_back(glm::length(vec3(from1To2)));
-		collisionResult->distancesToPointsFromOriginC2.push_back(glm::length(vec3(from1To2)));
+		if (saveResult)
+		{		
+			CollisionResult* collisionResult = new CollisionResult;
+			collisionResult->c1 = c1;
+			collisionResult->c2 = c2;
+			collisionResult->penetrationVector = glm::normalize(vec3(from1To2)) * (sumOfRadiuses - distanceBetweenOrigins);
+			collisionResult->pointsC1.push_back(glm::normalize(from1To2) * c1->getBoundingRadius());
+			collisionResult->pointsC2.push_back(glm::normalize(from2To1) * c2->getBoundingRadius());
+			collisionResult->distancesToPointsFromOriginC1.push_back(glm::length(vec3(from1To2)));
+			collisionResult->distancesToPointsFromOriginC2.push_back(glm::length(vec3(from1To2)));
 
-		CollisionEngine::getInstance()->addCollisionResult(collisionResult);
+			CollisionEngine::getInstance()->addCollisionResult(collisionResult);
+		}
 		return true;
 	}
 
@@ -334,11 +299,6 @@ bool CollisionEngine::areCollidingGJK(CollisionComponent * c1, CollisionComponen
 {
 	GJK gjk(*c1, *c2);
 	return gjk.areColliding();
-}
-
-std::unordered_map<int, CollisionData>& CollisionEngine::getCollisionData()
-{
-	return collisionData;
 }
 
 void CollisionEngine::updateMaxRadius()
