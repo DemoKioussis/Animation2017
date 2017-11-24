@@ -1,27 +1,12 @@
-0|1
+0|0
 render
 position|0|0|0
-physics|100|0|0|0
+physics|10|0|0|0
 collider
 1|0
 render
 position|5|0|0
-physics|200|0|0|0
-collider
-2|0
-render
-position|10|0|0
-physics|300|0|0|0
-collider
-3|0
-render
-position|-5|0|0
-physics|400|0|0|0
-collider
-4|0
-render
-position|-10|0|0
-physics|500|0|0|0
+physics|2|0|0|0
 collider
 
 

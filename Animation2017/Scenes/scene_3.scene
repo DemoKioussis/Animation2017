@@ -1,10 +1,10 @@
 0|0
 render
 position|15|0|0
-physics|10|0|0|0
+physics|10|-1000|0|0
 collider
 1|0
 render
 position|-15|0|0
-physics|2|0.7|0|0
+physics|2|1200|0|0
 collider

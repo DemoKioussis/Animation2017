@@ -33,9 +33,9 @@ void TimeSystem::update() {
 
 void TimeSystem::resetTime() {
 	glfwSetTime(0);
-	elapsedTime = glfwGetTime();
-	lastFrameStep = elapsedTime;
-	lastPhysicsStep = elapsedTime;
+	elapsedTime = 0;
+	lastFrameStep = 0;
+	lastPhysicsStep = 0;
 	frameDeltaTime = 0;
 	physicsDeltaTime = 0;
 	std::cout << "reset time" << std::endl;

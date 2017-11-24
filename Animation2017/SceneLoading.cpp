@@ -38,9 +38,7 @@ void SceneLoading::Initialize() {
 }
 
 void SceneLoading::loadScene(char * sceneName) {
-	float timeScale = TimeSystem::getTimeScale();
-	TimeSystem::setTimeScale(0);
-	//float elapsedTime = glfwGetTime();
+
 	char pathfile[100];
 	strcpy_s(pathfile, "Scenes/");
 	strcat_s(pathfile, sceneName);
@@ -52,8 +50,11 @@ void SceneLoading::loadScene(char * sceneName) {
 	scene.open(pathfile);
 	if (!scene) {
 		std::cout << "Unable to open scene: " << pathfile << std::endl;
-		exit(1);
+		return;
 	}
+	float timeScale = TimeSystem::getTimeScale();
+	TimeSystem::setTimeScale(0);
+	//float elapsedTime = glfwGetTime();
 	InputManager::Entities->clear();
 	RenderEngine::Clear();
 	PhysicsEngine::Clear();
@@ -62,6 +63,7 @@ void SceneLoading::loadScene(char * sceneName) {
 	string line;
 	int currentMeshIndex;
 	Entity* e = nullptr;
+	glm::vec3 force(0,0,0);
 	while (getline(scene, line)) {
 		splitstring sLine = splitstring(line);
 		vector<string> sVec= sLine.split('|');
@@ -104,7 +106,13 @@ void SceneLoading::loadScene(char * sceneName) {
 				p->setMass(mass);
 				e->addComponent(p);
 				PhysicsEngine::getInstance()->addComponent(p);
-				PhysicsEngine::getInstance()->addForce(p, glm::vec3(stof(sVec[2]), stof(sVec[3]), stof(sVec[4])), glm::vec3(e->translation[0][3], e->translation[1][3], e->translation[2][3]));
+				//std::cout << e->translation[3][0]<< e->translation[3][1]<< e->translation[3][2] << std::endl;
+				//system("pause");
+				force.x = stof(sVec[2]);
+				force.y = stof(sVec[3]);
+				force.z = stof(sVec[4]);
+				PhysicsEngine::getInstance()->addForce(p, glm::vec3(stof(sVec[2]), stof(sVec[3]), stof(sVec[4])),e->translation[3]);
+				//PhysicsEngine::getInstance()->
 			}
 			if (sVec[0] == "collider") {
 				//std::cout << "collider" << std::endl;
@@ -121,14 +129,12 @@ void SceneLoading::loadScene(char * sceneName) {
 
 		InputManager::Entities->push_back(e);
 	}
-
-	CollisionEngine::getInstance()->calculateUniqueIndices(); // Important for updating the info about the collisions
+	
 	CollisionEngine::getInstance()->updateAllBoundingBoxes(); // Can only be called after calculating the unique indices
-	//TimeSystem::resetTime();
+
 	//glfwSetTime(elapsedTime);
 	TimeSystem::setTimeScale(timeScale);
-	//PhysicsEngine::getInstance()->step();
-
+	TimeSystem::resetTime();
 }
 SceneLoading* SceneLoading::getInstance() {
 	return instance;
