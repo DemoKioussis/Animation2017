@@ -38,8 +38,9 @@ void SceneLoading::Initialize() {
 }
 
 void SceneLoading::loadScene(char * sceneName) {
-	
-	float elapsedTime = glfwGetTime();
+	float timeScale = TimeSystem::getTimeScale();
+	TimeSystem::setTimeScale(0);
+	//float elapsedTime = glfwGetTime();
 	char pathfile[100];
 	strcpy_s(pathfile, "Scenes/");
 	strcat_s(pathfile, sceneName);
@@ -85,6 +86,9 @@ void SceneLoading::loadScene(char * sceneName) {
 				//std::cout << "position" << std::endl;
 				e->translation =glm::translate(e->translation, glm::vec3(stof(sVec[1]), stof(sVec[2]), stof(sVec[3])));
 			}
+			if (sVec[0] == "scale") {//scale
+				e->scale = glm::scale(e->scale, glm::vec3(stof(sVec[1]), stof(sVec[2]), stof(sVec[3])));
+			}
 			if (sVec[0] == "render") {//render
 				//std::cout << "render" << std::endl;
 				RenderComponent *r = new RenderComponent();
@@ -121,9 +125,9 @@ void SceneLoading::loadScene(char * sceneName) {
 	CollisionEngine::getInstance()->calculateUniqueIndices(); // Important for updating the info about the collisions
 	CollisionEngine::getInstance()->updateAllBoundingBoxes(); // Can only be called after calculating the unique indices
 	//TimeSystem::resetTime();
-	glfwSetTime(elapsedTime);
-	TimeSystem::update();
-	PhysicsEngine::getInstance()->step();
+	//glfwSetTime(elapsedTime);
+	TimeSystem::setTimeScale(timeScale);
+	//PhysicsEngine::getInstance()->step();
 
 }
 SceneLoading* SceneLoading::getInstance() {
