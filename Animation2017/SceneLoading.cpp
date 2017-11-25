@@ -158,6 +158,7 @@ void SceneLoading::Initialize() {
 				//std::cout << "collider" << std::endl;
 				CollisionComponent* c = new CollisionComponent();
 				c->setMeshID(currentMeshIndex);
+				
 				e->addComponent(c);
 				CollisionEngine::getInstance()->addComponent(c);
 
@@ -171,7 +172,7 @@ void SceneLoading::Initialize() {
 	}
 	
 	CollisionEngine::getInstance()->updateAllBoundingBoxes(); // Can only be called after calculating the unique indices
-
+	
 	//glfwSetTime(elapsedTime);
 	TimeSystem::setTimeScale(timeScale);
 	TimeSystem::resetTime();

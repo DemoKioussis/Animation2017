@@ -89,6 +89,7 @@ int main()
 	float disp = 1.0f;
 
 	float fieldSize = 25.f;
+	TimeSystem::resetTime();
 
 	SceneLoading::getInstance()->loadScene("scene_2");
 	//std::cout << "test1 "<< camera->skybox->getID() << std::endl;
