@@ -22,7 +22,7 @@ void CollisionComponent::updateBoundingShapes()
 
 	if (mesh->getMeshType() == MeshType::VERTICES || (mesh->getMeshType() == MeshType::SPHERE && isNotPureSphere))
 	{		
-		mat4& transform = getUpdatedTransform();
+		mat4& transform = getTransform();
 
 		vec3 biggest(0, 0, 0);
 		vec3 smallest(0, 0, 0);

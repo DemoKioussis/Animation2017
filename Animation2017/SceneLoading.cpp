@@ -170,6 +170,11 @@ void SceneLoading::Initialize() {
 
 		InputManager::Entities->push_back(e);
 	}
+
+	for (Entity* ent : *InputManager::Entities)
+	{
+		ent->transform = ent->translation * ent->rotation * ent->scale;
+	}
 	
 	CollisionEngine::getInstance()->updateAllBoundingBoxes(); // Can only be called after calculating the unique indices
 	
