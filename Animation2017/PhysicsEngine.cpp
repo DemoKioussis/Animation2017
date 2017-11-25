@@ -62,10 +62,12 @@ void PhysicsEngine::updatePhysics() {
 	for (int i = 0; i < targetComponents.size();i++) {
 
 		PhysicsComponent* component = (PhysicsComponent*)targetComponents[i];
-		addGravity(component);
-		setAcceleration(component);
-		setMomentum(component);
-		setVelocity(component);
+		if (!component->getIsStatic()) {
+			addGravity(component);
+			setAcceleration(component);
+			setMomentum(component);
+			setVelocity(component);
+		}
 	}
 }
 

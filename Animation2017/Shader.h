@@ -81,6 +81,7 @@ public:
 	void use()
 	{
 		glUseProgram(ID);
+		
 	}
 	// generic utility uniform functions by name
 	// ------------------------------------------------------------------------
@@ -142,8 +143,10 @@ public:
 	{
 		glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
 	}
-
-
+	static void skyboxFlag(int isRenderingSkybox) {
+		glUniform1i(isRenderSkyboxLoc, isRenderingSkybox);
+	}
+	static GLuint isRenderSkyboxLoc;
 private:
 	// utility function for checking shader compilation/linking errors.
 	// ------------------------------------------------------------------------

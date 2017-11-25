@@ -108,6 +108,12 @@
     <ClCompile Include="RenderEngine.cpp">
       <Filter>Source Files\Engines</Filter>
     </ClCompile>
+    <ClCompile Include="Skybox.cpp">
+      <Filter>Source Files\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Source Files\Shaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mesh.h">
@@ -181,6 +187,9 @@
     </ClInclude>
     <ClInclude Include="PhysicsBuilder.h">
       <Filter>Header Files\Builders</Filter>
+    </ClInclude>
+    <ClInclude Include="Skybox.h">
+      <Filter>Header Files\Loading</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

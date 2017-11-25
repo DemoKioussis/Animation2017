@@ -1,5 +1,6 @@
 0|0
 position|-50|0|0
+scale|3|3|3
 render
 physics|1|1000|0|0
 collider

@@ -12,7 +12,7 @@ class InputManager {
 private:
 	static Camera* camera;
 	static WindowManager* windowManager;
-
+	static void updateSkybox();
 	static GLfloat lastX;
 	static GLfloat lastY;
 	static GLboolean firstMouse;

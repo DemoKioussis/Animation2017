@@ -37,7 +37,7 @@ private:
 	float coeffOfRestitution;
 	glm::vec3 rotationLock;
 
-	bool isStatic;
+	bool isStatic =false;
 	float gravityMultiplyer;
 
 
@@ -117,5 +117,10 @@ public:
 		glm::vec4 r = w;
 		angularVelocity += glm::vec3(r.x, r.y, r.z);
 	}
-
+	void setStatic(bool _static) {
+		isStatic = _static;
+	}
+	bool getIsStatic() {
+		return isStatic;
+	}
 };

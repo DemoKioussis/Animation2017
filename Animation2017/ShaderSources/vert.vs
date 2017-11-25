@@ -13,11 +13,13 @@ uniform mat4 projection;
 flat out vec3 sendColor;
 flat out vec3 sendNorm;
 
+out vec3 TexCoords;
+
 void main()
 {
 //	gl_Position = projection*view * model * vec4(pos, 1.0f);
 	gl_Position = projection*view * transform * vec4(pos, 1.0f);
-
+	TexCoords=pos;
 	sendColor = color;
 	sendNorm= (transform*vec4(-norm,0)).xyz;
 

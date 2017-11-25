@@ -11,6 +11,7 @@ enum class MeshType
 {
 	VERTICES,
 	SPHERE,
+	SKYBOX
 };
 
 enum class MeshShape {
@@ -51,4 +52,6 @@ public:
 	void Mesh::makeMesh(char* objName);
 	const vector<glm::vec3>* Mesh::getUniqueVerts();
 	MeshType getMeshType();
+	static unsigned int  cubemapTexture;
+
 };

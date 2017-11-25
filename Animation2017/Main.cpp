@@ -19,6 +19,8 @@
 #include "CollisionComponent.h"
 
 #include "SceneLoading.h"
+
+#include "Skybox.h"
 /**
 This class right now just sets thigns up, ideally by the end of this it would be a list of settings and nothing else
 */
@@ -62,6 +64,19 @@ int main()
 	CollisionEngine::Initialize();
 
 	SceneLoading::Initialize();
+
+	vector<std::string> faces=
+	{
+			"Skybox/TropicalSunnyDayRight2048.png",
+			"Skybox/TropicalSunnyDayLeft2048.png",
+			"Skybox/TropicalSunnyDayUp2048.png",
+			"Skybox/TropicalSunnyDayDown2048.png",
+			"Skybox/TropicalSunnyDayBack2048.png",
+			"Skybox/TropicalSunnyDayFront2048.png"
+	};
+	unsigned int cubemapTexture = loadSkybox(faces);
+	Mesh::cubemapTexture = cubemapTexture;
+
 #pragma endregion
 
 
@@ -76,21 +91,21 @@ int main()
 	float fieldSize = 25.f;
 
 	SceneLoading::getInstance()->loadScene("scene_2");
+	//std::cout << "test1 "<< camera->skybox->getID() << std::endl;
 
 	glm::mat4 rotation(1.0f), projection;
 
 	GLuint projLoc = glGetUniformLocation(shaderProg.ID, "projection");
 	GLuint viewLoc = glGetUniformLocation(shaderProg.ID, "view");
 	GLuint modelLoc = glGetUniformLocation(shaderProg.ID, "model");
-
+	Shader::isRenderSkyboxLoc = glGetUniformLocation(shaderProg.ID, "isRenderSkybox");
 	projection = glm::perspective(glm::radians(camera->Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100000.0f);
 	shaderProg.use();
 
 	shaderProg.setMat4(projLoc, projection);
-	shaderProg.setVec3("lightDirection", glm::vec3(0, -1, 1));
+	shaderProg.setVec3("lightDirection", glm::vec3(-1.4, -1.5, -2));
 	shaderProg.setVec3("ambientLight", glm::vec3(1.0f, 1.0f, 1.0f));
 	float cosT = 0, sinT = 0;
-
 	TimeSystem::resetTime();
 #pragma region mainLoop
 	while (windowManager->windowHasClosed())
@@ -99,9 +114,9 @@ int main()
 		glm::mat4 view = camera->GetViewMatrix();
 		glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(1,1,1));
 		shaderProg.setMat4(viewLoc, view);
-
-		TimeSystem::update();				
 		
+		TimeSystem::update();				
+
 		PhysicsEngine::getInstance()->step();
 		
 		windowManager->frameTick();
