@@ -11,7 +11,7 @@
 #include <iostream>
 #define stepsPerSecond  240
 #define updateTime 1.0f/stepsPerSecond
-
+#define MIN_ENERGY 0.05f
 PhysicsEngine* PhysicsEngine::instance = 0;
 
 #pragma region initialization
@@ -67,6 +67,7 @@ void PhysicsEngine::updatePhysics() {
 			setAcceleration(component);
 			setMomentum(component);
 			setVelocity(component);
+			energy(component);
 		}
 	}
 }
@@ -75,16 +76,13 @@ void PhysicsEngine::applyPhysics() {
 	#pragma omp parallel for
 	for (int i = 0; i < targetComponents.size();i++) {
 		PhysicsComponent* component = (PhysicsComponent*)targetComponents[i];
-		energy(component);
-		rotate(component);
-		translate(component);
-		component->getTransform() = component->getTranslation()*component->getRotation()*component->getScale();
-//		std::cout << "Time: "<<TimeSystem::getTimeSinceStart()<<"\n";
-//		std::cout << "Pos: " << component->getTranslation()[3][0] << ", " << component->getTranslation()[3][1] << ", " << component->getTranslation()[3][2] << "\n";
-//		std::cout << "Vel: " << component->velocity.x << ", " << component->velocity.y << ", " << component->velocity.z << "\n\n";
+		if (!component->getIsStatic() || component->kineticEnergy>MIN_ENERGY) {
+			rotate(component);
+			translate(component);
+			component->getTransform() = component->getTranslation()*component->getRotation()*component->getScale();
 
-
-		reset(component);
+			reset(component);
+		}
 	}
 }
 #pragma endregion
@@ -171,7 +169,9 @@ void PhysicsEngine::resolveCollisions() {
 
 		PhysicsComponent & physA = (PhysicsComponent&)(*entA.getComponent(PHYSICS_COMPONENT));
 		PhysicsComponent & physB = (PhysicsComponent&)(*entB.getComponent(PHYSICS_COMPONENT));
-		vRel = glm::dot(normalizedPenVector,(physA.velocity - physB.velocity));
+		if (physA.isStatic && physB.isStatic)
+			continue;
+		vRel = glm::dot(normalizedPenVector,(physA.velocity - physB.velocity)/TimeSystem::getPhysicsDeltaTime());
 
 		if (vRel >epsilon)
 			std::cout << "AWAY " << std::endl;
@@ -184,7 +184,10 @@ void PhysicsEngine::resolveCollisions() {
 			float coeffOfRestitution = 0.5f*(physA.coeffOfRestitution + physB.coeffOfRestitution);
 			coeffOfRestitution = -(1 + coeffOfRestitution)*vRel;
 		
-			float massInverseSum = physA.massInverse + physB.massInverse;
+			float massInverseSum = 0; 
+			
+			if (!physA.isStatic) massInverseSum += physA.massInverse; 
+			if (!physB.isStatic) massInverseSum += physB.massInverse;
 		
 			glm::vec3 rA = penVector;// collision.pointsC1[0];
 			glm::vec3 rB = -penVector;//collision.pointsC2[0];
@@ -199,12 +202,15 @@ void PhysicsEngine::resolveCollisions() {
 			float dotB = glm::dot(normalizedPenVector, rBX);
 
 			impulse = coeffOfRestitution / (dotA + dotB + massInverseSum);
-			glm::vec3 impulseVector = glm::normalize(impulse*penVector);
+			glm::vec3 impulseVector = impulse*glm::normalize(penVector);
 
-			physA.P = physB.mass*impulseVector*physA.coeffOfRestitution*glm::distance(physA.velocity,glm::vec3());
-			physB.P = physA.mass*impulseVector*physB.coeffOfRestitution*glm::distance(physB.velocity,glm::vec3());
-		std::cout << "CUBE VECTOR " << rA.x << ", " << rA.y << ", " << rA.z << std::endl;
-		std::cout << "CYLINDER VECTOR " << rB.x << ", " << rB.y << ", " << rB.z << std::endl;
+			physA.P += impulseVector;
+			physB.P -= impulseVector;
+
+			physA.L += glm::cross(rA,impulseVector);
+			physB.L -= glm::cross(rB,impulseVector);
+			
+
 
 		}
 

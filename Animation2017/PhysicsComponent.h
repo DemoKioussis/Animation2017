@@ -58,7 +58,7 @@ public:
 		netTorque = glm::vec3();
 		momentOfInertia = glm::mat4();
 		momentOfInertiaInverse = glm::mat4();
-		coeffOfRestitution = 0.90f;
+		coeffOfRestitution = 0.50f;
 
 	};
 	~PhysicsComponent() {};
@@ -70,7 +70,7 @@ public:
 	void setMomentOfInertia(glm::mat4 _moment) {
 		momentOfInertia = _moment;
 		momentOfInertiaInverse = glm::inverse(_moment);
-		std::cout << "Inetia" << std::endl;
+	//	std::cout << "Inetia" << std::endl;
 
 		for (int i = 0; i < 4;i++) {
 			for (int j = 0; j < 4;j++) {

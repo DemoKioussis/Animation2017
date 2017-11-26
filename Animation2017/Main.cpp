@@ -91,7 +91,7 @@ int main()
 	float fieldSize = 25.f;
 	TimeSystem::resetTime();
 
-	SceneLoading::getInstance()->loadScene("scene_2");
+	SceneLoading::getInstance()->loadScene("scene_1");
 	//std::cout << "test1 "<< camera->skybox->getID() << std::endl;
 
 	glm::mat4 rotation(1.0f), projection;
