@@ -172,13 +172,21 @@ void PhysicsEngine::resolveCollisions() {
 		if (physA.isStatic && physB.isStatic)
 			continue;
 		vRel = glm::dot(normalizedPenVector,(physA.velocity - physB.velocity)/TimeSystem::getPhysicsDeltaTime());
+		std::cout << "vrel: " << vRel << std::endl;
+		std::cout << "penMAg: " << glm::length(penVector)<<"\n\n" << std::endl;
 
 		if (vRel >epsilon)
 			std::cout << "AWAY " << std::endl;
-		if (abs(vRel) <=epsilon)
+
+		if (abs(vRel) <= epsilon || glm::length(penVector) < 0.0018f) {
+			
 			std::cout << "RESTING " << std::endl;
+
+		}
+
 		if (vRel < -epsilon)
 		{
+			std::cout << "Collision " << std::endl;
 
 			float impulse;
 			float coeffOfRestitution = 0.5f*(physA.coeffOfRestitution + physB.coeffOfRestitution);
@@ -206,7 +214,9 @@ void PhysicsEngine::resolveCollisions() {
 
 			physA.P += impulseVector;
 			physB.P -= impulseVector;
-			
+			physA.getTranslation() = glm::translate(physA.getTranslation(), penVector);
+			physB.getTranslation() = glm::translate(physB.getTranslation(), -penVector);
+
 			auto makeVec3 = [&](glm::vec4 & v)->glm::vec3 
 			{
 				return glm::vec3(v.x, v.y, v.z);
@@ -217,10 +227,7 @@ void PhysicsEngine::resolveCollisions() {
 			for (int i = 0; i < collision.pointsC2.size(); i++) {
 				physB.L -= glm::cross(makeVec3(collision.pointsC2[i]), impulseVector);
 			}
-	
-
 		}
-
 	}
 }
 
