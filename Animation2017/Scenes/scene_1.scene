@@ -34,8 +34,8 @@ collider
 
 0|1
 render
-position|0|-25|0
-scale|100|1|100
+position|0|-125|0
+scale|100|100|100
 physics|-1|0|0|0
 collider
 
