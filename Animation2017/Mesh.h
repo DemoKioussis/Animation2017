@@ -32,7 +32,7 @@ private:
 	vector<glm::vec3> uniqueVertices;
 
 	vector<GLuint>* indices;
-	GLuint VBO, VAO, EBO, transformBuffer;
+	GLuint VBO, VAO, EBO, transformBuffer, colorBuffer;
 	int numPrims;
 	MeshType meshType;
 public:
@@ -46,6 +46,7 @@ public:
 	//void setVerticiesStaticColour(std::vector<GLfloat>& p, std::vector<GLfloat>& c);
 	void setVerticies(vector<GLfloat>* v);
 	void setIndices(vector<GLuint>* i);
+	void setColorBuffer(vector<glm::vec3> & color);
 	void setBufferData(vector<glm::mat4> & data);
 	vector<GLfloat>* getVerticies();
 	void draw();

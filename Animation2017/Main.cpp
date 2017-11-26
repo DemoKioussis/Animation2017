@@ -91,7 +91,7 @@ int main()
 	float fieldSize = 25.f;
 	TimeSystem::resetTime();
 
-	SceneLoading::getInstance()->loadScene("scene_1");
+	SceneLoading::getInstance()->loadScene("newtons_cradle");
 	//std::cout << "test1 "<< camera->skybox->getID() << std::endl;
 
 	glm::mat4 rotation(1.0f), projection;
@@ -108,6 +108,9 @@ int main()
 	shaderProg.setVec3("ambientLight", glm::vec3(1.0f, 1.0f, 1.0f));
 	float cosT = 0, sinT = 0;
 	TimeSystem::resetTime();
+	RenderComponent* r = (RenderComponent*)InputManager::Entities->at(1)->getComponent(RENDER_COMPONENT);
+	r->setColor(glm::vec3(1, 0, 0));
+	RenderEngine::getInstance()->updateColors();
 #pragma region mainLoop
 	while (windowManager->windowHasClosed())
 	{

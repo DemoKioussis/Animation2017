@@ -11,6 +11,7 @@ void RenderEngine::Initialize() {
 		return;
 	RenderEngine * engine = new RenderEngine();
 	instance = engine;
+	engine->colorsSet = false;
 }
 void RenderEngine::Clear() {
 	for (int i = 0; i < instance->sortedRenderCompoents.size(); i++) {
@@ -35,6 +36,21 @@ void RenderEngine::addComponent(Component* _renderComponent) {
 
 	int mesID = ((RenderComponent*)_renderComponent)->getMeshID();
 	sortedRenderCompoents[mesID]->push_back((RenderComponent*)_renderComponent);
+	colorsSet = false;
+}
+void RenderEngine::updateColors() {
+	for (int i = 0; i < sortedRenderCompoents.size();i++) {
+
+		vector<glm::vec3> colorData;
+		for (int j = 0; j < sortedRenderCompoents[i]->size();j++) {
+
+			glm::vec3 & color = sortedRenderCompoents[i]->at(j)->getColor();
+			colorData.push_back(color);
+		}
+		renderReferences[i]->setColorBuffer(colorData);
+	}
+	colorsSet = true;
+
 }
 void RenderEngine::drawRenderComponents() {
 #ifndef USE_INSTANCING
@@ -47,7 +63,9 @@ void RenderEngine::drawRenderComponents() {
 	}
 
 
-#else	
+#else
+
+	if (!colorsSet) updateColors();
 	for (int i = 0; i < sortedRenderCompoents.size();i++) {
 		
 		vector<glm::mat4> data;

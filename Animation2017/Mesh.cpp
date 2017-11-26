@@ -15,7 +15,7 @@ Mesh::Mesh() {
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
 	glGenBuffers(1, &transformBuffer);
-
+	glGenBuffers(1, &colorBuffer);
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -24,7 +24,7 @@ Mesh::Mesh() {
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0); // verts
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float))); // color
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float))); // color -> not going to be used
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float))); // norm
 	glEnableVertexAttribArray(2);
@@ -43,6 +43,7 @@ Mesh::Mesh(char* objName, MeshType type) : meshType(type)
 	glGenBuffers(1, &VBO);
 	//glGenBuffers(1, &EBO);
 	glGenBuffers(1, &transformBuffer);
+	glGenBuffers(1, &colorBuffer);
 
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -177,6 +178,19 @@ void Mesh::setIndices(std::vector<GLuint>* i) {
 	//	glBindVertexArray(0);
 }
 
+void Mesh::setColorBuffer(vector<glm::vec3> & color) {
+
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+	if (color.size() > 0) {
+
+		glBufferData(GL_ARRAY_BUFFER, color.size() * sizeof(glm::vec3), &color[0], GL_DYNAMIC_DRAW);
+
+		glEnableVertexAttribArray(7);
+		glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+		glVertexAttribDivisor(7, 1);
+	}
+}
 void Mesh::setBufferData(vector<glm::mat4> & data) {
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER,transformBuffer);

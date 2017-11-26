@@ -5,6 +5,7 @@ layout (location = 2) in vec3 norm;
 
 layout (location = 3) in mat4 transform;
 
+layout(location = 7) in vec3 outColor;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -20,7 +21,7 @@ void main()
 //	gl_Position = projection*view * model * vec4(pos, 1.0f);
 	gl_Position = projection*view * transform * vec4(pos, 1.0f);
 	TexCoords=pos;
-	sendColor = color;
+	sendColor = outColor;
 	sendNorm= (transform*vec4(-norm,0)).xyz;
 
 }

@@ -16,6 +16,7 @@ public:
 	std::vector<Mesh*>& getAllRenderReferences();
 	std::vector<Mesh*> renderReferences;
 	void addComponent(Component *_renderComponent);
+	void updateColors();
 	void drawRenderComponents();
 	static RenderEngine * getInstance();
 private:
@@ -25,6 +26,6 @@ private:
 	GLuint viewLoc;
 	GLuint modelLoc;
 	void draw(int _renderIndex);
-
+	bool colorsSet;
 	std::vector<std::vector<RenderComponent*>*> sortedRenderCompoents;
 };

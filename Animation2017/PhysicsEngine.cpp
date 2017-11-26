@@ -206,11 +206,18 @@ void PhysicsEngine::resolveCollisions() {
 
 			physA.P += impulseVector;
 			physB.P -= impulseVector;
-
-			physA.L += glm::cross(rA,impulseVector);
-			physB.L -= glm::cross(rB,impulseVector);
 			
-
+			auto makeVec3 = [&](glm::vec4 & v)->glm::vec3 
+			{
+				return glm::vec3(v.x, v.y, v.z);
+			};
+			for (int i = 0; i < collision.pointsC1.size(); i++) {
+				physA.L += glm::cross(makeVec3(collision.pointsC1[i]), impulseVector);
+			}
+			for (int i = 0; i < collision.pointsC2.size(); i++) {
+				physB.L -= glm::cross(makeVec3(collision.pointsC2[i]), impulseVector);
+			}
+	
 
 		}
 

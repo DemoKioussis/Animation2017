@@ -147,7 +147,7 @@ void SceneLoading::Initialize() {
 				force.x = stof(sVec[2]);
 				force.y = stof(sVec[3]);
 				force.z = stof(sVec[4]);
-				PhysicsEngine::getInstance()->addForce(p, glm::vec3(stof(sVec[2]), stof(sVec[3]), stof(sVec[4])),e->translation[3]);
+				PhysicsEngine::getInstance()->addForce(p, force,glm::vec3());
 				if (sVec.size() > 5) { //attractor?
 					if (stoi(sVec[5]) > 0) {
 						PhysicsEngine::getInstance()->addAttractor(p);
