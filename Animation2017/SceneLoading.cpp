@@ -122,6 +122,7 @@ void SceneLoading::loadScene(char * sceneName) {
 	//TimeSystem::resetTime();
 	glfwSetTime(elapsedTime);
 	TimeSystem::update();
+	TimeSystem::resetTime();
 	PhysicsEngine::getInstance()->step();
 
 }

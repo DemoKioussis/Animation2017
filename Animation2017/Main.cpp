@@ -91,7 +91,9 @@ int main()
 	shaderProg.setVec3("ambientLight", glm::vec3(1.0f, 1.0f, 1.0f));
 	float cosT = 0, sinT = 0;
 
-	TimeSystem::resetTime();
+	PhysicsEngine::getInstance()->disable();
+
+	//TimeSystem::resetTime();
 #pragma region mainLoop
 	while (windowManager->windowHasClosed())
 	{
