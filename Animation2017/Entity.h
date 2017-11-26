@@ -15,14 +15,18 @@ public:
 	glm::mat4 inverseRotation;
 
 	Entity(bool _isStatic);
+	Entity(bool _isStatic,bool skybox);
+
 	~Entity();
 	void addComponent(Component *_component);
 	Component* getComponent(int _componentType);
 	void removeComponent(int _componentType);
 	const int getID();
 	bool isStatic();
+	bool isSkybox();
 private:
 	static int idCounter;
 	int id;
 	bool isStaticEntity;
+	bool isSkyboxEntity;
 };

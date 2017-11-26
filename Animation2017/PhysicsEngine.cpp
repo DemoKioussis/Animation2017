@@ -62,11 +62,12 @@ void PhysicsEngine::updatePhysics() {
 	for (int i = 0; i < targetComponents.size();i++) {
 
 		PhysicsComponent* component = (PhysicsComponent*)targetComponents[i];
-		addGravity(component);
-		setAcceleration(component);
-		setMomentum(component);
-		setVelocity(component);
-		
+		if (!component->getIsStatic()) {
+			addGravity(component);
+			setAcceleration(component);
+			setMomentum(component);
+			setVelocity(component);
+		}
 	}
 }
 
@@ -74,13 +75,16 @@ void PhysicsEngine::applyPhysics() {
 	#pragma omp parallel for
 	for (int i = 0; i < targetComponents.size();i++) {
 		PhysicsComponent* component = (PhysicsComponent*)targetComponents[i];
-		if (!component->isStatic) {
-			energy(component);
-			rotate(component);
-			translate(component);
-			component->getTransform() = component->getTranslation()*component->getRotation()*component->getScale();
-			reset(component);
-		}
+		energy(component);
+		rotate(component);
+		translate(component);
+		component->getTransform() = component->getTranslation()*component->getRotation()*component->getScale();
+//		std::cout << "Time: "<<TimeSystem::getTimeSinceStart()<<"\n";
+//		std::cout << "Pos: " << component->getTranslation()[3][0] << ", " << component->getTranslation()[3][1] << ", " << component->getTranslation()[3][2] << "\n";
+//		std::cout << "Vel: " << component->velocity.x << ", " << component->velocity.y << ", " << component->velocity.z << "\n\n";
+
+
+		reset(component);
 	}
 }
 #pragma endregion
@@ -167,12 +171,12 @@ void PhysicsEngine::resolveCollisions() {
 
 		PhysicsComponent & physA = (PhysicsComponent&)(*entA.getComponent(PHYSICS_COMPONENT));
 		PhysicsComponent & physB = (PhysicsComponent&)(*entB.getComponent(PHYSICS_COMPONENT));
-		vRel = glm::dot(normalizedPenVector,(physA.velocity - physB.velocity) / TimeSystem::getPhysicsDeltaTime());
+		vRel = glm::dot(normalizedPenVector,(physA.velocity - physB.velocity));
 
 		if (vRel >epsilon)
-		continue;//std::cout << "AWAY " << std::endl;
+			std::cout << "AWAY " << std::endl;
 		if (abs(vRel) <=epsilon)
-		continue;//std::cout << "RESTING " << std::endl;
+			std::cout << "RESTING " << std::endl;
 		if (vRel < -epsilon)
 		{
 
@@ -195,11 +199,12 @@ void PhysicsEngine::resolveCollisions() {
 			float dotB = glm::dot(normalizedPenVector, rBX);
 
 			impulse = coeffOfRestitution / (dotA + dotB + massInverseSum);
-			glm::vec3 impulseVector = impulse*glm::normalize(penVector) ;
+			glm::vec3 impulseVector = glm::normalize(impulse*penVector);
 
-			physA.P += impulseVector;
-			physB.P -= impulseVector;
-	//	std::cout << "Implulse: "<<impulseVector.x<<", "<< impulseVector.y<<", "<< impulseVector.z << std::endl;
+			physA.P = physB.mass*impulseVector*physA.coeffOfRestitution*glm::distance(physA.velocity,glm::vec3());
+			physB.P = physA.mass*impulseVector*physB.coeffOfRestitution*glm::distance(physB.velocity,glm::vec3());
+		std::cout << "CUBE VECTOR " << rA.x << ", " << rA.y << ", " << rA.z << std::endl;
+		std::cout << "CYLINDER VECTOR " << rB.x << ", " << rB.y << ", " << rB.z << std::endl;
 
 		}
 

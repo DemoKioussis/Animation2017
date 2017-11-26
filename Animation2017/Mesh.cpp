@@ -1,10 +1,14 @@
 #include "Mesh.h"
 #include "Renderable.h"
+#include "Shader.h"
 #include <iostream>
 #include <glm\glm.hpp>
 /* The mesh class will hold data about rendering an object. Ideally physical properties would be stored in a 
 	rigid body class or something (think unity if you've used it). 
 */
+
+unsigned int Mesh::cubemapTexture = 0;
+
 Mesh::Mesh() {
 
 	glGenVertexArrays(1, &VAO);
@@ -37,7 +41,7 @@ Mesh::Mesh(char* objName, MeshType type) : meshType(type)
 
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
+	//glGenBuffers(1, &EBO);
 	glGenBuffers(1, &transformBuffer);
 
 	glBindVertexArray(VAO);
@@ -215,7 +219,14 @@ vector<GLfloat>* Mesh::getVerticies()
 #pragma endregion
 
 void Mesh::draw() {
-		glBindVertexArray(VAO); 
+	glBindVertexArray(VAO);
+
+	if (meshType == MeshType::SKYBOX) {
+		Shader::skyboxFlag(1);
+		glDepthMask(GL_FALSE);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+		
+	}
 		//glDrawArrays(GL_TRIANGLES, 0, vertices->size());
 		//glDrawElements(GL_TRIANGLES, sizeof(GLuint)*indices->size(), GL_UNSIGNED_INT, 0);
 #ifndef USE_INSTANCING
@@ -226,7 +237,11 @@ void Mesh::draw() {
 	glDrawArraysInstanced(GL_TRIANGLES,  0, sizeof(GLfloat)*vertices->size(), numPrims);
 
 #endif
+	if (meshType == MeshType::SKYBOX) {
 
+		glDepthMask(GL_TRUE);
+		Shader::skyboxFlag(0);
+	}
 }
 
 

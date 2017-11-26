@@ -1,11 +1,13 @@
+gravity|0|-1|0
 0|0
 render
-physics|100|0|0|0
-collider
 position|0|0|0
+physics|10|0|0|0
+collider
 1|0
 render
-physics|200|0|0|0
-collider
 position|5|0|0
+physics|2|0|0|0
+collider
+
 

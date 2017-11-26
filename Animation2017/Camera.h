@@ -3,7 +3,6 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
 #include <vector>
 #include "Direction.h"
 
@@ -87,6 +86,7 @@ public:
 			Position -= WorldUp * velocity;
 		if (direction == DOWN)
 			Position += WorldUp * velocity;
+
     }
 
 	void ToggleFpsMode() 

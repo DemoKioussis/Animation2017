@@ -29,6 +29,9 @@ const bool Component::isEnabled() {
 glm::mat4 & Component::getTransform() {
 	return entity->transform;
 }
+glm::mat4 & Component::getUpdatedTransform() {
+	return entity->transform*entity->rotation*entity->scale;
+}
 glm::mat4 & Component::getRotation() {
 	return entity->rotation;
 }

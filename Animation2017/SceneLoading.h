@@ -20,9 +20,10 @@ class SceneLoading
 	
 
 public:
-	 void loadScene(char * sceneName);
+	void loadScene(char * sceneName);
 	 static void Initialize();
 	 static SceneLoading* getInstance();
+
 	//~SceneLoading();
 private:
 	 SceneLoading();
@@ -33,6 +34,9 @@ private:
 	 Mesh* ellipsoid;
 	 Mesh* sphere;
 	 Mesh* sphereLR;
+	 Mesh* sphereSky;
+
+	 
 	//Mesh* sphereHD 
 };
 
