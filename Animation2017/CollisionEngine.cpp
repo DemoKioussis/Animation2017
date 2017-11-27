@@ -20,6 +20,7 @@ void CollisionEngine::Initialize()
 	instance = engine;
 	getInstance()->maxRadius = 0;
 	engine->enable();
+	getInstance()->fakeSphereComponent.setMeshID(-1);
 }
 void CollisionEngine::Clear() {
 	instance->targetComponents.clear();
@@ -212,12 +213,12 @@ bool CollisionEngine::areCollidingDynamic(CollisionComponent * c1, CollisionComp
 	Mesh* m1 = meshes[c1->getMeshID()];
 	Mesh* m2 = meshes[c2->getMeshID()];
 
-	if (m1->getMeshType() == MeshType::SPHERE && m2->getMeshType() == MeshType::SPHERE && !c1->isNotPureSphere && !c1->isNotPureSphere)
-	{
-		// Sphere collides with sphere
-		return areSpheresColliding(c1, c2, true); 
-	}
-	else // Any other collisions
+	//if (m1->getMeshType() == MeshType::SPHERE && m2->getMeshType() == MeshType::SPHERE && !c1->isNotPureSphere && !c1->isNotPureSphere)
+	//{
+	//	// Sphere collides with sphere
+	//	return areSpheresColliding(c1, c2, true); 
+	//}
+	//else // Any other collisions
 	{
 		return areSpheresColliding(c1, c2, false) ? areCollidingGJK(c1, c2) : false; // For testing
 	}
@@ -282,8 +283,8 @@ bool CollisionEngine::areSpheresColliding(CollisionComponent * c1, CollisionComp
 			collisionResult->c1 = c1;
 			collisionResult->c2 = c2;
 			collisionResult->penetrationVector = glm::normalize(vec3(from1To2)) * (sumOfRadiuses - distanceBetweenOrigins);
-			collisionResult->pointsC1.push_back(glm::normalize(from1To2) * c1->getBoundingRadius());
-			collisionResult->pointsC2.push_back(glm::normalize(from2To1) * c2->getBoundingRadius());
+			collisionResult->points1OC.push_back(glm::normalize(from1To2) * c1->getBoundingRadius());
+			collisionResult->points2OC.push_back(glm::normalize(from2To1) * c2->getBoundingRadius());
 			//collisionResult->distancesToPointsFromOriginC1.push_back(glm::length(vec3(from1To2)));
 			//collisionResult->distancesToPointsFromOriginC2.push_back(glm::length(vec3(from1To2)));
 
@@ -298,7 +299,7 @@ bool CollisionEngine::areSpheresColliding(CollisionComponent * c1, CollisionComp
 bool CollisionEngine::areCollidingGJK(CollisionComponent * c1, CollisionComponent * c2)
 {
 	GJK gjk(*c1, *c2);
-	return gjk.areColliding();
+	return gjk.areColliding(true);
 }
 
 void CollisionEngine::updateMaxRadius()
@@ -333,3 +334,10 @@ void CollisionEngine::addCollisionResult(CollisionResult * collisionResult)
 	collisionResults.push_back(collisionResult);
 	collisionResultsMutex.unlock();
 }
+
+CollisionComponent & CollisionEngine::getFakeSphereComponent()
+{
+	return fakeSphereComponent;
+}
+
+

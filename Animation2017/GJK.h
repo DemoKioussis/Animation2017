@@ -40,9 +40,10 @@ class GJK
 	int pointsCount = 0;
 
 	glm::vec3 support(const glm::vec3& directionWC);
-	glm::vec3 furthestPointInDirectionVertex(glm::vec3& directionOCnormalized, const std::vector<glm::vec3>& vertices, std::vector<glm::vec4>* pointsForResult = nullptr);  //, std::vector<float>* distancesForResult = nullptr);
+	glm::vec3 furthestPointInDirectionVertex(glm::vec3& directionOCnormalized, const std::vector<glm::vec3>& vertices, std::vector<glm::vec3>* pointsForResult = nullptr);  //, std::vector<float>* distancesForResult = nullptr);
 	glm::vec3 furthestPointInDirectionSphere(glm::vec3& directionOCnormalized, CollisionComponent& collisionComponent);
 	void supportForResult(glm::vec3& penetrationVectorWC, CollisionResult& collisionResult);
+	void determineCollidingVertices(CollisionResult& collisionResult);
 	bool simplex(glm::vec3& direction);
 	bool simplex2(glm::vec3 & direction);
 	bool simplex3(glm::vec3 & direction);
@@ -53,8 +54,9 @@ class GJK
 	void setPoints(glm::vec3 a, glm::vec3 b, glm::vec3 c);
 	void setPoints(glm::vec3 a, glm::vec3 b, glm::vec3 c, glm::vec3 d);
 	void addPoint(glm::vec3 newA);
+	bool isSecondFake();
 public:
 	GJK(CollisionComponent & cc1, CollisionComponent & cc2);
-	bool areColliding();
+	bool areColliding(bool storeResult);
 	//glm::vec3 gjkSupport(glm::vec3& directionInWorldCoordinates, );
 };

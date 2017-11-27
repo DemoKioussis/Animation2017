@@ -10,18 +10,20 @@ GJK::GJK(CollisionComponent & cc1, CollisionComponent & cc2) : c1(cc1), c2(cc2),
 	std::vector<Mesh*>& meshes = CollisionEngine::getInstance()->getAllMeshes();
 
 	transform1I = glm::inverse(transform1);
-	transform2I = glm::inverse(transform2);
-
 	Mesh* mesh1 = meshes[cc1.getMeshID()];
 	vertices1 = mesh1->getUniqueVerts();
 	meshType1 = mesh1->getMeshType();
-
-	Mesh* mesh2 = meshes[cc2.getMeshID()];
-	vertices2 = mesh2->getUniqueVerts();
-	meshType2 = mesh2->getMeshType();
+	
+	if (!isSecondFake())
+	{
+		transform2I = glm::inverse(transform2);
+		Mesh* mesh2 = meshes[cc2.getMeshID()];
+		vertices2 = mesh2->getUniqueVerts();
+		meshType2 = mesh2->getMeshType();
+	}
 }
 
-bool GJK::areColliding()
+bool GJK::areColliding(bool storeResult)
 {
 	// Use a random direction to get the furthest point of that direction
 	vec3 furthestPoint = support(vec3(1, 1, 1));
@@ -49,16 +51,21 @@ bool GJK::areColliding()
 		// Collision check
 		if (simplex(direction))
 		{
-			EPA epa(*this);
-			vec3 penetrationVector = epa.getPenetrationVector();
-			CollisionResult* collisionResult = new CollisionResult;
-			collisionResult->c1 = &c1;
-			collisionResult->c2 = &c2;
-			collisionResult->penetrationVector = penetrationVector;
-			supportForResult(penetrationVector, *collisionResult);
+			if (storeResult)
+			{
+				EPA epa(*this);
+				vec3 penetrationVector = epa.getPenetrationVector();
+				CollisionResult* collisionResult = new CollisionResult;
+				collisionResult->c1 = &c1;
+				collisionResult->c2 = &c2;
+				collisionResult->penetrationVector = penetrationVector;
+				supportForResult(penetrationVector, *collisionResult);
+				determineCollidingVertices(*collisionResult);
 
-			CollisionEngine::getInstance()->addCollisionResult(collisionResult);
-			return true;
+				CollisionEngine::getInstance()->addCollisionResult(collisionResult);				
+			}
+
+			return true; // Collision!
 		}
 	}
 
@@ -70,20 +77,27 @@ glm::vec3 GJK::support(const glm::vec3& directionWC)
 	// OC means object coordinates, WC means world coordinates
 	vec3 directionOC1 = transform1I * vec4(directionWC, 0);
 	vec3 directionOC1normalized = glm::normalize(directionOC1);
-
-	vec3 directionOC2 = transform2I * vec4(-directionWC, 0);
-	vec3 directionOC2normalized = glm::normalize(directionOC2);
-
 	vec3 furthestOC1 = (meshType1 == MeshType::SPHERE && !c1.getIsNotPureSphere()) ? furthestPointInDirectionSphere(directionOC1normalized, c1) : furthestPointInDirectionVertex(directionOC1normalized, *vertices1);
-	vec3 furthestOC2 = (meshType2 == MeshType::SPHERE && !c2.getIsNotPureSphere()) ? furthestPointInDirectionSphere(directionOC2normalized, c2) : furthestPointInDirectionVertex(directionOC2normalized, *vertices2);
-
 	vec3 furthestWC1 = transform1 * vec4(furthestOC1, 1);
-	vec3 furthestWC2 = transform2 * vec4(furthestOC2, 1);	
+
+	vec3 furthestWC2;
+
+	if (!isSecondFake())
+	{
+		vec3 directionOC2 = transform2I * vec4(-directionWC, 0);
+		vec3 directionOC2normalized = glm::normalize(directionOC2);
+		vec3 furthestOC2 = (meshType2 == MeshType::SPHERE && !c2.getIsNotPureSphere()) ? furthestPointInDirectionSphere(directionOC2normalized, c2) : furthestPointInDirectionVertex(directionOC2normalized, *vertices2);
+		furthestWC2 = transform2 * vec4(furthestOC2, 1);
+	}
+	else
+	{
+		furthestWC2 = c2.fakePosition + (-directionWC) * 0.01f;
+	}	
 
 	return  furthestWC1 - furthestWC2;
 }
 
-glm::vec3 GJK::furthestPointInDirectionVertex(glm::vec3& directionOCnormalized, const std::vector<glm::vec3>& vertices, std::vector<glm::vec4>* pointsForResult)
+glm::vec3 GJK::furthestPointInDirectionVertex(glm::vec3& directionOCnormalized, const std::vector<glm::vec3>& vertices, std::vector<glm::vec3>* pointsForResult)
 {
 	float dotProductMax = -1;
 	vec3 mostSimilarVectorOC(0, 0, 0);
@@ -113,7 +127,7 @@ glm::vec3 GJK::furthestPointInDirectionVertex(glm::vec3& directionOCnormalized, 
 
 			if (dotProduct > dotProductMax - 0.001 && dotProduct < dotProductMax + 0.001)
 			{
-				pointsForResult->push_back(vec4(vertexOC,1));
+				pointsForResult->push_back(vertexOC);
 			}
 		}
 	}
@@ -138,24 +152,81 @@ void GJK::supportForResult(glm::vec3& penetrationVectorWC, CollisionResult& coll
 	if (meshType1 == MeshType::SPHERE && !c1.getIsNotPureSphere())
 	{
 		vec3 pointOC = furthestPointInDirectionSphere(directionOC1normalized, c1);
-		collisionResult.pointsC1.push_back(vec4(pointOC,1));
+		collisionResult.points1OC.push_back(pointOC);
 	}
 	else
 	{
-		furthestPointInDirectionVertex(directionOC1normalized, *vertices1, &collisionResult.pointsC1);
+		furthestPointInDirectionVertex(directionOC1normalized, *vertices1, &collisionResult.points1OC);
 	}
 
 	if (meshType2 == MeshType::SPHERE && !c2.getIsNotPureSphere())
 	{
 		vec3 pointOC = furthestPointInDirectionSphere(directionOC2normalized, c2);
-		collisionResult.pointsC2.push_back(vec4(pointOC, 1));
+		collisionResult.points2OC.push_back(pointOC);
 	}
 	else
 	{
-		furthestPointInDirectionVertex(directionOC2normalized, *vertices2, &collisionResult.pointsC2);
+		furthestPointInDirectionVertex(directionOC2normalized, *vertices2, &collisionResult.points2OC);
 	}
 
 	
+}
+
+void GJK::determineCollidingVertices(CollisionResult& collisionResult)
+{
+	for (size_t i = 0; i < collisionResult.points1OC.size(); i++)
+	{
+		vec3 pointOC = collisionResult.points1OC[i];
+		vec4 pointLC = transform1 * vec4(pointOC, 0);
+		vec4 pointWC = transform1 * vec4(pointOC, 1);
+
+		CollisionComponent fakeSphere = CollisionEngine::getInstance()->getFakeSphereComponent();
+		fakeSphere.fakePosition = pointWC;
+		GJK gjk(c2, fakeSphere);
+		if (!gjk.areColliding(false))
+		{
+			collisionResult.points1OC.erase(collisionResult.points1OC.begin() + i);
+			i--;
+		}
+		else
+		{
+			collisionResult.points1LC.push_back(pointLC);
+		}
+	}
+
+	for (size_t i = 0; i < collisionResult.points2OC.size(); i++)
+	{
+		vec3 pointOC = collisionResult.points2OC[i];
+		vec4 pointLC = transform2 * vec4(pointOC, 0);
+		vec4 pointWC = transform2 * vec4(pointOC, 1);
+
+		CollisionComponent fakeSphere = CollisionEngine::getInstance()->getFakeSphereComponent();
+		fakeSphere.fakePosition = pointWC;
+		GJK gjk(c1, fakeSphere);
+		if (!gjk.areColliding(false))
+		{
+			collisionResult.points2OC.erase(collisionResult.points2OC.begin() + i);
+			i--;
+		}
+		else
+		{
+			collisionResult.points2LC.push_back(pointLC);
+		}
+	}
+
+	for (vec3 pointOC1 : collisionResult.points1OC)
+	{
+		vec3 pointOC2 = transform2I *  transform1 * vec4(pointOC1, 1);
+		collisionResult.pointsOf1Inside2OC.push_back(pointOC2);
+		collisionResult.pointsOf1Inside2LC.push_back(transform2 * vec4(pointOC2, 0));
+	}
+
+	for (vec3 pointOC2 : collisionResult.points2OC)
+	{
+		vec3 pointOC1 = transform1I *  transform2 * vec4(pointOC2, 1);
+		collisionResult.pointsOf2Inside1OC.push_back(pointOC1);
+		collisionResult.pointsOf2Inside1LC.push_back(transform1 * vec4(pointOC1, 0));
+	}
 }
 
 bool GJK::simplex(vec3& direction)
@@ -296,4 +367,9 @@ void GJK::addPoint(glm::vec3 newA)
 	b = a;
 	a = newA;
 	pointsCount++;
+}
+
+bool GJK::isSecondFake()
+{
+	return c2.getMeshID() == -1;
 }

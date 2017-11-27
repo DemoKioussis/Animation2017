@@ -16,7 +16,7 @@ class CollisionComponent : public Component
 	static int uidCounter;
 
 public:
-	
+	glm::vec3 fakePosition; // Only used for collision resolution to determine the vertices that are actually colliding
 
 	CollisionComponent() : Component() , boundingBox(0,0,0), updateHasBeenCalledOnce(false), isNotPureSphere(false)
 	{
@@ -31,6 +31,11 @@ public:
 	void setMeshID(int _i) {
 		meshID = _i;
 	};
+
+	float getBoundingRadius(float radius)
+	{
+		boundingRadius = radius;
+	}
 
 	float getBoundingRadius()
 	{

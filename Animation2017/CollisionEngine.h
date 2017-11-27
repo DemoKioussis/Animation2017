@@ -16,9 +16,15 @@ struct CollisionResult
 	CollisionComponent* c2;
 	glm::vec3 penetrationVector;
 
-	std::vector<glm::vec4> pointsC1;
+	std::vector<glm::vec3> points1OC;
+	std::vector<glm::vec3> points1LC;
+	std::vector<glm::vec3> pointsOf1Inside2OC;
+	std::vector<glm::vec3> pointsOf1Inside2LC;
 
-	std::vector<glm::vec4> pointsC2;
+	std::vector<glm::vec3> points2OC;
+	std::vector<glm::vec3> points2LC;
+	std::vector<glm::vec3> pointsOf2Inside1OC;
+	std::vector<glm::vec3> pointsOf2Inside1LC;
 };
 
 class CollisionEngine : public Engine
@@ -29,6 +35,8 @@ class CollisionEngine : public Engine
 	static CollisionEngine* instance;
 	std::unordered_map<unsigned long long, std::vector<CollisionComponent*>*> vonNeumannGrid;
 	std::mutex collisionResultsMutex;
+
+	CollisionComponent fakeSphereComponent;
 	
 	// Dynamic collisions with Von Neumann neighbourhood 
 	void createVonNeumannGrid();
@@ -58,4 +66,5 @@ public:
 	void updateMaxRadius();
 	void clearCollisionResults();
 	void addCollisionResult(CollisionResult* collisionResult);
+	CollisionComponent& getFakeSphereComponent();
 };
