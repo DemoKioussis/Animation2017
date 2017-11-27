@@ -75,13 +75,13 @@ void SceneLoading::Initialize() {
 	skybox->addComponent(rs);
 	RenderEngine::getInstance()->addComponent(rs);
 
-	PhysicsComponent* ps = new PhysicsComponent();
-	ps->setStatic(true);
-	float massS =1;
-	ps->setMomentOfInertia(PhysicsBuilder::getMomentOfInertia(5, glm::mat4(), massS));
-	ps->setMass(massS);
-	skybox->addComponent(ps);
-	PhysicsEngine::getInstance()->addComponent(ps);
+	//PhysicsComponent* ps = new PhysicsComponent();
+	//ps->setStatic(true);
+	//float massS =1;
+	//ps->setMomentOfInertia(PhysicsBuilder::getMomentOfInertia(5, glm::mat4(), massS));
+	//ps->setMass(massS);
+	//skybox->addComponent(ps);
+	//PhysicsEngine::getInstance()->addComponent(ps);
 
 	InputManager::Entities->push_back(skybox);
 	string line;
@@ -130,6 +130,10 @@ void SceneLoading::Initialize() {
 				//std::cout << "render" << std::endl;
 				RenderComponent *r = new RenderComponent();
 				r->setMeshID(currentMeshIndex);
+
+				if (sVec.size() > 1) {
+					r->setColor(glm::vec3(stof(sVec[1]), stof(sVec[2]), stof(sVec[3])));
+				}
 				e->addComponent(r);
 				RenderEngine::getInstance()->addComponent(r);
 			}
@@ -141,18 +145,22 @@ void SceneLoading::Initialize() {
 				p->setMass(mass);
 				p->setStatic(isStatic);
 
-				e->addComponent(p);
-				PhysicsEngine::getInstance()->addComponent(p);
+
 				//std::cout << e->translation[3][0]<< e->translation[3][1]<< e->translation[3][2] << std::endl;
 				force.x = stof(sVec[2]);
 				force.y = stof(sVec[3]);
 				force.z = stof(sVec[4]);
 				PhysicsEngine::getInstance()->addForce(p, force,glm::vec3());
-				if (sVec.size() > 5) { //attractor?
-					if (stoi(sVec[5]) > 0) {
+				if (sVec.size() == 6) { //bouciness
+					p->setCoeffOfRestitution(stof(sVec[5]));
+				}
+				if (sVec.size() == 7) {//attractor
+					if (stoi(sVec[6]) > 0) {
 						PhysicsEngine::getInstance()->addAttractor(p);
 					}
 				}
+				e->addComponent(p);
+				PhysicsEngine::getInstance()->addComponent(p);
 			}
 			if (sVec[0] == "collider") {
 				//std::cout << "collider" << std::endl;
@@ -163,6 +171,7 @@ void SceneLoading::Initialize() {
 				CollisionEngine::getInstance()->addComponent(c);
 
 			}
+
 		}
 	}
 	if (e != nullptr) {//entity loaded all components/add to list
@@ -175,7 +184,7 @@ void SceneLoading::Initialize() {
 	{
 		ent->transform = ent->translation * ent->rotation * ent->scale;
 	}
-	
+	//RenderEngine::getInstance()->updateColors();
 	CollisionEngine::getInstance()->updateAllBoundingBoxes(); // Can only be called after calculating the unique indices
 	
 	//glfwSetTime(elapsedTime);

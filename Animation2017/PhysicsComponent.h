@@ -58,7 +58,7 @@ public:
 		netTorque = glm::vec3();
 		momentOfInertia = glm::mat4();
 		momentOfInertiaInverse = glm::mat4();
-		coeffOfRestitution = 0.750f;
+		coeffOfRestitution = 0.75f;
 
 	};
 	~PhysicsComponent() {};
@@ -122,5 +122,9 @@ public:
 	}
 	bool getIsStatic() {
 		return isStatic;
+	}
+
+	void setCoeffOfRestitution(float cr) {
+		coeffOfRestitution = cr;
 	}
 };

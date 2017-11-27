@@ -108,9 +108,9 @@ int main()
 	shaderProg.setVec3("ambientLight", glm::vec3(1.0f, 1.0f, 1.0f));
 	float cosT = 0, sinT = 0;
 	TimeSystem::resetTime();
-	RenderComponent* r = (RenderComponent*)InputManager::Entities->at(1)->getComponent(RENDER_COMPONENT);
-	r->setColor(glm::vec3(1, 0, 0));
-	RenderEngine::getInstance()->updateColors();
+	//RenderComponent* r = (RenderComponent*)InputManager::Entities->at(1)->getComponent(RENDER_COMPONENT);
+	//r->setColor(glm::vec3(1, 0, 0));
+	//RenderEngine::getInstance()->updateColors();
 #pragma region mainLoop
 	while (windowManager->windowHasClosed())
 	{
