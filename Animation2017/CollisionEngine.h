@@ -17,10 +17,8 @@ struct CollisionResult
 	glm::vec3 penetrationVector;
 
 	std::vector<glm::vec4> pointsC1;
-	std::vector<float> distancesToPointsFromOriginC1;
 
-	std::vector<glm::vec4> pointsC2;	
-	std::vector<float> distancesToPointsFromOriginC2;
+	std::vector<glm::vec4> pointsC2;
 };
 
 class CollisionEngine : public Engine
