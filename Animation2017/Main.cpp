@@ -91,7 +91,7 @@ int main()
 	float fieldSize = 25.f;
 	TimeSystem::resetTime();
 
-	SceneLoading::getInstance()->loadScene("newtons_cradle");
+	SceneLoading::getInstance()->loadScene("drop_test");
 	//std::cout << "test1 "<< camera->skybox->getID() << std::endl;
 
 	glm::mat4 rotation(1.0f), projection;
@@ -109,14 +109,18 @@ int main()
 	float cosT = 0, sinT = 0;
 	TimeSystem::resetTime();
 	//RenderComponent* r = (RenderComponent*)InputManager::Entities->at(1)->getComponent(RENDER_COMPONENT);
+	//RenderComponent* r2 = (RenderComponent*)InputManager::Entities->at(2)->getComponent(RENDER_COMPONENT);
+
 	//r->setColor(glm::vec3(1, 0, 0));
+	//r2->setColor(glm::vec3(0, 0, 1));
+
 	//RenderEngine::getInstance()->updateColors();
+
 #pragma region mainLoop
 	while (windowManager->windowHasClosed())
 	{
 		float cosT = cosf(glfwGetTime()), sinT = sinf(glfwGetTime());
 		glm::mat4 view = camera->GetViewMatrix();
-		glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(1,1,1));
 		shaderProg.setMat4(viewLoc, view);
 		
 		TimeSystem::update();				

@@ -139,7 +139,6 @@ void GJK::supportForResult(glm::vec3& penetrationVectorWC, CollisionResult& coll
 	{
 		vec3 pointOC = furthestPointInDirectionSphere(directionOC1normalized, c1);
 		collisionResult.pointsC1.push_back(vec4(pointOC,1));
-		collisionResult.distancesToPointsFromOriginC1.push_back(glm::length(pointOC));
 	}
 	else
 	{
@@ -150,32 +149,13 @@ void GJK::supportForResult(glm::vec3& penetrationVectorWC, CollisionResult& coll
 	{
 		vec3 pointOC = furthestPointInDirectionSphere(directionOC2normalized, c2);
 		collisionResult.pointsC2.push_back(vec4(pointOC, 1));
-		collisionResult.distancesToPointsFromOriginC2.push_back(glm::length(pointOC));
 	}
 	else
 	{
 		furthestPointInDirectionVertex(directionOC2normalized, *vertices2, &collisionResult.pointsC2);
 	}
 
-	vec3 minkowskiDiffPoint = support(penetrationVectorWC);
-
-	vec3 center1 = transform1 * vec4(0, 0, 0, 1);
-	for (size_t i = 0; i < collisionResult.pointsC1.size(); i++)
-	{
-		vec4 point1OC = transform1 * collisionResult.pointsC1[i];
-		//collisionResult.pointsC1[i] = point1OC;
-		vec3 s = support(vec3(point1OC) - center1);
-		collisionResult.distancesToPointsFromOriginC1.push_back(glm::length(s));
-	}
-
-	vec3 center2 = transform2 * vec4(0, 0, 0, 1);
-	for (size_t i = 0; i < collisionResult.pointsC2.size(); i++)
-	{
-		vec4 point2OC = transform2 * collisionResult.pointsC2[i];
-		//collisionResult.pointsC2[i] = point2OC;
-		vec3 s = support(-(vec3(point2OC) - center2));
-		collisionResult.distancesToPointsFromOriginC2.push_back(glm::length(s));
-	}
+	
 }
 
 bool GJK::simplex(vec3& direction)
