@@ -172,21 +172,22 @@ void PhysicsEngine::resolveCollisions() {
 		if (physA.isStatic && physB.isStatic)
 			continue;
 		vRel = glm::dot(normalizedPenVector,(physA.velocity - physB.velocity)/TimeSystem::getPhysicsDeltaTime());
-		std::cout << "vrel: " << vRel << std::endl;
-		std::cout << "penMAg: " << glm::length(penVector)<<"\n\n" << std::endl;
+//		std::cout << "vrel: " << vRel << std::endl;
+//		std::cout << "penMAg: " << glm::length(penVector)<<"\n\n" << std::endl;
 
-		if (vRel >epsilon)
-			std::cout << "AWAY " << std::endl;
-
-		if (abs(vRel) <= epsilon || glm::length(penVector) < 0.0018f) {
+		if (vRel > epsilon) {
+			//	std::cout << "AWAY " << std::endl;
+		}
+		if (abs(vRel) <= epsilon || glm::length(penVector) < 0.0025f) {
 			
-			std::cout << "RESTING " << std::endl;
 
+
+		
 		}
 
 		if (vRel < -epsilon)
 		{
-			std::cout << "Collision " << std::endl;
+		//	std::cout << "Collision " << std::endl;
 
 			float impulse;
 			float coeffOfRestitution = 0.5f*(physA.coeffOfRestitution + physB.coeffOfRestitution);
@@ -206,22 +207,27 @@ void PhysicsEngine::resolveCollisions() {
 			glm::vec3 rAX = glm::cross(glm::vec3(IrAXN.x, IrAXN.y, IrAXN.z), rA);
 			glm::vec3 rBX = glm::cross(glm::vec3(IrBXN.x, IrBXN.y, IrBXN.z), rB);
 
-			float dotA = glm::dot(normalizedPenVector, rAX);
-			float dotB = glm::dot(normalizedPenVector, rBX);
+			float dotA, dotB;
+
+			if (physA.isStatic) dotA = 0;
+			else dotA = glm::dot(normalizedPenVector, rAX);
+
+			if (physB.isStatic) dotB = 0;
+			else dotB = glm::dot(normalizedPenVector, rBX);
+
 
 			impulse = coeffOfRestitution / (dotA + dotB + massInverseSum);
 			glm::vec3 impulseVector = impulse*glm::normalize(penVector);
 
 			physA.P += impulseVector;
 			physB.P -= impulseVector;
-			physA.getTranslation() = glm::translate(physA.getTranslation(), penVector);
-			physB.getTranslation() = glm::translate(physB.getTranslation(), -penVector);
-
+			physA.getTranslation() = glm::translate(physA.getTranslation(), penVector/2.0f);
+			physB.getTranslation() = glm::translate(physB.getTranslation(), -penVector/2.0f);
 			auto makeVec3 = [&](glm::vec4 & v)->glm::vec3 
 			{
 				return glm::vec3(v.x, v.y, v.z);
 			};
-			for (int i = 0; i < collision.pointsC1.size(); i++) {
+			for (int i = 0; i <collision.pointsC1.size(); i++) {
 				physA.L += glm::cross(makeVec3(collision.pointsC1[i]), impulseVector);
 			}
 			for (int i = 0; i < collision.pointsC2.size(); i++) {
