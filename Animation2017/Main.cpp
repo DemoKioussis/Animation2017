@@ -91,7 +91,7 @@ int main()
 	float fieldSize = 25.f;
 	TimeSystem::resetTime();
 
-	SceneLoading::getInstance()->loadScene("drop_test");
+	SceneLoading::getInstance()->loadScene("bowl");
 	//std::cout << "test1 "<< camera->skybox->getID() << std::endl;
 
 	glm::mat4 rotation(1.0f), projection;
@@ -119,6 +119,7 @@ int main()
 #pragma region mainLoop
 	while (windowManager->windowHasClosed())
 	{
+		
 		float cosT = cosf(glfwGetTime()), sinT = sinf(glfwGetTime());
 		glm::mat4 view = camera->GetViewMatrix();
 		shaderProg.setMat4(viewLoc, view);

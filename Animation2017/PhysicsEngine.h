@@ -35,6 +35,10 @@ private:
 	void setMomentum(PhysicsComponent* _component);
 	void setVelocity(PhysicsComponent* _component);
 	void resolveCollisions();
+	glm::vec3 getImpulse(glm::vec3 & _rA, glm::vec3 & _rB, float _vRel, PhysicsComponent & _physA, PhysicsComponent & _physB,
+		float _massInverseSum,glm::vec3 & _penVector, glm::vec3 & _normalizePenVector, float _coeffOfRestitution);
+	void resolveCollisions2();
+	
 	void energy(PhysicsComponent* _component);
 	void translate(PhysicsComponent* _component);
 	void rotate(PhysicsComponent* _component);

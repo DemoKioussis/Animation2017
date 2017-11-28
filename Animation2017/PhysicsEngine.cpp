@@ -12,6 +12,7 @@
 #define stepsPerSecond  240
 #define updateTime 1.0f/stepsPerSecond
 #define MIN_ENERGY 0.05f
+#define epsilon 1E-6f
 PhysicsEngine* PhysicsEngine::instance = 0;
 
 #pragma region initialization
@@ -46,13 +47,13 @@ void PhysicsEngine::Clear() {
 #pragma region mainLoop
  void PhysicsEngine::step() {
 	 if (isEnabled()) {
-		 if (TimeSystem::physicsCheck() >= updateTime) {
+	//	 if (TimeSystem::physicsCheck() >= updateTime) {
 			 TimeSystem::physicsStep();			 
 			 updatePhysics();
 			 applyPhysics();
 			 CollisionEngine::getInstance()->step(); // Collision detection should only happen at the physical step
 			 resolveCollisions();
-		 }
+		// }
 	 }
 
  }
@@ -159,7 +160,145 @@ void PhysicsEngine::reset(PhysicsComponent* _component) {
 void PhysicsEngine::resolveCollisions() {
 
 	for (int i = 0; i < CollisionEngine::getInstance()->collisionResults.size();i++) {
-		float epsilon = 1E-6;
+		CollisionResult & collision = *CollisionEngine::getInstance()->collisionResults[i];
+
+		Entity & entA = *collision.c1->entity;
+		Entity & entB = *collision.c2->entity;
+
+		glm::vec3 normalizedPenVector = glm::normalize(-collision.penetrationVector);
+		glm::vec3 penVector = -collision.penetrationVector;
+	//	printf("\npenVector %d: %f , %f, %f\n",i, penVector.x, penVector.y, penVector.z);
+
+
+		PhysicsComponent & physA = (PhysicsComponent&)(*entA.getComponent(PHYSICS_COMPONENT));
+		PhysicsComponent & physB = (PhysicsComponent&)(*entB.getComponent(PHYSICS_COMPONENT));
+
+		float massInverseSum = 0;
+		float coeffOfRestitution = 0.5f*(physA.coeffOfRestitution + physB.coeffOfRestitution);
+
+		if (!physA.isStatic) massInverseSum += physA.massInverse*8;
+		if (!physB.isStatic) massInverseSum += physB.massInverse*8;
+
+		if (physA.isStatic && physB.isStatic)
+			continue;
+
+		vector<glm::vec3> impulses(collision.points1LC.size() + collision.points2LC.size());
+		glm::vec3 netImpulse(0);
+
+//#pragma omp parallel for
+		for (int j = 0; j < collision.points1LC.size();j++) {
+			glm::vec3 worldPos = physA.getTransform()*glm::vec4(collision.points1OC[j], 1);
+
+
+			glm::vec3 rA = collision.points1LC[j];
+			glm::vec3 rB = physB.getScale()*glm::inverse(physB.getTransform())*physA.getTransform()*glm::vec4(collision.points1OC[j],1);
+			glm::vec3 velA = physA.velocity + glm::cross(physA.angularVelocity, rA);
+			glm::vec3 velB = physB.velocity + glm::cross(physB.angularVelocity, rB);
+
+
+			float vRel =  glm::dot(normalizedPenVector,(velA - velB));
+	//		printf("\nA %d/%d - vrel%f:\n", j+1, collision.points1LC.size(),vRel);
+	//		printf("vA: %f , %f, %f\n", velA.x, velA.y, velA.z);
+	//		printf("vB: %f , %f, %f\n", velB.x, velB.y, velB.z);
+
+
+	//		printf("posA: %f , %f, %f\n", rA.x, rA.y, rA.z);
+	//		printf("posB: %f , %f, %f\n", rB.x, rB.y, rB.z);
+
+	//		printf("World pos: %f , %f, %f\n\n", worldPos.x, worldPos.y, worldPos.z);
+
+			if (vRel > epsilon) {
+			//	std::cout << "AWAY " << std::endl;
+			}
+			if (abs(vRel) <= epsilon || glm::length(penVector) < 0.0025f) {
+
+			//	std::cout << "RESTING " << std::endl;
+			}
+			if (vRel < -epsilon) {
+			//	std::cout << "COLLISION " << std::endl;
+				impulses[j] = getImpulse(rA, rB, vRel, physA, physB,massInverseSum,penVector,normalizedPenVector, coeffOfRestitution)
+					/ (float)collision.points1LC.size();
+			}
+
+		}
+//#pragma omp parallel for
+		for (int k = 0; k < collision.points2LC.size();k++) {
+			glm::vec3 worldPos = physB.getTransform()*glm::vec4(collision.points2OC[k], 1);
+			glm::vec3 rB = collision.points2LC[k];
+			glm::vec3 rA = physA.getScale()*glm::inverse(physA.getTransform())*physB.getTransform()*glm::vec4(collision.points2OC[k], 1);
+			glm::vec3 velA = physA.velocity + glm::cross(physA.angularVelocity, rA);
+			glm::vec3 velB = physB.velocity + glm::cross(physB.angularVelocity, rB);
+			float vRel = glm::dot(normalizedPenVector, (velA - velB));
+
+	//		printf("\nB %d/%d - vrel%f:\n", k+1, collision.points2LC.size(),vRel);
+	//		printf("vA: %f , %f, %f\n", velA.x, velA.y, velA.z);
+	//		printf("vB: %f , %f, %f\n", velB.x, velB.y, velB.z);
+
+	//		printf("posA: %f , %f, %f\n", rA.x, rA.y, rA.z);
+	//		printf("posB: %f , %f, %f\n", rB.x, rB.y, rB.z);
+			
+	//		printf("World pos: %f , %f, %f\n\n", worldPos.x, worldPos.y, worldPos.z);
+
+
+			if (vRel > epsilon) {
+			//	std::cout << "AWAY " << std::endl;
+			}
+			if (abs(vRel) <= epsilon || glm::length(penVector) < 0.0025f) {
+
+			//	std::cout << "RESTING " << std::endl;
+			}
+			if (vRel < -epsilon) {
+			//	std::cout << "COLLISION " << std::endl;
+
+				impulses[k+ collision.points1LC.size()] = getImpulse(rA, rB, vRel, physA, physB, massInverseSum, penVector, normalizedPenVector, coeffOfRestitution)
+					/(float) collision.points2LC.size();
+			}
+		}
+		for (int i = 0; i < impulses.size();i++) {
+			netImpulse += impulses[i];
+		}
+		netImpulse /= TimeSystem::getPhysicsDeltaTime();
+		physA.P += netImpulse;
+		physB.P -= netImpulse;
+	}
+
+
+}
+
+glm::vec3 PhysicsEngine::getImpulse(glm::vec3 &rA, glm::vec3 &rB, float vRel, PhysicsComponent & physA, PhysicsComponent & physB,
+	float massInverseSum, glm::vec3 &penVector, glm::vec3 & normalizedPenVector, float coeffOfRestitution) {
+	
+	float impulse;
+
+	glm::vec4 IrAXN = physA.momentOfInertiaInverse*glm::vec4(glm::cross(rA, normalizedPenVector), 0);
+	glm::vec4 IrBXN = physB.momentOfInertiaInverse*glm::vec4(glm::cross(rB, normalizedPenVector), 0);
+
+	glm::vec3 rAX = glm::cross(glm::vec3(IrAXN.x, IrAXN.y, IrAXN.z), rA);
+	glm::vec3 rBX = glm::cross(glm::vec3(IrBXN.x, IrBXN.y, IrBXN.z), rB);
+
+	float dotA, dotB;
+
+	if (physA.isStatic) dotA = 0;
+	else dotA = glm::dot(normalizedPenVector, rAX);
+
+	if (physB.isStatic) dotB = 0;
+	else dotB = glm::dot(normalizedPenVector, rBX);
+
+
+	impulse = coeffOfRestitution / (dotA + dotB + massInverseSum);
+	glm::vec3 impulseVector = impulse*glm::normalize(penVector) / TimeSystem::getPhysicsDeltaTime();
+//	physA.P += impulseVector*250.0f;
+//	physB.P -= impulseVector*250.0f;
+	physA.L += glm::cross(rA, impulseVector);
+	physB.L -= glm::cross(rB, impulseVector);
+
+	return impulseVector;
+}
+
+void PhysicsEngine::resolveCollisions2() {
+
+	for (int i = 0; i < CollisionEngine::getInstance()->collisionResults.size();i++) {
+
 		CollisionResult & collision = *CollisionEngine::getInstance()->collisionResults[i];
 		float vRel;
 		Entity & entA = *collision.c1->entity;
@@ -172,14 +311,15 @@ void PhysicsEngine::resolveCollisions() {
 		if (physA.isStatic && physB.isStatic)
 			continue;
 		vRel = glm::dot(normalizedPenVector,(physA.velocity - physB.velocity)/TimeSystem::getPhysicsDeltaTime());
-//		std::cout << "vrel: " << vRel << std::endl;
-//		std::cout << "penMAg: " << glm::length(penVector)<<"\n\n" << std::endl;
+		std::cout << "vrel: " << vRel << std::endl;
+		std::cout << "penMAg: " << glm::length(penVector)<<"\n\n" << std::endl;
 
 		if (vRel > epsilon) {
-			//	std::cout << "AWAY " << std::endl;
+				std::cout << "AWAY " << std::endl;
 		}
 		if (abs(vRel) <= epsilon || glm::length(penVector) < 0.0025f) {
 			
+			std::cout << "resting " << std::endl;
 
 
 		
@@ -187,7 +327,7 @@ void PhysicsEngine::resolveCollisions() {
 
 		if (vRel < -epsilon)
 		{
-		//	std::cout << "Collision " << std::endl;
+			std::cout << "Collision " << std::endl;
 
 			float impulse;
 			float coeffOfRestitution = 0.5f*(physA.coeffOfRestitution + physB.coeffOfRestitution);
@@ -221,17 +361,17 @@ void PhysicsEngine::resolveCollisions() {
 
 			physA.P += impulseVector;
 			physB.P -= impulseVector;
-			physA.getTranslation() = glm::translate(physA.getTranslation(), penVector/2.0f);
-			physB.getTranslation() = glm::translate(physB.getTranslation(), -penVector/2.0f);
+	//		physA.getTranslation() = glm::translate(physA.getTranslation(), penVector/2.0f);
+	//		physB.getTranslation() = glm::translate(physB.getTranslation(), -penVector/2.0f);
 			auto makeVec3 = [&](glm::vec4 & v)->glm::vec3 
 			{
 				return glm::vec3(v.x, v.y, v.z);
 			};
-			for (int i = 0; i < collision.points1OC.size(); i++) {
-				physA.L += glm::cross(collision.points1OC[i], impulseVector);
+			for (int i = 0; i < collision.pointsOf2Inside1LC.size(); i++) {
+				physA.L += glm::cross(collision.pointsOf2Inside1LC[i], impulseVector) /(float) collision.pointsOf2Inside1LC.size()*0.05f;
 			}
-			for (int i = 0; i < collision.points2OC.size(); i++) {
-				physB.L -= glm::cross(collision.points2OC[i], impulseVector);
+			for (int i = 0; i < collision.pointsOf1Inside2LC.size(); i++) {
+				physB.L -= glm::cross(collision.pointsOf1Inside2LC[i], impulseVector) / (float) collision.pointsOf1Inside2LC.size()*0.05f;
 			}
 		}
 	}

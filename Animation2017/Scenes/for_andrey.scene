@@ -2,7 +2,7 @@ gravity|0|-1|0
 
 0|0
 render|0|0|1
-position|7|10|0
+position|0|5.5|0
 physics|10|0|0|0|0.5
 scale|6|1|6
 collider

@@ -69,7 +69,7 @@ float TimeSystem::getFrameDeltaTime() {
 	return frameDeltaTime;
 };
 float TimeSystem::getPhysicsDeltaTime() {
-	return physicsDeltaTime;
+	return 1 / 120.0f;//physicsDeltaTime;
 };
 
 
