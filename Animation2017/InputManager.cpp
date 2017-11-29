@@ -73,11 +73,52 @@ void InputManager::key_callback(GLFWwindow* window, int key, int scancode, int a
 		}
 	}
 
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_O) == GLFW_PRESS) {
+		if (CollisionEngine::getInstance()->isEnabled())
+			CollisionEngine::getInstance()->disable();
+		else {
+			CollisionEngine::getInstance()->enable();
+		}
+	}
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_I) == GLFW_PRESS) {
+		std::cout << "Delta time: " << TimeSystem::getPhysicsDeltaTime() << std::endl;
+	}
+
+	if ((glfwGetKey(windowManager->getWindow(), GLFW_KEY_K) == GLFW_PRESS) ) {
+		for (int i = 0; i < Entities->size();i++) {
+			auto e = (Entities->at(i));
+			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
+			if (p != nullptr) {
+				p->setAngularMomentum(glm::vec3());
+				p->setMomentum(glm::vec3());
+			}
+
+		}
+	}
+
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
 		camera->ToggleSpeed();
 		
 	}
 
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_UP) == GLFW_PRESS) {
+		PhysicsEngine::getInstance()->setGravity(glm::vec3(0, 1, 0), 9.81);
+	}
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_DOWN) == GLFW_PRESS) {
+		PhysicsEngine::getInstance()->setGravity(glm::vec3(0, -1, 0), 9.81);
+	}
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_RIGHT) == GLFW_PRESS) {
+		PhysicsEngine::getInstance()->setGravity(glm::vec3(-1, 0, 0), 9.81);
+	}
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_LEFT) == GLFW_PRESS) {
+		PhysicsEngine::getInstance()->setGravity(glm::vec3(1, 0, 0), 9.81);
+	}
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_PAGE_UP) == GLFW_PRESS) {
+		PhysicsEngine::getInstance()->setGravity(glm::vec3(0, 0, 1), 9.81);
+	}
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_PAGE_DOWN) == GLFW_PRESS) {
+		PhysicsEngine::getInstance()->setGravity(glm::vec3(0, 0, -1), 9.81);
+	}
 }
 
 void InputManager::setCamera(Camera* c) {

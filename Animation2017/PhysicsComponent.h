@@ -66,20 +66,23 @@ public:
 	void setMass(float _mass) {
 		mass = _mass;
 		massInverse = 1 / _mass;
+		if (isStatic) {
+			massInverse = 0;
+		}
 	}
 	void setMomentOfInertia(glm::mat4 _moment) {
 		momentOfInertia = _moment;
 		momentOfInertiaInverse = glm::inverse(_moment);
-	//	std::cout << "Inetia" << std::endl;
 
-		for (int i = 0; i < 4;i++) {
-			for (int j = 0; j < 4;j++) {
-				std::cout << momentOfInertia[j][i] << " ";
+		if (isStatic) {
+			std::cout << "static moment" << std::endl;
+			momentOfInertiaInverse = glm::mat4(0);
+			for (int i = 0; i < 4;i++) {
+				for (int j = 0; j < 4;j++) {
+					momentOfInertiaInverse[i][j] = 0;
+				}
 			}
-			std::cout << std::endl;
 		}
-		std::cout << std::endl;
-		std::cout << std::endl;
 
 	}
 	void setGravityMultiply(float _multiplyer) {
@@ -95,27 +98,13 @@ public:
 
 		rotationLock = glm::vec3(x, y, z);
 	}
-	void setAngularVelocity(glm::vec3 _axis, float _vel) {
-		angularVelocity = glm::normalize(_axis) * _vel;
-	}
 
-	void addAngularVelocity(glm::vec3 _axis, float _vel) {
-		glm::vec4 w =glm::vec4( glm::normalize(_axis) * _vel,0);
-		glm::vec4 r = getRotation()*w;
-		
-		angularVelocity += glm::vec3(r.x, r.y, r.z);
-	}
 
-	void addAngularVelocity2(glm::vec3 _axis, float _vel) {
-		glm::vec4 w = glm::vec4(glm::normalize(_axis) * _vel, 0);
-		glm::vec4 r = glm::inverse(getRotation())*w;
-
-		angularVelocity += glm::vec3(r.x, r.y, r.z);
+	void setAngularMomentum(glm::vec3 m) {
+		L = m;
 	}
-	void addAngularVelocity3(glm::vec3 _axis, float _vel) {
-		glm::vec4 w = glm::vec4(glm::normalize(_axis) * _vel, 0);
-		glm::vec4 r = w;
-		angularVelocity += glm::vec3(r.x, r.y, r.z);
+	void setMomentum(glm::vec3 m) {
+		P = m;
 	}
 	void setStatic(bool _static) {
 		isStatic = _static;
