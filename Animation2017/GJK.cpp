@@ -156,7 +156,7 @@ void GJK::supportForResult(glm::vec3& penetrationVectorWC, CollisionResult& coll
 	}
 	else
 	{
-		furthestPointInDirectionVertex(directionOC1normalized, *vertices1, &collisionResult.points1OC);
+		furthestPointInDirectionVertex(directionOC1normalized, *vertices1, &collisionResult.originalPoints1OC);
 	}
 
 	if (meshType2 == MeshType::SPHERE)
@@ -166,7 +166,7 @@ void GJK::supportForResult(glm::vec3& penetrationVectorWC, CollisionResult& coll
 	}
 	else
 	{
-		furthestPointInDirectionVertex(directionOC2normalized, *vertices2, &collisionResult.points2OC);
+		furthestPointInDirectionVertex(directionOC2normalized, *vertices2, &collisionResult.originalPoints2OC);
 	}
 
 	
@@ -174,42 +174,34 @@ void GJK::supportForResult(glm::vec3& penetrationVectorWC, CollisionResult& coll
 
 void GJK::determineCollidingVertices(CollisionResult& collisionResult)
 {
-	for (size_t i = 0; i < collisionResult.points1OC.size(); i++)
+	for (size_t i = 0; i < collisionResult.originalPoints1OC.size(); i++)
 	{
-		vec3 pointOC = collisionResult.points1OC[i];
+		vec3 pointOC = collisionResult.originalPoints1OC[i];
 		vec4 pointLC = transform1 * vec4(pointOC, 0);
 		vec4 pointWC = transform1 * vec4(pointOC, 1);
 
 		CollisionComponent fakeSphere = CollisionEngine::getInstance()->getFakeSphereComponent();
 		fakeSphere.fakePosition = pointWC;
 		GJK gjk(c2, fakeSphere);
-		if (!gjk.areColliding(false))
+		if (gjk.areColliding(false))
 		{
-			collisionResult.points1OC.erase(collisionResult.points1OC.begin() + i);
-			i--;
-		}
-		else
-		{
+			collisionResult.points1OC.push_back(pointOC);
 			collisionResult.points1LC.push_back(pointLC);
 		}
 	}
 
-	for (size_t i = 0; i < collisionResult.points2OC.size(); i++)
+	for (size_t i = 0; i < collisionResult.originalPoints2OC.size(); i++)
 	{
-		vec3 pointOC = collisionResult.points2OC[i];
+		vec3 pointOC = collisionResult.originalPoints2OC[i];
 		vec4 pointLC = transform2 * vec4(pointOC, 0);
 		vec4 pointWC = transform2 * vec4(pointOC, 1);
 
 		CollisionComponent fakeSphere = CollisionEngine::getInstance()->getFakeSphereComponent();
 		fakeSphere.fakePosition = pointWC;
 		GJK gjk(c1, fakeSphere);
-		if (!gjk.areColliding(false))
+		if (gjk.areColliding(false))
 		{
-			collisionResult.points2OC.erase(collisionResult.points2OC.begin() + i);
-			i--;
-		}
-		else
-		{
+			collisionResult.points2OC.push_back(pointOC);
 			collisionResult.points2LC.push_back(pointLC);
 		}
 	}
