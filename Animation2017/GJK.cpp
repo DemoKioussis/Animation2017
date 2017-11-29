@@ -91,7 +91,7 @@ glm::vec3 GJK::support(const glm::vec3& directionWC)
 	}
 	else
 	{
-		furthestWC2 = c2.fakePosition + (-directionWC) * 0.01f;
+		furthestWC2 = c2.fakePosition + glm::normalize(-directionWC) * 0.01f;
 	}	
 
 	return  furthestWC1 - furthestWC2;
