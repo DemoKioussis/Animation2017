@@ -77,7 +77,7 @@ glm::vec3 GJK::support(const glm::vec3& directionWC)
 	// OC means object coordinates, WC means world coordinates
 	vec3 directionOC1 = transform1I * vec4(directionWC, 0);
 	vec3 directionOC1normalized = glm::normalize(directionOC1);
-	vec3 furthestOC1 = (meshType1 == MeshType::SPHERE && !c1.getIsNotPureSphere()) ? furthestPointInDirectionSphere(directionOC1normalized, c1) : furthestPointInDirectionVertex(directionOC1normalized, *vertices1);
+	vec3 furthestOC1 = (meshType1 == MeshType::SPHERE) ? furthestPointInDirectionSphere(directionOC1normalized, c1) : furthestPointInDirectionVertex(directionOC1normalized, *vertices1);
 	vec3 furthestWC1 = transform1 * vec4(furthestOC1, 1);
 
 	vec3 furthestWC2;
@@ -86,7 +86,7 @@ glm::vec3 GJK::support(const glm::vec3& directionWC)
 	{
 		vec3 directionOC2 = transform2I * vec4(-directionWC, 0);
 		vec3 directionOC2normalized = glm::normalize(directionOC2);
-		vec3 furthestOC2 = (meshType2 == MeshType::SPHERE && !c2.getIsNotPureSphere()) ? furthestPointInDirectionSphere(directionOC2normalized, c2) : furthestPointInDirectionVertex(directionOC2normalized, *vertices2);
+		vec3 furthestOC2 = (meshType2 == MeshType::SPHERE) ? furthestPointInDirectionSphere(directionOC2normalized, c2) : furthestPointInDirectionVertex(directionOC2normalized, *vertices2);
 		furthestWC2 = transform2 * vec4(furthestOC2, 1);
 	}
 	else
@@ -149,7 +149,7 @@ void GJK::supportForResult(glm::vec3& penetrationVectorWC, CollisionResult& coll
 	vec3 directionOC2 = transform2I * vec4(-penetrationVectorWC, 0);
 	vec3 directionOC2normalized = glm::normalize(directionOC2);
 
-	if (meshType1 == MeshType::SPHERE && !c1.getIsNotPureSphere())
+	if (meshType1 == MeshType::SPHERE)
 	{
 		vec3 pointOC = furthestPointInDirectionSphere(directionOC1normalized, c1);
 		collisionResult.points1OC.push_back(pointOC);
@@ -159,7 +159,7 @@ void GJK::supportForResult(glm::vec3& penetrationVectorWC, CollisionResult& coll
 		furthestPointInDirectionVertex(directionOC1normalized, *vertices1, &collisionResult.points1OC);
 	}
 
-	if (meshType2 == MeshType::SPHERE && !c2.getIsNotPureSphere())
+	if (meshType2 == MeshType::SPHERE)
 	{
 		vec3 pointOC = furthestPointInDirectionSphere(directionOC2normalized, c2);
 		collisionResult.points2OC.push_back(pointOC);

@@ -213,7 +213,7 @@ bool CollisionEngine::areCollidingDynamic(CollisionComponent * c1, CollisionComp
 	Mesh* m1 = meshes[c1->getMeshID()];
 	Mesh* m2 = meshes[c2->getMeshID()];
 
-	//if (m1->getMeshType() == MeshType::SPHERE && m2->getMeshType() == MeshType::SPHERE && !c1->isNotPureSphere && !c1->isNotPureSphere)
+	//if (m1->getMeshType() == MeshType::SPHERE && m2->getMeshType() == MeshType::SPHERE)
 	//{
 	//	// Sphere collides with sphere
 	//	return areSpheresColliding(c1, c2, true); 
