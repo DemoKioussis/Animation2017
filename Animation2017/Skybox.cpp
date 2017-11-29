@@ -1,5 +1,5 @@
 #include "Skybox.h"
-
+//code is based and modified from learnopengl.com
 unsigned int loadSkybox(vector<std::string> faces)
 {
 	unsigned int textureID;
