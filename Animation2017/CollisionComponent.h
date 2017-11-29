@@ -9,8 +9,6 @@ class CollisionComponent : public Component
 	int meshID;
 	float boundingRadius;
 	glm::vec3 boundingBox;
-	bool updateHasBeenCalledOnce;
-	bool isNotPureSphere;
 	glm::ivec3 vonNeumannPosition;
 	int uid;
 	static int uidCounter;
@@ -18,7 +16,7 @@ class CollisionComponent : public Component
 public:
 	glm::vec3 fakePosition; // Only used for collision resolution to determine the vertices that are actually colliding
 
-	CollisionComponent() : Component() , boundingBox(0,0,0), updateHasBeenCalledOnce(false), isNotPureSphere(false)
+	CollisionComponent() : Component() , boundingBox(0,0,0)
 	{
 		componentType = COLLISION_COMPONENT;
 		uid = uidCounter++;
@@ -45,11 +43,6 @@ public:
 	glm::vec3 getBoundingBox()
 	{
 		return boundingBox;
-	}
-
-	bool getIsNotPureSphere()
-	{
-		return isNotPureSphere;
 	}
 
 	int getUid()

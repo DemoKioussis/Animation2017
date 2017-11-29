@@ -16,15 +16,19 @@ struct CollisionResult
 	CollisionComponent* c2;
 	glm::vec3 penetrationVector;
 
-	std::vector<glm::vec3> points1OC;
-	std::vector<glm::vec3> points1LC;
+	std::vector<glm::vec3> originalPoints1OC;
+	std::vector<glm::vec3> originalPoints1LC;
+	std::vector<glm::vec3> points1OC; //pa
+	std::vector<glm::vec3> points1LC; //pa  <--
 	std::vector<glm::vec3> pointsOf1Inside2OC;
-	std::vector<glm::vec3> pointsOf1Inside2LC;
+	std::vector<glm::vec3> pointsOf1Inside2LC; // transVertexB
 
-	std::vector<glm::vec3> points2OC;
-	std::vector<glm::vec3> points2LC;
+	std::vector<glm::vec3> originalPoints2OC;
+	std::vector<glm::vec3> originalPoints2LC;
+	std::vector<glm::vec3> points2OC; // pb
+	std::vector<glm::vec3> points2LC; // pb <--
 	std::vector<glm::vec3> pointsOf2Inside1OC;
-	std::vector<glm::vec3> pointsOf2Inside1LC;
+	std::vector<glm::vec3> pointsOf2Inside1LC; // transVertexA
 };
 
 class CollisionEngine : public Engine
