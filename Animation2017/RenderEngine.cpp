@@ -12,6 +12,7 @@ void RenderEngine::Initialize() {
 	RenderEngine * engine = new RenderEngine();
 	instance = engine;
 	engine->colorsSet = false;
+	engine->enable();
 }
 void RenderEngine::Clear() {
 	for (int i = 0; i < instance->sortedRenderCompoents.size(); i++) {
@@ -53,6 +54,9 @@ void RenderEngine::updateColors() {
 
 }
 void RenderEngine::drawRenderComponents() {
+
+	if (!isEnabled())
+		return;
 #ifndef USE_INSTANCING
 
 	for (int i = 0; i < targetComponents.size();i++) {
@@ -81,6 +85,7 @@ void RenderEngine::drawRenderComponents() {
 	for (int i = 0; i < renderReferences.size();i++) {
 		renderReferences[i]->draw();
 	}
+
 #endif
 }
 

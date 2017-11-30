@@ -2,23 +2,33 @@ gravity|0|-1|0
 
 0|0
 render|0|0|1
-position|7|10|0
+position|8|10|0
 physics|10|0|0|0|0.5
 scale|6|1|6
 collider
 
+0|0
+render|0|1|1
+position|0|10|0
+scale|6|1|6
+
+
 0|1
 render|1|0|0
 position|0|-5|0
-physics|0|0|0|0|0.5
+physics|0|0|0|0|1
 scale|5|10|5
 collider
+
+
+
+
 
 
 0|1
 render|0|1|0
 position|0|-25|0
-scale|100|1|100
+scale|1000|1|1000
 physics|10|0|0|0|0.75
 collider
 

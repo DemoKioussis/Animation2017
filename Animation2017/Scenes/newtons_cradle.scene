@@ -268,3 +268,16 @@ physics|-1|0|0|0|1
 collider
 
 
+0|1
+position|0|0|-5
+scale|25|25|1|
+physics|-1|0|0|0|1
+collider
+
+0|1
+position|0|0|5
+scale|25|25|1|
+physics|-1|0|0|0|1
+collider
+
+
