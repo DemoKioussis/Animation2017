@@ -1,5 +1,6 @@
 #include "SceneLoading.h"
 #include "PhysicsBuilder.h"
+#include "EntityManager.h"
 SceneLoading* SceneLoading::instance=nullptr;
 void SceneLoading::Initialize() {
 	if (instance)
@@ -39,11 +40,26 @@ void SceneLoading::Initialize() {
 	PhysicsEngine::getInstance()->meshes.push_back(sphereLR);
 	PhysicsEngine::getInstance()->meshes.push_back(sphereSky);
 	//CollisionEngine::getInstance()->addMesh(sphereHD);
+
+	Entity* skybox = new Entity(true, true);
+	//skybox->translation = glm::translate(skybox->translation, glm::vec3(0,0,0));
+
+	skybox->scale = glm::scale(skybox->scale, glm::vec3(50.0, 50.0, 50.0));
+
+	RenderComponent *rs = new RenderComponent();
+	rs->setMeshID(5);
+	skybox->addComponent(rs);
+	RenderEngine::getInstance()->addComponent(rs);
+
 }
 
- void SceneLoading::loadScene(string sceneName) {
 
-	
+ void SceneLoading::loadScene(string sceneName) {
+	 PhysicsEngine::getInstance()->disable();
+	 PhysicsEngine::getInstance()->setGravity(glm::vec3(0,-1,0), 0);
+
+
+
 	ifstream scene;
 	scene.open(sceneName);
 	if (!scene) {
@@ -52,8 +68,10 @@ void SceneLoading::Initialize() {
 	}
 	float timeScale = TimeSystem::getTimeScale();
 	TimeSystem::setTimeScale(0);
-	//float elapsedTime = glfwGetTime();
-	InputManager::Entities->clear();
+	//float elapsedTime = glfwGetTime();		
+	std::vector<Entity*> *Entities;
+	Entities = EntityManager::getInstance()->getEntities();
+	Entities->clear();
 	RenderEngine::Clear();
 	PhysicsEngine::Clear();
 	CollisionEngine::Clear();
@@ -77,7 +95,7 @@ void SceneLoading::Initialize() {
 	//skybox->addComponent(ps);
 	//PhysicsEngine::getInstance()->addComponent(ps);
 
-	InputManager::Entities->push_back(skybox);
+	EntityManager::getInstance()->add(skybox);
 	string line;
 	int currentMeshIndex;
 	Entity* e = nullptr;
@@ -95,7 +113,8 @@ void SceneLoading::Initialize() {
 			if (e!=nullptr) {//entity loaded all components/add to list
 				//std::cout << "pushed" << std::endl;
 
-				InputManager::Entities->push_back(e);
+				EntityManager::getInstance()->add(e);
+
 			}
 			Entity* etmp = new Entity(stoi(sVec[1]));
 			isStatic = stoi(sVec[1]);
@@ -103,6 +122,10 @@ void SceneLoading::Initialize() {
 			continue;
 		}
 		else {
+
+			if (sVec[0][0] == '/'&&sVec[0][1] == '/') {
+				continue;
+			}
 			//scene params
 			if (sVec[0] == "gravity") {
 				if (sVec.size() > 4) {
@@ -171,19 +194,22 @@ void SceneLoading::Initialize() {
 	if (e != nullptr) {//entity loaded all components/add to list
 		//std::cout << "pushed" << std::endl;
 
-		InputManager::Entities->push_back(e);
+		EntityManager::getInstance()->add(e);
+
 	}
 
-	for (Entity* ent : *InputManager::Entities)
+	for (Entity* ent : *EntityManager::getInstance()->getEntities())
 	{
 		ent->transform = ent->translation * ent->rotation * ent->scale;
 	}
 	//RenderEngine::getInstance()->updateColors();
 	CollisionEngine::getInstance()->updateAllBoundingBoxes(); // Can only be called after calculating the unique indices
 	
+
 	//glfwSetTime(elapsedTime);
 	TimeSystem::setTimeScale(timeScale);
 	TimeSystem::resetTime();
+
 	//return *skybox;
 }
 SceneLoading* SceneLoading::getInstance() {

@@ -31,6 +31,5 @@ public:
 	static void processInput();
 
 	static void processCameraInput();
-	static std::vector<Entity *> *Entities;
 
 };

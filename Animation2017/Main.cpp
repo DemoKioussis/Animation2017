@@ -19,7 +19,7 @@
 #include "CollisionComponent.h"
 
 #include "SceneLoading.h"
-
+#include "EntityManager.h"
 #include "Skybox.h"
 
 
@@ -112,7 +112,7 @@ int main()
 
 	camera = new Camera(windowManager);
 	camera->translate(glm::vec3(0, 0, -100));
-
+	EntityManager::Initialize();
 	InputManager::setWindow(windowManager);
 	InputManager::setCamera(camera);
 	InputManager::initialize();

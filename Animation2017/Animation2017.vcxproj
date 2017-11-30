@@ -164,6 +164,7 @@
     <ClCompile Include="CollisionEngine.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="EPA.cpp" />
     <ClCompile Include="GJK.cpp" />
     <ClCompile Include="InputManager.cpp" />
@@ -185,6 +186,7 @@
     <ClInclude Include="Component.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="EntityManager.h" />
     <ClInclude Include="EPA.h" />
     <ClInclude Include="GJK.h" />
     <ClInclude Include="GLSetup.h" />
