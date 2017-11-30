@@ -20,7 +20,7 @@ class SceneLoading
 	
 
 public:
-	void loadScene(char * sceneName);
+	void loadScene(string sceneName);
 	 static void Initialize();
 	 static SceneLoading* getInstance();
 

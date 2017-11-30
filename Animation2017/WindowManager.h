@@ -6,6 +6,7 @@
 #include "RenderEngine.h"
 #include "InputManager.h"
 
+
 class InputManager;
 
 /*
@@ -32,6 +33,16 @@ private:
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+
+		glfwWindowHint(GLFW_SAMPLES, 0);
+		glfwWindowHint(GLFW_RED_BITS, 8);
+		glfwWindowHint(GLFW_GREEN_BITS, 8);
+		glfwWindowHint(GLFW_BLUE_BITS, 8);
+		glfwWindowHint(GLFW_ALPHA_BITS, 8);
+		glfwWindowHint(GLFW_STENCIL_BITS, 8);
+		glfwWindowHint(GLFW_DEPTH_BITS, 24);
+		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+
 		// glfw window creation
 		// --------------------
 		GLFWwindow* window = glfwCreateWindow(width, height, "LearnOpenGL", NULL, NULL);
@@ -49,6 +60,9 @@ private:
 			std::cout << "Failed to initialize GLAD" << std::endl;
 		}
 		glEnable(GL_DEPTH_TEST);
+
+
+
 		return window;
 
 	}
@@ -95,7 +109,7 @@ public:
 		refreshRate = (float)1 / (float)i;
 	}
 	void clearWindow() {
-		glClearColor(backgroundColor.x, backgroundColor.y, backgroundColor.z, backgroundColor.a);
+		glClearColor(backgroundColor.x,backgroundColor.y,backgroundColor.z,backgroundColor.a);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 		
 	}
@@ -117,7 +131,7 @@ public:
 	void refreshWindow() {
 		clearWindow();
 		drawMeshes();
-		swapBuffer();
+		//swapBuffer();
 
 	}
 	// we will extend this funciton to take in multiple inputs

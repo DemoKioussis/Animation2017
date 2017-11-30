@@ -69,9 +69,6 @@
     <ClCompile Include="TimeSystem.cpp">
       <Filter>Source Files\MainSystem</Filter>
     </ClCompile>
-    <ClCompile Include="glad.c">
-      <Filter>Source Files\MainSystem</Filter>
-    </ClCompile>
     <ClCompile Include="RenderEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

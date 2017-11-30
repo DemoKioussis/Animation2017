@@ -41,19 +41,13 @@ void SceneLoading::Initialize() {
 	//CollisionEngine::getInstance()->addMesh(sphereHD);
 }
 
- void SceneLoading::loadScene(char * sceneName) {
+ void SceneLoading::loadScene(string sceneName) {
 
-	char pathfile[100];
-	strcpy_s(pathfile, "Scenes/");
-	strcat_s(pathfile, sceneName);
-	strcpy_s(pathfile, pathfile);
-
-	strcat_s(pathfile, ".scene");
-	cout << pathfile << endl;
+	
 	ifstream scene;
-	scene.open(pathfile);
+	scene.open(sceneName);
 	if (!scene) {
-		std::cout << "Unable to open scene: " << pathfile << std::endl;
+		std::cout << "Unable to open scene: " <<sceneName << std::endl;
 		return;
 	}
 	float timeScale = TimeSystem::getTimeScale();
