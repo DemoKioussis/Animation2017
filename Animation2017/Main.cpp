@@ -91,7 +91,7 @@ int main()
 	float fieldSize = 25.f;
 	TimeSystem::resetTime();
 	PhysicsEngine::getInstance()->disable();
-	SceneLoading::getInstance()->loadScene("bowl");
+	SceneLoading::getInstance()->loadScene("newtons_cradle");
 	//std::cout << "test1 "<< camera->skybox->getID() << std::endl;
 
 	glm::mat4 rotation(1.0f), projection;

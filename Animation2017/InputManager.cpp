@@ -80,6 +80,14 @@ void InputManager::key_callback(GLFWwindow* window, int key, int scancode, int a
 			CollisionEngine::getInstance()->enable();
 		}
 	}
+
+	if ((glfwGetKey(windowManager->getWindow(), GLFW_KEY_R) == GLFW_PRESS)) {
+		if (RenderEngine::getInstance()->isEnabled())
+			RenderEngine::getInstance()->disable();
+		else {
+			RenderEngine::getInstance()->enable();
+		}
+	}
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_I) == GLFW_PRESS) {
 		std::cout << "Delta time: " << TimeSystem::getPhysicsDeltaTime() << std::endl;
 	}
@@ -95,6 +103,8 @@ void InputManager::key_callback(GLFWwindow* window, int key, int scancode, int a
 
 		}
 	}
+
+
 
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
 		camera->ToggleSpeed();

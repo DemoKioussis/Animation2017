@@ -49,7 +49,7 @@ void TimeSystem::physicsStep() {
 	//lastPhysicsStep = elapsedTime;
 	//if (physicsDeltaTime > 0.0167) {
 	//	std::cout << "PROBLEM WITH DELTA TIME: " << physicsDeltaTime << std::endl;
-		physicsDeltaTime = 0.0165;
+		physicsDeltaTime = 0.0165*timeScale;
 	//}
 };
 
