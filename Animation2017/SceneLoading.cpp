@@ -1,5 +1,6 @@
 #include "SceneLoading.h"
 #include "PhysicsBuilder.h"
+#include "EntityManager.h"
 SceneLoading* SceneLoading::instance=nullptr;
 void SceneLoading::Initialize() {
 	if (instance)
@@ -72,8 +73,10 @@ void SceneLoading::Initialize() {
 	}
 	float timeScale = TimeSystem::getTimeScale();
 	TimeSystem::setTimeScale(0);
-	//float elapsedTime = glfwGetTime();
-	InputManager::Entities->clear();
+	//float elapsedTime = glfwGetTime();		
+	std::vector<Entity*> *Entities;
+	Entities = EntityManager::getInstance()->getEntities();
+	Entities->clear();
 	RenderEngine::Clear();
 	PhysicsEngine::Clear();
 	CollisionEngine::Clear();
@@ -97,7 +100,7 @@ void SceneLoading::Initialize() {
 	//skybox->addComponent(ps);
 	//PhysicsEngine::getInstance()->addComponent(ps);
 
-	InputManager::Entities->push_back(skybox);
+	EntityManager::getInstance()->add(skybox);
 	string line;
 	int currentMeshIndex;
 	Entity* e = nullptr;
@@ -115,7 +118,8 @@ void SceneLoading::Initialize() {
 			if (e!=nullptr) {//entity loaded all components/add to list
 				//std::cout << "pushed" << std::endl;
 
-				InputManager::Entities->push_back(e);
+				EntityManager::getInstance()->add(e);
+
 			}
 			Entity* etmp = new Entity(stoi(sVec[1]));
 			isStatic = stoi(sVec[1]);
@@ -195,10 +199,11 @@ void SceneLoading::Initialize() {
 	if (e != nullptr) {//entity loaded all components/add to list
 		//std::cout << "pushed" << std::endl;
 
-		InputManager::Entities->push_back(e);
+		EntityManager::getInstance()->add(e);
+
 	}
 
-	for (Entity* ent : *InputManager::Entities)
+	for (Entity* ent : *EntityManager::getInstance()->getEntities())
 	{
 		ent->transform = ent->translation * ent->rotation * ent->scale;
 	}
