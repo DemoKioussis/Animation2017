@@ -39,6 +39,17 @@ void SceneLoading::Initialize() {
 	PhysicsEngine::getInstance()->meshes.push_back(sphereLR);
 	PhysicsEngine::getInstance()->meshes.push_back(sphereSky);
 	//CollisionEngine::getInstance()->addMesh(sphereHD);
+
+	Entity* skybox = new Entity(true, true);
+	//skybox->translation = glm::translate(skybox->translation, glm::vec3(0,0,0));
+
+	skybox->scale = glm::scale(skybox->scale, glm::vec3(50.0, 50.0, 50.0));
+
+	RenderComponent *rs = new RenderComponent();
+	rs->setMeshID(5);
+	skybox->addComponent(rs);
+	RenderEngine::getInstance()->addComponent(rs);
+
 }
 
  void SceneLoading::loadScene(char * sceneName) {
