@@ -42,6 +42,8 @@ void SceneLoading::Initialize() {
 }
 
  void SceneLoading::loadScene(char * sceneName) {
+	 PhysicsEngine::getInstance()->disable();
+	 PhysicsEngine::getInstance()->setGravity(glm::vec3(0,-1,0), 0);
 
 	char pathfile[100];
 	strcpy_s(pathfile, "Scenes/");
@@ -49,6 +51,7 @@ void SceneLoading::Initialize() {
 	strcpy_s(pathfile, pathfile);
 
 	strcat_s(pathfile, ".scene");
+
 	cout << pathfile << endl;
 	ifstream scene;
 	scene.open(pathfile);
@@ -187,9 +190,11 @@ void SceneLoading::Initialize() {
 	//RenderEngine::getInstance()->updateColors();
 	CollisionEngine::getInstance()->updateAllBoundingBoxes(); // Can only be called after calculating the unique indices
 	
+
 	//glfwSetTime(elapsedTime);
 	TimeSystem::setTimeScale(timeScale);
 	TimeSystem::resetTime();
+
 	//return *skybox;
 }
 SceneLoading* SceneLoading::getInstance() {
