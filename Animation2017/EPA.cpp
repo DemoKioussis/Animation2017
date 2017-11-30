@@ -51,6 +51,10 @@ glm::vec3 EPA::getPenetrationVector()
 		}
 	}
 
+	for (size_t i = 0; i < faces.size(); i++)
+	{
+		delete faces[i];
+	}
 	return glm::vec3();
 }
 
