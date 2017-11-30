@@ -112,6 +112,10 @@ void SceneLoading::Initialize() {
 			continue;
 		}
 		else {
+
+			if (sVec[0][0] == '/'&&sVec[0][1] == '/') {
+				continue;
+			}
 			//scene params
 			if (sVec[0] == "gravity") {
 				if (sVec.size() > 4) {
