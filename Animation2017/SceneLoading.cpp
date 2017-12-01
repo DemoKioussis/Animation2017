@@ -148,6 +148,16 @@ void SceneLoading::Initialize() {
 			if (sVec[0] == "scale") {//scale
 				e->scale = glm::scale(e->scale, glm::vec3(stof(sVec[1]), stof(sVec[2]), stof(sVec[3])));
 			}
+			if (sVec[0] == "rotation") {//scale
+				//e->rotation = glm::eulerAngleYXZ(stof(sVec[2]), stof(sVec[1]), stof(sVec[3]));
+				glm::quat tmpQuat;
+				tmpQuat.x = stof(sVec[1]);
+				tmpQuat.y = stof(sVec[2]);
+				tmpQuat.z = stof(sVec[3]);
+				tmpQuat.w = stof(sVec[4]);
+
+				e->rotation = glm::toMat4(tmpQuat);
+			}
 			if (sVec[0] == "render") {//render
 				//std::cout << "render" << std::endl;
 				RenderComponent *r = new RenderComponent();
