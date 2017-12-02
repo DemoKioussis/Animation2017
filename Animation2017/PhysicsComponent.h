@@ -62,13 +62,24 @@ public:
 
 	};
 	~PhysicsComponent() {};
-
+	void setVelocity(glm::vec3 vel) {
+		velocity = vel;
+	 }
+	glm::vec3 getAngularVelocity() {
+		return angularVelocity;
+	}
+	glm::vec3 getVeloctiy() {
+		return velocity;
+	}
 	void setMass(float _mass) {
 		mass = _mass;
 		massInverse = 1 / _mass;
 		if (isStatic) {
 			massInverse = 0;
 		}
+	}
+	float getMass() {
+		return mass;
 	}
 	void setMomentOfInertia(glm::mat4 _moment) {
 		momentOfInertia = _moment;
@@ -114,5 +125,11 @@ public:
 	}
 	void setCoeffOfRestitution(float cr) {
 		coeffOfRestitution = cr;
+	}
+	glm::vec3 getForce() {
+		return netForce;
+	}
+	float getCoeffOfRestitution() {
+		return coeffOfRestitution;
 	}
 };

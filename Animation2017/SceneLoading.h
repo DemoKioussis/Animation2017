@@ -6,6 +6,7 @@
 #include "PhysicsComponent.h"
 #include "CollisionEngine.h"
 #include "CollisionComponent.h"
+#include "Component.h";
 #include "InputManager.h"
 #include "TimeSystem.h"
 #include <GLFW\glfw3.h>
@@ -22,6 +23,7 @@ class SceneLoading
 
 public:
 	void loadScene(char * sceneName);
+	void saveScene(char * sceneName);
 	 static void Initialize();
 	 static SceneLoading* getInstance();
 

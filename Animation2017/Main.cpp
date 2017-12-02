@@ -59,7 +59,7 @@ int main()
 	RenderEngine::getInstance()->setShader(&shaderProg);
 
 	PhysicsEngine::Initialize();
-	PhysicsEngine::getInstance()->setGravity(glm::vec3(0, -1, 0),0);
+	PhysicsEngine::getInstance()->setGravity(glm::vec3(0, 0, 0),0);
 
 	CollisionEngine::Initialize();
 

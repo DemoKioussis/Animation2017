@@ -3,15 +3,19 @@
 #include "iostream"
 
 int Entity::idCounter = 0;
-Entity::Entity(bool _isStatic) : isStaticEntity(_isStatic)
+Entity::Entity(bool _isStatic, int _meshID)
 {
+	isStaticEntity = _isStatic;
 	id = idCounter++;
 	transform = glm::mat4(1.0f);
 	scale = glm::mat4(1.0f);
 	rotation = glm::mat4(1.0f);
 	translation = glm::mat4(1.0f);
+	meshID = _meshID;
 }
-
+int Entity::getMeshID() {
+	return meshID;
+}
 Entity::Entity(bool _isStatic, bool _isSkybox)
 {
 	isSkyboxEntity = _isSkybox;

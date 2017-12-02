@@ -242,6 +242,14 @@ void InputManager::processInput() {
 		SceneLoading::getInstance()->loadScene(sceneName);
 
 	}
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_J) == GLFW_PRESS) {
+		//save
+		std::cout << "Enter scene name you want to save (no extensions)" << std::endl;
+		char* sceneName = new char[100];
+		std::cin >> sceneName;
+		SceneLoading::getInstance()->saveScene(sceneName);
+
+	}
 }
 void InputManager::updateSkybox() {
 	glm::mat4 viewMat = camera->GetViewMatrix();

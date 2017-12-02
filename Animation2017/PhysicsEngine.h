@@ -18,14 +18,15 @@ public:
 	static PhysicsEngine * getInstance();
 	void updatePhysics();
 	void applyPhysics();
-
+	glm::vec3 getForce(PhysicsComponent* _component);
 	void addAttractor(PhysicsComponent* _component);
 	void setGravity(glm::vec3 _dir, float _mag);
 	glm::vec3 getGravity();
 	void step();
 	void addForce(PhysicsComponent* _component, glm::vec3 _force, glm::vec3 _position);
 	float updateTime;
-
+	void setVelocity(PhysicsComponent* _component);
+	void addTorque(PhysicsComponent* _component, glm::vec3 torque);
 private:
 	static PhysicsEngine* instance;
 
@@ -33,7 +34,6 @@ private:
 	void addAttractiveForces(PhysicsComponent* _component);
 	void setAcceleration(PhysicsComponent* _component);
 	void setMomentum(PhysicsComponent* _component);
-	void setVelocity(PhysicsComponent* _component);
 	void resolveCollisions();
 	glm::vec3 getImpulse(glm::vec3 & _rA, glm::vec3 & _rB, float _vRel, PhysicsComponent & _physA, PhysicsComponent & _physB,
 		float _massInverseSum,glm::vec3 & _penVector, glm::vec3 & _normalizePenVector, float _coeffOfRestitution, int _numPoints);
