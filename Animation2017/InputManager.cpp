@@ -6,13 +6,12 @@
 #include "PhysicsEngine.h"
 #include "Entity.h"
 #include "SceneLoading.h"
-
+#include "EntityManager.h"
 Camera* InputManager::camera = nullptr;
 WindowManager* InputManager::windowManager = nullptr;
 GLboolean InputManager::firstMouse = false;
 GLfloat InputManager::lastX = 0;
 GLfloat InputManager::lastY = 0;
-std::vector<Entity*> *InputManager::Entities =new std::vector<Entity*>();
 
 void InputManager::initialize() {
 	if (windowManager != nullptr) {
@@ -93,6 +92,8 @@ void InputManager::key_callback(GLFWwindow* window, int key, int scancode, int a
 	}
 
 	if ((glfwGetKey(windowManager->getWindow(), GLFW_KEY_K) == GLFW_PRESS) ) {
+		std::vector<Entity*> *Entities;
+		Entities= EntityManager::getInstance()->getEntities();
 		for (int i = 0; i < Entities->size();i++) {
 			auto e = (Entities->at(i));
 			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
@@ -175,6 +176,8 @@ void InputManager::processInput() {
 	glm::vec3 z(0, 0, 1);
 
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_5) == GLFW_PRESS) {
+		std::vector<Entity*> *Entities;
+		Entities = EntityManager::getInstance()->getEntities();
 		for (int i = 0; i < Entities->size();i++) {
 			auto e = (Entities->at(i));
 			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
@@ -184,6 +187,8 @@ void InputManager::processInput() {
 		}
 	}
 	if ((glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_8) == GLFW_PRESS) || (glfwGetKey(windowManager->getWindow(), GLFW_KEY_8) == GLFW_PRESS)) {
+		std::vector<Entity*> *Entities;
+		Entities = EntityManager::getInstance()->getEntities();
 		for (int i = 0; i < Entities->size();i++) {
 			auto e = (Entities->at(i));
 			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
@@ -193,6 +198,8 @@ void InputManager::processInput() {
 		}
 	}
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_4) == GLFW_PRESS) {
+		std::vector<Entity*> *Entities;
+		Entities = EntityManager::getInstance()->getEntities();
 		for (int i = 0; i < Entities->size();i++) {
 			auto e = (Entities->at(i));
 			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
@@ -201,6 +208,8 @@ void InputManager::processInput() {
 		}
 	}
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_6) == GLFW_PRESS) {
+		std::vector<Entity*> *Entities;
+		Entities = EntityManager::getInstance()->getEntities();
 		for (int i = 0; i < Entities->size();i++) {
 			auto e = (Entities->at(i));
 			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
@@ -210,6 +219,8 @@ void InputManager::processInput() {
 	}
 
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_9) == GLFW_PRESS) {
+		std::vector<Entity*> *Entities;
+		Entities = EntityManager::getInstance()->getEntities();
 		for (int i = 0; i < Entities->size();i++) {
 			auto e = (Entities->at(i));
 			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
@@ -219,6 +230,8 @@ void InputManager::processInput() {
 		}
 	}
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_7) == GLFW_PRESS) {
+		std::vector<Entity*> *Entities;
+		Entities = EntityManager::getInstance()->getEntities();
 		for (int i = 0; i < Entities->size();i++) {
 			auto e = (Entities->at(i));
 			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
@@ -241,6 +254,14 @@ void InputManager::processInput() {
 		SceneLoading::getInstance()->loadScene(sceneName);
 
 	}
+	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_J) == GLFW_PRESS) {
+		//save
+		std::cout << "Enter scene name you want to save (no extensions)" << std::endl;
+		char* sceneName = new char[100];
+		std::cin >> sceneName;
+		SceneLoading::getInstance()->saveScene(sceneName);
+
+	}
 }
 void InputManager::updateSkybox() {
 	glm::mat4 viewMat = camera->GetViewMatrix();
@@ -253,6 +274,8 @@ void InputManager::updateSkybox() {
 	viewMat[1][2] = 0;
 	viewMat[2][0] = 0;
 	viewMat[2][1] = 0;
+	std::vector<Entity*> *Entities;
+	Entities = EntityManager::getInstance()->getEntities();
 	Entities->at(0)->translation = viewMat;
 }
 void InputManager::processCameraInput() {

@@ -6,6 +6,7 @@
 #include "PhysicsComponent.h"
 #include "CollisionEngine.h"
 #include "CollisionComponent.h"
+#include "Component.h";
 #include "InputManager.h"
 #include "TimeSystem.h"
 #include <GLFW\glfw3.h>
@@ -15,12 +16,14 @@
 #include <string>
 #include "splitstring.h"
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
 class SceneLoading
 {
 	
 
 public:
 	void loadScene(char * sceneName);
+	void saveScene(char * sceneName);
 	 static void Initialize();
 	 static SceneLoading* getInstance();
 

@@ -13,7 +13,7 @@ class TimeSystem {
 	static float frameDeltaTime;
 	static float physicsDeltaTime;
 	static float timeScale;
-
+	static float physicsTimeFactor;
 	static int fpsCounter;
 	static float fpsTracker;
 public:
@@ -33,4 +33,5 @@ public:
 
 	static void setTimeScale(float t);
 	static const float getTimeScale();
+	static float getPhysicsTimeFactor();
 };

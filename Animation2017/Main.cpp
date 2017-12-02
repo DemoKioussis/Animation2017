@@ -19,7 +19,7 @@
 #include "CollisionComponent.h"
 
 #include "SceneLoading.h"
-
+#include "EntityManager.h"
 #include "Skybox.h"
 /**
 This class right now just sets thigns up, ideally by the end of this it would be a list of settings and nothing else
@@ -48,7 +48,7 @@ int main()
 
 	camera = new Camera(windowManager);
 	camera->translate(glm::vec3(0, 0, -100));
-
+	EntityManager::Initialize();
 	InputManager::setWindow(windowManager);
 	InputManager::setCamera(camera);
 	InputManager::initialize();
@@ -59,7 +59,7 @@ int main()
 	RenderEngine::getInstance()->setShader(&shaderProg);
 
 	PhysicsEngine::Initialize();
-	PhysicsEngine::getInstance()->setGravity(glm::vec3(0, -1, 0),0);
+	PhysicsEngine::getInstance()->setGravity(glm::vec3(0, 0, 0),0);
 
 	CollisionEngine::Initialize();
 
