@@ -105,6 +105,8 @@ void InputManager::key_callback(GLFWwindow* window, int key, int scancode, int a
 		}
 	}
 	if ((glfwGetKey(windowManager->getWindow(), GLFW_KEY_B) == GLFW_PRESS)) {
+		std::vector<Entity*> *Entities;
+		Entities = EntityManager::getInstance()->getEntities();
 		for (int i = 0; i < Entities->size();i++) {
 			auto e = (Entities->at(i));
 			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
