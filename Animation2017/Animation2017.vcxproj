@@ -167,17 +167,20 @@
     <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="EPA.cpp" />
     <ClCompile Include="GJK.cpp" />
+    <ClCompile Include="GUIManager.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="objloader.cpp" />
     <ClCompile Include="PhysicsEngine.cpp" />
+    <ClCompile Include="PhysicsSimulation.cpp" />
     <ClCompile Include="RenderEngine.cpp" />
     <ClCompile Include="SceneLoading.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="splitstring.cpp" />
     <ClCompile Include="TimeSystem.cpp" />
+    <ClCompile Include="WindowRender.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
@@ -190,12 +193,14 @@
     <ClInclude Include="EPA.h" />
     <ClInclude Include="GJK.h" />
     <ClInclude Include="GLSetup.h" />
+    <ClInclude Include="GUIManager.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="objloader.hpp" />
     <ClInclude Include="PhysicsBuilder.h" />
     <ClInclude Include="PhysicsComponent.h" />
     <ClInclude Include="PhysicsEngine.h" />
+    <ClInclude Include="PhysicsSimulation.h" />
     <ClInclude Include="RenderComponent.h" />
     <ClInclude Include="RenderEngine.h" />
     <ClInclude Include="SceneLoading.h" />
@@ -205,6 +210,7 @@
     <ClInclude Include="TimeSystem.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="WindowManager.h" />
+    <ClInclude Include="WindowRender.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderSources\frag.fs" />

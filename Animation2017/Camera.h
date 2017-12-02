@@ -12,7 +12,7 @@
 // Default camera values
 const float YAW        =  90.0f;
 const float PITCH      =  0.0f;
-const float MAX_SPEED  =  40.0f;
+const float MAX_CAMERA_SPEED  =  40.0f;
 const float MIN_SPEED  =  5.0f;
 const float SENSITIVTY =  0.1f;
 const float ZOOM       =  45.0f;
@@ -41,7 +41,7 @@ public:
 
     // Constructor with vectors
 	
-    Camera(WindowManager* windowManager, glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH) : Front(glm::vec3(1.0f, 0.0f, 0.0f)), MovementSpeed(MAX_SPEED), MouseSensitivity(SENSITIVTY), Zoom(ZOOM), windowManager(windowManager), fps_mode_enabled(false)
+    Camera(WindowManager* windowManager, glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH) : Front(glm::vec3(1.0f, 0.0f, 0.0f)), MovementSpeed(MAX_CAMERA_SPEED), MouseSensitivity(SENSITIVTY), Zoom(ZOOM), windowManager(windowManager), fps_mode_enabled(false)
     {
         Position = position;
         WorldUp = up;
@@ -50,7 +50,7 @@ public:
         updateCameraVectors();
     }
     // Constructor with scalar values
-    Camera(WindowManager* windowManager, float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(MAX_SPEED), MouseSensitivity(SENSITIVTY), Zoom(ZOOM), windowManager(windowManager), fps_mode_enabled(false)
+    Camera(WindowManager* windowManager, float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(MAX_CAMERA_SPEED), MouseSensitivity(SENSITIVTY), Zoom(ZOOM), windowManager(windowManager), fps_mode_enabled(false)
     {
         Position = glm::vec3(posX, posY, posZ);
         WorldUp = glm::vec3(upX, upY, upZ);
@@ -104,10 +104,10 @@ public:
 	}
 
 	void ToggleSpeed() {
-		if (MovementSpeed == MAX_SPEED)
+		if (MovementSpeed == MAX_CAMERA_SPEED)
 			MovementSpeed = MIN_SPEED;
 		else
-			MovementSpeed = MAX_SPEED;
+			MovementSpeed = MAX_CAMERA_SPEED;
 	
 	}
     // Processes input received from a mouse input system. Expects the offset value in both the x and y direction.

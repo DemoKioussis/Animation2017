@@ -163,6 +163,7 @@ void InputManager::processInput() {
 	glm::vec3 y(0, 1, 0);
 	glm::vec3 z(0, 0, 1);
 
+
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_5) == GLFW_PRESS) {
 		std::vector<Entity*> *Entities;
 		Entities = EntityManager::getInstance()->getEntities();
