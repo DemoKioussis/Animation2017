@@ -14,7 +14,6 @@
 #define MIN_ENERGY 0.05f
 #define epsilon 1E-6f
 PhysicsEngine* PhysicsEngine::instance = 0;
-
 #pragma region initialization
  void PhysicsEngine::Initialize() {
 	 if (instance)
@@ -92,6 +91,12 @@ void PhysicsEngine::applyPhysics() {
 void PhysicsEngine::addForce(PhysicsComponent* _component, glm::vec3 force,glm::vec3 position) {
 	_component->netForce += force;
 	_component->netTorque += glm::cross(position, force);
+}
+void PhysicsEngine::addTorque(PhysicsComponent* _component, glm::vec3 torque) {
+	_component->netTorque += torque;
+}
+glm::vec3 PhysicsEngine::getForce(PhysicsComponent* _component) {
+	return _component->netForce;
 }
 void PhysicsEngine::addGravity(PhysicsComponent* _component) {
 	_component->netForce += gravity*_component->gravityMultiplyer*_component->mass;

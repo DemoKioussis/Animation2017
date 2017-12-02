@@ -14,7 +14,8 @@ public:
 	glm::mat4 scale;
 	glm::mat4 inverseRotation;
 
-	Entity(bool _isStatic);
+	Entity(bool _isStatic,int _meshID);
+
 	Entity(bool _isStatic,bool skybox);
 
 	~Entity();
@@ -24,9 +25,11 @@ public:
 	const int getID();
 	bool isStatic();
 	bool isSkybox();
+	int getMeshID();
 private:
 	static int idCounter;
 	int id;
 	bool isStaticEntity;
 	bool isSkyboxEntity;
+	int meshID;
 };

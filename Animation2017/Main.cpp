@@ -6,6 +6,7 @@
 int main()
 {
 
+
 	PhysicsSimulation::Initialize();
 
 #pragma region mainLoop

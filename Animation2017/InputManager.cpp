@@ -235,14 +235,7 @@ void InputManager::processInput() {
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_KP_2) == GLFW_PRESS) {
 		TimeSystem::setTimeScale(TimeSystem::getTimeScale() + 0.01f);
 	}
-	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_L) == GLFW_PRESS) {
-		//load
-		std::cout << "Enter scene name you want to load (no extensions)" << std::endl;
-		char* sceneName= new char[100];
-		std::cin >> sceneName;
-		SceneLoading::getInstance()->loadScene(sceneName);
 
-	}
 }
 void InputManager::updateSkybox() {
 	glm::mat4 viewMat = camera->GetViewMatrix();

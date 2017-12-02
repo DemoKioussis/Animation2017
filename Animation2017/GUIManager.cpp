@@ -36,7 +36,8 @@ void GUIManager::createMainMenuWindow()
 
 	});
 	Button *bMainNew = new Button(mainMenuWindow, "Create New Scene", ENTYPO_ICON_BRUSH);
-	bMainNew->setCallback([&] {isNewScene = true;	 isOnEdit = true;	});
+	bMainNew->setCallback([&] {isNewScene = true;	 isOnEdit = true;	//PhysicsEngine::getInstance()->setGravity(glm::vec3(0.0f, -1.0f,0.0f), 9.8f);
+});
 
 
 }
@@ -51,7 +52,7 @@ void GUIManager::createEditorWindow()
 	engineEditorWindow->setTooltip("Allows user to edit scene, play out the scene and save the scene");
 	Button *bEditorPlay = new Button(engineEditorWindow, "Play", ENTYPO_ICON_CONTROLLER_PLAY);
 	bEditorPlay->setFlags(Button::RadioButton);
-	bEditorPlay->setCallback([&] {isOnEdit = false; });
+	bEditorPlay->setCallback([&] {isOnEdit = false;	TimeSystem::resetTime(); });
 	Button *bEditorEdit = new Button(engineEditorWindow, "Edit", ENTYPO_ICON_EDIT);
 	bEditorEdit->setFlags(Button::RadioButton);
 	bEditorEdit->setPushed(true);
@@ -72,11 +73,22 @@ void GUIManager::createEditorWindow()
 	});
 	Button *bEditorSave = new Button(engineEditorWindow, "Save", ENTYPO_ICON_SAVE);
 	//THIS RETURNS THE FILE DESTINATION OF WHERE I DECIDED TO PUT THE FILE
-	bEditorSave->setCallback([&] {  cout << "File dialog result: " << file_dialog(
-	{ { "scene", "Scene Engine Parser File" } }, true) << endl;
+	bEditorSave->setCallback([&] {
+		string savedFileName = file_dialog(
+		{ { "scene", "Scene Engine Parser File" } }, true);
 
-	//IF FILE SAVING WAS SUCCESFUL
-	MessageDialog *dlg = new MessageDialog(PhysicsSimulation::getScreen(), MessageDialog::Type::Information, "File", "Your scene has been successfully saved.");
+		if (savedFileName != "")
+		{
+			MessageDialog *dlg = new MessageDialog(PhysicsSimulation::getScreen(), MessageDialog::Type::Information, "File", "Your scene has been successfully saved.");
+			SceneLoading::getInstance()->saveScene(savedFileName);
+		}
+		else
+		{
+			MessageDialog *dlg = new MessageDialog(PhysicsSimulation::getScreen(), MessageDialog::Type::Warning, "File", "Your scene has not been saved!");
+		}
+	
+
+	
 
 
 	});
@@ -245,6 +257,89 @@ void GUIManager::createTransformPopUpWindow()
 
 }
 
+void GUIManager::createPhysicsPopUpWindow()
+{
+	popupBtnForce = new PopupButton(gameObjectInspectorWindow, "Force", ENTYPO_ICON_EXPORT);
+	popupF = popupBtnForce->popup();
+	popupF->setLayout(new GridLayout(Orientation::Horizontal, 6,
+		Alignment::Middle, 15, 6));
+	popupF->setTooltip("Change the Force of the current GameObject.");
+
+
+	new Label(popupF, " Apply Force X");
+	forceBoxX = new FloatBox<float>(popupF);
+	forceBoxX->setEditable(true);
+	forceBoxX->setFixedSize(Vector2i(100, 20));
+	forceBoxX->setValue(0);
+	forceBoxX->setDefaultValue("0");
+	forceBoxX->setFontSize(16);
+	forceBoxX->setSpinnable(true);
+	forceBoxX->setValueIncrement(.5);
+	forceBoxX->setCallback([&](float x) {  gameObjectForceX = x; modifyCurrentEntity(); });
+
+	new Label(popupF, " Apply Force  Y");
+	forceBoxY = new FloatBox<float>(popupF);
+	forceBoxY->setEditable(true);
+	forceBoxY->setFixedSize(Vector2i(100, 20));
+	forceBoxY->setValue(0);
+	forceBoxY->setDefaultValue("0");
+	forceBoxY->setFontSize(16);
+	forceBoxY->setSpinnable(true);
+	forceBoxY->setValueIncrement(.5);
+	forceBoxY->setCallback([&](float y) {  gameObjectForceY = y; modifyCurrentEntity(); });
+
+	new Label(popupF, " Apply Force  Z");
+	forceBoxZ = new FloatBox<float>(popupF);
+	forceBoxZ->setEditable(true);
+	forceBoxZ->setFixedSize(Vector2i(100, 20));
+	forceBoxZ->setValue(0);
+	forceBoxZ->setDefaultValue("0");
+	forceBoxZ->setFontSize(16);
+	forceBoxZ->setSpinnable(true);
+	forceBoxZ->setValueIncrement(.5);
+	forceBoxY->setCallback([&](float z) {  gameObjectForceY = z; modifyCurrentEntity(); });
+
+
+	new Label(popupF, "Mass");
+	massBox = new FloatBox<float>(popupF);
+	massBox->setEditable(true);
+	massBox->setFixedSize(Vector2i(100, 20));
+	massBox->setValue(0);
+	massBox->setDefaultValue("0");
+	massBox->setFontSize(16);
+	massBox->setSpinnable(true);
+	massBox->setMinValue(0);
+	massBox->setFormat("[0-9]*\\.?[0-9]+");
+	massBox->setValueIncrement(1);
+	massBox->setCallback([&](float m) {  if (m <= 0.1)m = .1; gameObjectMass = m; modifyCurrentEntity(); });
+
+	new Label(popupF, "Bounciness");
+	bouncinessBox = new FloatBox<float>(popupF);
+	bouncinessBox->setEditable(true);
+	bouncinessBox->setFixedSize(Vector2i(100, 20));
+	bouncinessBox->setValue(0);
+	bouncinessBox->setDefaultValue("0");
+	bouncinessBox->setFontSize(16);
+	bouncinessBox->setSpinnable(true);
+	bouncinessBox->setMinValue(0);
+	bouncinessBox->setFormat("[0-9]*\\.?[0-9]+");
+	bouncinessBox->setValueIncrement(.1);
+	bouncinessBox->setCallback([&](float b) {  gameObjectBounciness = b; modifyCurrentEntity(); });
+
+	staticCheckBox = new CheckBox(popupF, "Static");
+	staticCheckBox->setFontSize(16);
+	staticCheckBox->setChecked(false);
+	staticCheckBox->setTooltip("Allow the GameObject to stay in place");
+	staticCheckBox->setCallback([&](bool state)
+	{
+		isGameObjectStatic = state;
+		modifyCurrentEntity();
+	});
+
+
+
+}
+
 
 void GUIManager::createInspectorWindow()
 {
@@ -283,69 +378,11 @@ void GUIManager::createInspectorWindow()
 	cb2->setTooltip("Turn on and off the physics component.");
 	cb->setCallback([&](bool state)
 	{
-		isPhysicsComponentOn = true;
+		isPhysicsComponentOn = state;
 		modifyCurrentEntity();
 	});
-	PopupButton *popupBtnForce = new PopupButton(gameObjectInspectorWindow, "Force", ENTYPO_ICON_EXPORT);
-	Popup *popupF = popupBtnForce->popup();
-	popupF->setLayout(new GridLayout(Orientation::Horizontal, 6,
-		Alignment::Middle, 15, 6));
-	popupF->setTooltip("Change the Force of the current GameObject.");
-	new Label(popupF, " Apply Force X");
-	auto intBox10 = new FloatBox<float>(popupF);
-	intBox10->setEditable(true);
-	intBox10->setFixedSize(Vector2i(100, 20));
-	intBox10->setValue(0);
-	intBox10->setDefaultValue("0");
-	intBox10->setFontSize(16);
-	intBox10->setSpinnable(true);
-	intBox10->setValueIncrement(.5);
-	new Label(popupF, " Apply Force  Y");
-	auto intBox11 = new FloatBox<float>(popupF);
-	intBox11->setEditable(true);
-	intBox11->setFixedSize(Vector2i(100, 20));
-	intBox11->setValue(0);
-	intBox11->setDefaultValue("0");
-	intBox11->setFontSize(16);
-	intBox11->setSpinnable(true);
-	intBox11->setValueIncrement(.5);
-	new Label(popupF, " Apply Force  Z");
-	auto intBox12 = new FloatBox<float>(popupF);
-	intBox12->setEditable(true);
-	intBox12->setFixedSize(Vector2i(100, 20));
-	intBox12->setValue(0);
-	intBox12->setDefaultValue("0");
-	intBox12->setFontSize(16);
-	intBox12->setSpinnable(true);
-	intBox12->setValueIncrement(.5);
-	new Label(popupF, "Mass");
-	auto intBox13 = new FloatBox<float>(popupF);
-	intBox13->setEditable(true);
-	intBox13->setFixedSize(Vector2i(100, 20));
-	intBox13->setValue(0);
-	intBox13->setDefaultValue("0");
-	intBox13->setFontSize(16);
-	intBox13->setSpinnable(true);
-	intBox13->setMinValue(0);
-	intBox13->setFormat("[0-9]*\\.?[0-9]+");
-	intBox13->setValueIncrement(1);
-	new Label(popupF, "Bounciness");
-	auto intBox14 = new FloatBox<float>(popupF);
-	intBox14->setEditable(true);
-	intBox14->setFixedSize(Vector2i(100, 20));
-	intBox14->setValue(0);
-	intBox14->setDefaultValue("0");
-	intBox14->setFontSize(16);
-	intBox14->setSpinnable(true);
-	intBox14->setMinValue(0);
-	intBox14->setFormat("[0-9]*\\.?[0-9]+");
-	intBox14->setValueIncrement(.1);
-	CheckBox *cbs = new CheckBox(popupF, "Static");
-	cbs->setFontSize(16);
-	cbs->setChecked(false);
-	cbs->setTooltip("Allow the GameObject to stay in place");
 
-
+	createPhysicsPopUpWindow();
 
 	new Label(gameObjectInspectorWindow, "Collision Properties", "sans");
 	cb3 = new CheckBox(gameObjectInspectorWindow, "Collision Component");
@@ -372,8 +409,6 @@ void GUIManager::createInspectorWindow()
 }
 
 
-
-
 GUIManager::GUIManager()
 {
 
@@ -383,8 +418,6 @@ GUIManager::GUIManager()
 	createInspectorWindow();
 
 }
-
-
 
 
 
@@ -403,7 +436,10 @@ void GUIManager::interactWithGUI()
 	{
 		gameObjectInstantiationWindow->setVisible(false);
 		gameObjectInspectorWindow->setVisible(false);
+	
 		PhysicsEngine::getInstance()->enable();
+	
+
 	}
 
 	if (isNewScene)
@@ -419,9 +455,8 @@ void GUIManager::interactWithGUI()
 void GUIManager::instantiateGameObject(glm::vec3 col, int shape)
 {
 
-	eGameObject = new Entity(true);
+	eGameObject = new Entity(true,shape);
 	rGameObject = new RenderComponent();
-	rGameObject->setMeshID(shape);
 	rGameObject->setColor(col);
 	rGameObject->enable();
 	RenderEngine::getInstance()->addComponent(rGameObject);
@@ -452,7 +487,7 @@ void GUIManager::instantiateGameObject(glm::vec3 col, int shape)
 	//Add To EntityManager;
 	EntityManager::getInstance()->add(eGameObject);
 
-	updateButtons();
+
 }
 
 
@@ -473,6 +508,13 @@ void GUIManager::updateButtons()
 	scaleBoxX->setValue(gameObjectScaleX);
 	scaleBoxY->setValue(gameObjectScaleY);
 	scaleBoxZ->setValue(gameObjectScaleZ);
+
+	forceBoxX->setValue(gameObjectForceX);
+	forceBoxY->setValue(gameObjectForceY);
+	forceBoxZ->setValue(gameObjectForceZ);
+
+	staticCheckBox->setChecked(isGameObjectStatic);
+	massBox->setValue(gameObjectMass);
 }
 
 void GUIManager::updateCurrentEntity()
@@ -498,12 +540,20 @@ void GUIManager::updateCurrentEntity()
 	gameObjectRotY = degrees(-tmp.y);
 	gameObjectRotZ = degrees(tmp.z);
 
-
-
 	gameObjectScaleX = eGameObject->scale[0][0];
 	gameObjectScaleY = eGameObject->scale[1][1];
 	gameObjectScaleZ = eGameObject->scale[2][2];
 
+	glm::vec3 temp = pGameObject->getForce();
+	gameObjectForceX = temp.x;
+	gameObjectForceY = temp.y;
+	gameObjectForceZ = temp.z;
+
+	gameObjectBounciness = pGameObject->getCoeffOfRestitution();
+
+	isGameObjectStatic = pGameObject->getIsStatic();
+
+	gameObjectMass = pGameObject->getMass();
 
 }
 
@@ -591,7 +641,7 @@ void GUIManager::modifyCurrentEntity()
 		eGameObject->rotation = glm::toMat4(tmpQuat);
 		eGameObject->transform = eGameObject->translation * eGameObject->rotation * eGameObject->scale;
 
-		//ROTATION
+		//SCALE
 		eGameObject->translation = glm::scale(eGameObject->translation, glm::vec3(gameObjectScaleX / gameObjectScaleOldX, gameObjectScaleY / gameObjectScaleOldY, gameObjectScaleZ / gameObjectScaleOldZ));
 		eGameObject->transform = eGameObject->translation * eGameObject->rotation * eGameObject->scale;
 		gameObjectScaleOldX = gameObjectScaleX;
@@ -599,10 +649,26 @@ void GUIManager::modifyCurrentEntity()
 		gameObjectScaleOldZ = gameObjectScaleZ;
 
 
+		//FORCE
+		//HOW TO STOP FORCE?
+		//FORCE KEEPS GETTING APPLIED WHEN HITTING ANY BUTTON
+		PhysicsEngine::getInstance()->addForce(pGameObject, glm::vec3(gameObjectForceX, gameObjectForceY, gameObjectForceZ), glm::vec3(gameObjectPosX, gameObjectPosY, gameObjectPosZ));
+		
 
 
+		//MASS
+		pGameObject->setMass(gameObjectMass);
+
+		//BOUNCINESS
+		pGameObject->setCoeffOfRestitution(gameObjectBounciness);
+
+		//ISSTATIC
+		//MIGHT BE ACTING WEIRD?
+		pGameObject->setStatic(isGameObjectStatic);
 
 
+		PhysicsEngine::getInstance()->addComponent(pGameObject);
+		
 	}
 
 }

@@ -37,6 +37,7 @@ public:
 	void createInstantiationWindow();
 
 	void createTransformPopUpWindow();
+	void createPhysicsPopUpWindow();
 
 	void updateButtons();
 	void updateCurrentEntity();
@@ -49,7 +50,7 @@ private:
 	GUIManager();
 
 
-	//GUI INSPECTOR
+	//GUI INSPECTOR VALUES
 	bool isRenderComponentOn = true;
 	bool isPhysicsComponentOn = true;
 	bool isCollisionComponentOn = true;
@@ -79,6 +80,14 @@ private:
 	double gameObjectForceX = 0;
 	double gameObjectForceY = 0;
 	double gameObjectForceZ = 0;
+
+	double gameObjectOldForceX = 0;
+	double gameObjectOldForceY = 0;
+	double gameObjectOldForceZ = 0;
+
+	double gameObjectMass = 1;
+	bool isGameObjectStatic = false;
+	double gameObjectBounciness = 0;
 
 	std::string savedSceneName = "Scene 0";
 	std::string currentGameObjectName = "GameObject 0";
@@ -112,6 +121,21 @@ private:
 	FloatBox<float>* scaleBoxX;
 	FloatBox<float>* scaleBoxY;
 	FloatBox<float>* scaleBoxZ;
+
+
+	//POPUP PHYSICS
+	PopupButton *popupBtnForce;
+	Popup *popupF;
+
+
+	FloatBox<float>* forceBoxX;
+	FloatBox<float>* forceBoxY;
+	FloatBox<float>* forceBoxZ;
+
+
+	CheckBox *staticCheckBox;
+	FloatBox<float>* massBox;
+	FloatBox<float>* bouncinessBox;
 
 
 	//GUI INTERACTIONS
