@@ -24,10 +24,7 @@ class SceneLoading
 public:
 
 	void loadScene(string sceneName);
-	void loadSceneEditor(char* sceneName);
-
 	void saveScene(string sceneName);
-	void saveSceneEditor(string sceneName);
 
 	 static void Initialize();
 	 static SceneLoading* getInstance();
@@ -37,6 +34,8 @@ private:
 	 SceneLoading();
 	static SceneLoading* instance;
 
+
+	
 	 Mesh* cube;
 	 Mesh* cylinder;
 	 Mesh* ellipsoid;

@@ -2,6 +2,7 @@
 
 #include <nanogui/nanogui.h>
 #include <iostream>
+#include <fstream>
 #include <Eigen/Core>
 #include "PhysicsBuilder.h"
 
@@ -48,7 +49,7 @@ public:
 
 	void selectedGameObject();
 
-
+	
 	static GUIManager* getInstance();
 
 private:
@@ -102,7 +103,7 @@ private:
 
 	int iteratorGameObject = 0;
 
-	char* tempfile = "test";
+	string tempfile = "newtons_cradle";
 
 	//Container
 	Entity* eGameObject = nullptr;
@@ -176,6 +177,9 @@ private:
 	//GUI BUTTONS
 	Button *bEditorPlay;
 	Button *bEditorEdit;
+	Button *bEditorOpen;
+	Button *bEditorSave;
+	Button *bEditorReload;
 
 	//GUI WINDOWS
 	Window *gameObjectInspectorWindow;
@@ -186,6 +190,7 @@ private:
 	//GUI I/O
 	string fileNameExt;
 	string fileName;
+	string  savedFileName;
 
 	//INSTANTIATION
 	glm::vec3 instantiatedColor = glm::vec3(1, 0, 0);

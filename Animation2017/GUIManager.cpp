@@ -22,7 +22,7 @@ void GUIManager::createMainMenuWindow()
 	mainMenuWindow->setLayout(new GroupLayout());
 	Button *bMainOpen = new Button(mainMenuWindow, "Open Existing Scene", ENTYPO_ICON_ARCHIVE);
 	bMainOpen->setCallback([&] {
-		string fileNameExt = file_dialog({ { "scene", "Scene Engine Parser File" } }, false);
+		 fileNameExt = file_dialog({ { "scene", "Scene Engine Parser File" } }, false);
 
 		SceneLoading::getInstance()->loadScene(fileNameExt);
 
@@ -59,11 +59,7 @@ void GUIManager::createEditorWindow()
 	bEditorPlay = new Button(engineEditorWindow, "Play", ENTYPO_ICON_CONTROLLER_PLAY);
 	bEditorPlay->setFlags(Button::RadioButton);
 	bEditorPlay->setCallback([&] {
-
-
-		//	string fileNameExt = file_dialog({ { "scene", "Scene Engine Parser File" } }, false);
-		//	SceneLoading::getInstance()->saveSceneEditor("HI");
-
+		
 		isOnEdit = false;
 
 		TimeSystem::resetTime();
@@ -72,14 +68,13 @@ void GUIManager::createEditorWindow()
 	bEditorEdit->setFlags(Button::RadioButton);
 	bEditorEdit->setPushed(true);
 	bEditorEdit->setCallback([&] {
-
-		//	SceneLoading::getInstance()->loadSceneEditor(tempfile);
+	
 		isOnEdit = true;
 
 	});
-	Button *bEditorOpen = new Button(engineEditorWindow, "Open Another Scene", ENTYPO_ICON_ARCHIVE);
+	bEditorOpen = new Button(engineEditorWindow, "Open Another Scene", ENTYPO_ICON_ARCHIVE);
 	bEditorOpen->setCallback([&] {
-		string fileNameExt = file_dialog({ { "scene", "Scene Engine Parser File" } }, false);
+		fileNameExt = file_dialog({ { "scene", "Scene Engine Parser File" } }, false);
 		SceneLoading::getInstance()->loadScene(fileNameExt);
 	
 
@@ -97,11 +92,13 @@ void GUIManager::createEditorWindow()
 			isOnEdit = true;
 		}
 
+	
+		
 	});
-	Button *bEditorSave = new Button(engineEditorWindow, "Save", ENTYPO_ICON_SAVE);
+	bEditorSave = new Button(engineEditorWindow, "Save", ENTYPO_ICON_SAVE);
 	//THIS RETURNS THE FILE DESTINATION OF WHERE I DECIDED TO PUT THE FILE
 	bEditorSave->setCallback([&] {
-		string savedFileName = file_dialog(
+		 savedFileName = file_dialog(
 		{ { "scene", "Scene Engine Parser File" } }, true);
 
 		if (savedFileName != "")
@@ -116,6 +113,16 @@ void GUIManager::createEditorWindow()
 
 
 	});
+	bEditorReload = new Button(engineEditorWindow, "Reload Scene Completely", ENTYPO_ICON_CW);
+	//THIS RETURNS THE FILE DESTINATION OF WHERE I DECIDED TO PUT THE FILE
+	bEditorReload->setCallback([&] {
+		
+		SceneLoading::getInstance()->loadScene(fileNameExt);
+
+	});
+
+
+
 	new Label(engineEditorWindow, "Time Scale: ");
 	timeScaleBox = new FloatBox<float>(engineEditorWindow);
 	timeScaleBox->setEditable(true);
@@ -127,7 +134,7 @@ void GUIManager::createEditorWindow()
 	timeScaleBox->setMinValue(0);
 	timeScaleBox->setFormat("[0-9]*\\.?[0-9]+");
 	timeScaleBox->setValueIncrement(.05);
-	timeScaleBox->setMaxValue(1);
+	timeScaleBox->setMaxValue(100);
 	timeScaleBox->setCallback([&](float t) {  TimeSystem::setTimeScale(t); });
 
 
@@ -591,7 +598,7 @@ void GUIManager::interactWithGUI()
 
 void GUIManager::instantiateGameObject(glm::vec3 col, int shape)
 {
-
+	//POSSIBLE LEAK BY ADDING THESE NEW ENTITIES
 	eGameObject = new Entity();
 	eGameObject->setShape(shape);
 	eGameObject->setStatic(false);
@@ -942,3 +949,5 @@ GUIManager * GUIManager::getInstance()
 {
 	return instance;
 }
+
+
