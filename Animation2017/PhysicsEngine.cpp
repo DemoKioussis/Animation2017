@@ -95,6 +95,14 @@ void PhysicsEngine::addForce(PhysicsComponent* _component, glm::vec3 force,glm::
 void PhysicsEngine::addTorque(PhysicsComponent* _component, glm::vec3 torque) {
 	_component->netTorque += torque;
 }
+
+void PhysicsEngine::setForce(PhysicsComponent* _component, glm::vec3 force, glm::vec3 position) {
+	_component->netForce = force;
+	_component->netTorque = glm::cross(position, force);
+}
+void PhysicsEngine::setTorque(PhysicsComponent* _component, glm::vec3 torque) {
+	_component->netTorque = torque;
+}
 glm::vec3 PhysicsEngine::getForce(PhysicsComponent* _component) {
 	return _component->netForce;
 }

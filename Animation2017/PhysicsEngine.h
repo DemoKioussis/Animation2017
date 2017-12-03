@@ -24,8 +24,10 @@ public:
 	glm::vec3 getGravity();
 	void step();
 	void addForce(PhysicsComponent* _component, glm::vec3 _force, glm::vec3 _position);
+	void setForce(PhysicsComponent* _component, glm::vec3 _force, glm::vec3 _position);
 	float updateTime;
 	void setVelocity(PhysicsComponent* _component);
+	void setTorque(PhysicsComponent* _component, glm::vec3 torque);
 	void addTorque(PhysicsComponent* _component, glm::vec3 torque);
 private:
 	static PhysicsEngine* instance;

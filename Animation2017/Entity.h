@@ -17,12 +17,15 @@ public:
 	Entity(bool _isStatic,int _meshID);
 
 	Entity(bool _isStatic,bool skybox);
+	Entity();
 
 	~Entity();
 	void addComponent(Component *_component);
 	Component* getComponent(int _componentType);
 	void removeComponent(int _componentType);
 	const int getID();
+	void setStatic(bool isstatic);
+	void setShape(int shape);
 	bool isStatic();
 	bool isSkybox();
 	int getMeshID();

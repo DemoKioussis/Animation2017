@@ -68,7 +68,7 @@ public:
 	glm::vec3 getAngularVelocity() {
 		return angularVelocity;
 	}
-	glm::vec3 getVeloctiy() {
+	glm::vec3 getVelocity() {
 		return velocity;
 	}
 	void setMass(float _mass) {
@@ -128,6 +128,20 @@ public:
 	}
 	glm::vec3 getForce() {
 		return netForce;
+	}
+
+	void setForce(glm::vec3 force,glm::vec3 pos) {
+		netForce = force;
+		netTorque = glm::cross(pos,force);
+	}
+
+	glm::vec3 getTorque() {
+		return netTorque;
+	}
+
+	void setTorque(glm::vec3 torq) {
+	
+		netTorque = torq;
 	}
 	float getCoeffOfRestitution() {
 		return coeffOfRestitution;

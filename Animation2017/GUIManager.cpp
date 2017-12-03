@@ -23,11 +23,15 @@ void GUIManager::createMainMenuWindow()
 	Button *bMainOpen = new Button(mainMenuWindow, "Open Existing Scene", ENTYPO_ICON_ARCHIVE);
 	bMainOpen->setCallback([&] {
 		string fileNameExt = file_dialog({ { "scene", "Scene Engine Parser File" } }, false);
+
 		SceneLoading::getInstance()->loadScene(fileNameExt);
 
 
+		//updateCurrentEntity();
+
 		if (fileNameExt != "")
 		{
+			selectedGameObject();	updateCurrentEntity();	updateButtons();
 			isNewScene = true;
 
 			isOnEdit = true;
@@ -37,7 +41,7 @@ void GUIManager::createMainMenuWindow()
 	});
 	Button *bMainNew = new Button(mainMenuWindow, "Create New Scene", ENTYPO_ICON_BRUSH);
 	bMainNew->setCallback([&] {isNewScene = true;	 isOnEdit = true;	//PhysicsEngine::getInstance()->setGravity(glm::vec3(0.0f, -1.0f,0.0f), 9.8f);
-});
+	});
 
 
 }
@@ -46,25 +50,48 @@ void GUIManager::createMainMenuWindow()
 
 void GUIManager::createEditorWindow()
 {
+	initializeEmptyGameObject();
+
 	engineEditorWindow = new Window(PhysicsSimulation::getInstance()->getScreen(), "Engine Editor");
 	engineEditorWindow->setPosition((Eigen::Vector2i(10, 10)));
 	engineEditorWindow->setLayout(new GroupLayout());
 	engineEditorWindow->setTooltip("Allows user to edit scene, play out the scene and save the scene");
-	Button *bEditorPlay = new Button(engineEditorWindow, "Play", ENTYPO_ICON_CONTROLLER_PLAY);
+	bEditorPlay = new Button(engineEditorWindow, "Play", ENTYPO_ICON_CONTROLLER_PLAY);
 	bEditorPlay->setFlags(Button::RadioButton);
-	bEditorPlay->setCallback([&] {isOnEdit = false;	TimeSystem::resetTime(); });
-	Button *bEditorEdit = new Button(engineEditorWindow, "Edit", ENTYPO_ICON_EDIT);
+	bEditorPlay->setCallback([&] {
+
+
+		//	string fileNameExt = file_dialog({ { "scene", "Scene Engine Parser File" } }, false);
+		//	SceneLoading::getInstance()->saveSceneEditor("HI");
+
+		isOnEdit = false;
+
+		TimeSystem::resetTime();
+	});
+	bEditorEdit = new Button(engineEditorWindow, "Edit", ENTYPO_ICON_EDIT);
 	bEditorEdit->setFlags(Button::RadioButton);
 	bEditorEdit->setPushed(true);
-	bEditorEdit->setCallback([&] {isOnEdit = true; });
+	bEditorEdit->setCallback([&] {
+
+		//	SceneLoading::getInstance()->loadSceneEditor(tempfile);
+		isOnEdit = true;
+
+	});
 	Button *bEditorOpen = new Button(engineEditorWindow, "Open Another Scene", ENTYPO_ICON_ARCHIVE);
 	bEditorOpen->setCallback([&] {
 		string fileNameExt = file_dialog({ { "scene", "Scene Engine Parser File" } }, false);
 		SceneLoading::getInstance()->loadScene(fileNameExt);
-		//CHANGE ME
+	
 
+		
+		//CHANGE ME
+		
 		if (fileNameExt != "")
 		{
+			bEditorPlay->setPushed(false);
+			bEditorEdit->setPushed(true);
+
+			selectedGameObject();	updateCurrentEntity();	updateButtons();
 			isNewScene = true;
 
 			isOnEdit = true;
@@ -86,12 +113,25 @@ void GUIManager::createEditorWindow()
 		{
 			MessageDialog *dlg = new MessageDialog(PhysicsSimulation::getScreen(), MessageDialog::Type::Warning, "File", "Your scene has not been saved!");
 		}
-	
-
-	
 
 
 	});
+	new Label(engineEditorWindow, "Time Scale: ");
+	timeScaleBox = new FloatBox<float>(engineEditorWindow);
+	timeScaleBox->setEditable(true);
+	timeScaleBox->setFixedSize(Vector2i(100, 20));
+	timeScaleBox->setValue(1);
+	timeScaleBox->setDefaultValue("1");
+	timeScaleBox->setFontSize(16);
+	timeScaleBox->setSpinnable(true);
+	timeScaleBox->setMinValue(0);
+	timeScaleBox->setFormat("[0-9]*\\.?[0-9]+");
+	timeScaleBox->setValueIncrement(.05);
+	timeScaleBox->setMaxValue(1);
+	timeScaleBox->setCallback([&](float t) {  TimeSystem::setTimeScale(t); });
+
+
+
 
 	engineEditorWindow->setVisible(false);
 }
@@ -102,13 +142,6 @@ void GUIManager::createInstantiationWindow()
 	gameObjectInstantiationWindow->setPosition((Eigen::Vector2i(1400, 10)));
 	gameObjectInstantiationWindow->setLayout(new BoxLayout(Orientation::Vertical,
 		Alignment::Middle, 15, 6));
-	new Label(gameObjectInstantiationWindow, "GameObject Name", "sans");
-	TextBox *textBox2 = new TextBox(gameObjectInstantiationWindow);
-	textBox2->setEditable(true);
-	//MAKE A REGEX TO ONLY ALLOW LETTERS AND NUMBERS
-	//textBox->setFormat("^[0-9][a-z][A-Z]");
-	textBox2->setFixedSize(Vector2i(120, 20));
-	textBox2->setFontSize(16);
 	new Label(gameObjectInstantiationWindow, "GameObject Shape ", "sans");
 	ComboBox *cobo =
 		new ComboBox(gameObjectInstantiationWindow, { "Cube", "Cylinder","Ellipsoid","Sphere" });
@@ -221,7 +254,7 @@ void GUIManager::createTransformPopUpWindow()
 	scaleBoxX->setEditable(true);
 	scaleBoxX->setFixedSize(Vector2i(100, 20));
 	scaleBoxX->setValue(1);
-	scaleBoxX->setDefaultValue("0");
+	scaleBoxX->setDefaultValue("1");
 	scaleBoxX->setFontSize(16);
 	scaleBoxX->setSpinnable(true);
 	scaleBoxX->setMinValue(0.1);
@@ -234,7 +267,7 @@ void GUIManager::createTransformPopUpWindow()
 	scaleBoxY->setEditable(true);
 	scaleBoxY->setFixedSize(Vector2i(100, 20));
 	scaleBoxY->setValue(1);
-	scaleBoxY->setDefaultValue("0");
+	scaleBoxY->setDefaultValue("1");
 	scaleBoxY->setFontSize(16);
 	scaleBoxY->setSpinnable(true);
 	scaleBoxY->setMinValue(0.1);
@@ -247,7 +280,7 @@ void GUIManager::createTransformPopUpWindow()
 	scaleBoxZ->setEditable(true);
 	scaleBoxZ->setFixedSize(Vector2i(100, 20));
 	scaleBoxZ->setValue(1);
-	scaleBoxZ->setDefaultValue("0");
+	scaleBoxZ->setDefaultValue("1");
 	scaleBoxZ->setFontSize(16);
 	scaleBoxZ->setSpinnable(true);
 	scaleBoxZ->setMinValue(0.1);
@@ -297,7 +330,41 @@ void GUIManager::createPhysicsPopUpWindow()
 	forceBoxZ->setFontSize(16);
 	forceBoxZ->setSpinnable(true);
 	forceBoxZ->setValueIncrement(.5);
-	forceBoxY->setCallback([&](float z) {  gameObjectForceY = z; modifyCurrentEntity(); });
+	forceBoxY->setCallback([&](float z) {  gameObjectForceZ = z; modifyCurrentEntity(); });
+
+	new Label(popupF, " Apply Torque X");
+	torqueBoxX = new FloatBox<float>(popupF);
+	torqueBoxX->setEditable(true);
+	torqueBoxX->setFixedSize(Vector2i(100, 20));
+	torqueBoxX->setValue(0);
+	torqueBoxX->setDefaultValue("0");
+	torqueBoxX->setFontSize(16);
+	torqueBoxX->setSpinnable(true);
+	torqueBoxX->setValueIncrement(.5);
+	torqueBoxX->setCallback([&](float x) {  gameObjectTorqueX = x; modifyCurrentEntity(); });
+
+	new Label(popupF, " Apply Torque Y");
+	torqueBoxY = new FloatBox<float>(popupF);
+	torqueBoxY->setEditable(true);
+	torqueBoxY->setFixedSize(Vector2i(100, 20));
+	torqueBoxY->setValue(0);
+	torqueBoxY->setDefaultValue("0");
+	torqueBoxY->setFontSize(16);
+	torqueBoxY->setSpinnable(true);
+	torqueBoxY->setValueIncrement(.5);
+	torqueBoxY->setCallback([&](float y) {  gameObjectTorqueY = y; modifyCurrentEntity(); });
+
+	new Label(popupF, " Apply Torque Z");
+	torqueBoxZ = new FloatBox<float>(popupF);
+	torqueBoxZ->setEditable(true);
+	torqueBoxZ->setFixedSize(Vector2i(100, 20));
+	torqueBoxZ->setValue(0);
+	torqueBoxZ->setDefaultValue("0");
+	torqueBoxZ->setFontSize(16);
+	torqueBoxZ->setSpinnable(true);
+	torqueBoxZ->setValueIncrement(.5);
+	torqueBoxZ->setCallback([&](float z) {  gameObjectTorqueZ = z; modifyCurrentEntity(); });
+
 
 
 	new Label(popupF, "Mass");
@@ -317,7 +384,7 @@ void GUIManager::createPhysicsPopUpWindow()
 	bouncinessBox = new FloatBox<float>(popupF);
 	bouncinessBox->setEditable(true);
 	bouncinessBox->setFixedSize(Vector2i(100, 20));
-	bouncinessBox->setValue(0);
+	bouncinessBox->setValue(0.1);
 	bouncinessBox->setDefaultValue("0");
 	bouncinessBox->setFontSize(16);
 	bouncinessBox->setSpinnable(true);
@@ -340,19 +407,81 @@ void GUIManager::createPhysicsPopUpWindow()
 
 }
 
+void GUIManager::createGravityPopUpWindow()
+{
+
+	cbG = new CheckBox(gameObjectInspectorWindow, "Gravity");
+	cbG->setFontSize(16);
+	cbG->setChecked(false);
+	cbG->setTooltip("Turn on and off the gravity");
+	cbG->setCallback([&](bool state)
+	{
+		isGravityOn = state;
+		modifyCurrentEntity();
+	});
+
+
+
+	popupBtnGravity = new PopupButton(gameObjectInspectorWindow, "Gravity", ENTYPO_ICON_EXPORT);
+	popupG = popupBtnGravity->popup();
+	popupG->setLayout(new GridLayout(Orientation::Horizontal, 6,
+		Alignment::Middle, 15, 6));
+	popupG->setTooltip("Change the Gravity of the current scene.");
+
+
+	new Label(popupG, " Apply Gravity X");
+	gravityBoxX = new FloatBox<float>(popupG);
+	gravityBoxX->setEditable(true);
+	gravityBoxX->setFixedSize(Vector2i(100, 20));
+	gravityBoxX->setValue(0);
+	gravityBoxX->setDefaultValue("0");
+	gravityBoxX->setFontSize(16);
+	gravityBoxX->setSpinnable(true);
+	gravityBoxX->setValueIncrement(.5);
+	gravityBoxX->setCallback([&](float x) {  gameObjectGravityX = x; modifyCurrentEntity(); });
+
+	new Label(popupG, " Apply Gravity Y");
+	gravityBoxY = new FloatBox<float>(popupG);
+	gravityBoxY->setEditable(true);
+	gravityBoxY->setFixedSize(Vector2i(100, 20));
+	gravityBoxY->setValue(0);
+	gravityBoxY->setDefaultValue("0");
+	gravityBoxY->setFontSize(16);
+	gravityBoxY->setSpinnable(true);
+	gravityBoxY->setValueIncrement(.5);
+	gravityBoxY->setCallback([&](float y) {  gameObjectGravityY = y; modifyCurrentEntity(); });
+
+	new Label(popupG, " Apply Gravity Z");
+	gravityBoxZ = new FloatBox<float>(popupG);
+	gravityBoxZ->setEditable(true);
+	gravityBoxZ->setFixedSize(Vector2i(100, 20));
+	gravityBoxZ->setValue(0);
+	gravityBoxZ->setDefaultValue("0");
+	gravityBoxZ->setFontSize(16);
+	gravityBoxZ->setSpinnable(true);
+	gravityBoxZ->setValueIncrement(.5);
+	gravityBoxY->setCallback([&](float z) {  gameObjectGravityZ = z; modifyCurrentEntity(); });
+	popupG->setVisible(false);
+}
+
 
 void GUIManager::createInspectorWindow()
 {
 	gameObjectInspectorWindow = new Window(PhysicsSimulation::getScreen(), "GameObject Inspector");
 	gameObjectInspectorWindow->setPosition((Eigen::Vector2i(10, 300)));
 	gameObjectInspectorWindow->setLayout(new GroupLayout());
-	new Label(gameObjectInspectorWindow, "GameObject Name", "sans-bold");
-	TextBox *textBox = new TextBox(gameObjectInspectorWindow);
-	textBox->setEditable(true);
-	//MAKE A REGEX TO ONLY ALLOW LETTERS AND NUMBERS
-	//textBox->setFormat("^[0-9][a-z][A-Z]");
-	textBox->setFixedSize(Vector2i(120, 20));
-	textBox->setFontSize(16);
+
+	new Label(gameObjectInspectorWindow, "GameObject ID:");
+	iteratorBox = new IntBox<int>(gameObjectInspectorWindow);
+	iteratorBox->setEditable(true);
+	iteratorBox->setFixedSize(Vector2i(100, 20));
+	iteratorBox->setValue(0);
+	iteratorBox->setFontSize(16);
+	iteratorBox->setSpinnable(true);
+	iteratorBox->setMinValue(0.1);
+	iteratorBox->setFormat("[0-9]*\\.?[0-9]+");
+	iteratorBox->setValueIncrement(1);
+	iteratorBox->setCallback([&](int i) {  iteratorGameObject = i; selectedGameObject();	updateCurrentEntity();	updateButtons(); });
 
 	new Label(gameObjectInspectorWindow, "Render Properties", "sans");
 	cb = new CheckBox(gameObjectInspectorWindow, "Render Component");
@@ -376,13 +505,19 @@ void GUIManager::createInspectorWindow()
 	cb2->setFontSize(16);
 	cb2->setChecked(true);
 	cb2->setTooltip("Turn on and off the physics component.");
-	cb->setCallback([&](bool state)
+	cb2->setCallback([&](bool state)
 	{
 		isPhysicsComponentOn = state;
 		modifyCurrentEntity();
 	});
 
+
+
 	createPhysicsPopUpWindow();
+
+	createGravityPopUpWindow();
+
+
 
 	new Label(gameObjectInspectorWindow, "Collision Properties", "sans");
 	cb3 = new CheckBox(gameObjectInspectorWindow, "Collision Component");
@@ -400,7 +535,7 @@ void GUIManager::createInspectorWindow()
 
 	Button *b = gameObjectInspectorWindow->add<Button>("Next GameObject", ENTYPO_ICON_ARROW_RIGHT);
 	b->setBackgroundColor(Color(0, 255, 0, 25));
-	b->setCallback([&] {updateButtons(); });
+	b->setCallback([&] {iteratorGameObject++; selectedGameObject();	updateCurrentEntity();	updateButtons(); });
 	b->setTooltip("Iterates to the next gameobject in the scene.");
 
 	gameObjectInspectorWindow->setVisible(false);
@@ -425,20 +560,22 @@ GUIManager::GUIManager()
 void GUIManager::interactWithGUI()
 {
 
-	//MOVE ME
+	
 	if (isOnEdit)
 	{
 		gameObjectInstantiationWindow->setVisible(true);
 		gameObjectInspectorWindow->setVisible(true);
 		PhysicsEngine::getInstance()->disable();
+		popupBtnGravity->setVisible(isGravityOn);
+
 	}
 	else if (!isOnEdit)
 	{
 		gameObjectInstantiationWindow->setVisible(false);
 		gameObjectInspectorWindow->setVisible(false);
-	
+
 		PhysicsEngine::getInstance()->enable();
-	
+
 
 	}
 
@@ -455,24 +592,29 @@ void GUIManager::interactWithGUI()
 void GUIManager::instantiateGameObject(glm::vec3 col, int shape)
 {
 
-	eGameObject = new Entity(true,shape);
+	eGameObject = new Entity();
+	eGameObject->setShape(shape);
+	eGameObject->setStatic(false);
+	
 	rGameObject = new RenderComponent();
 	rGameObject->setColor(col);
 	rGameObject->enable();
+	rGameObject->setMeshID(shape);
 	RenderEngine::getInstance()->addComponent(rGameObject);
 	eGameObject->addComponent(rGameObject);
 
 
 
+	
 	pGameObject = new PhysicsComponent();
-
 	pGameObject->enable();
-	pGameObject->setMomentOfInertia(PhysicsBuilder::getMomentOfInertia(0, glm::mat4(), mass));
-	pGameObject->setMass(mass);
+	pGameObject->setMomentOfInertia(PhysicsBuilder::getMomentOfInertia(0, glm::mat4(), 1));
+	pGameObject->setMass(1);
+	pGameObject->setCoeffOfRestitution(gameObjectBounciness);
 	pGameObject->setStatic(false);
-	PhysicsEngine::getInstance()->addAttractor(pGameObject);
-	PhysicsEngine::getInstance()->addComponent(pGameObject);
-	//	p->setCoeffOfRestitution(stof(sVec[5]));
+
+
+	PhysicsEngine::getInstance()->addComponent(pGameObject);;
 	eGameObject->addComponent(pGameObject);
 
 	cGameObject = new CollisionComponent();
@@ -481,18 +623,31 @@ void GUIManager::instantiateGameObject(glm::vec3 col, int shape)
 	CollisionEngine::getInstance()->addComponent(cGameObject);
 	eGameObject->addComponent(cGameObject);
 	CollisionEngine::getInstance()->updateAllBoundingBoxes();
-	//PhysicsEngine::getInstance()->addForce(p, force, glm::vec3());
+
 
 
 	//Add To EntityManager;
 	EntityManager::getInstance()->add(eGameObject);
+	iteratorGameObject = EntityManager::getInstance()->getEntities()->size() -1;
 
 
+
+}
+
+void GUIManager::initializeEmptyGameObject()
+{
+	eGameObject = new Entity();
+	rGameObject = new RenderComponent();
+	pGameObject = new PhysicsComponent();
+	cGameObject = new CollisionComponent();
 }
 
 
 void GUIManager::updateButtons()
 {
+	iteratorBox->setValue(iteratorGameObject);
+
+
 	cb->setChecked(isRenderComponentOn);
 	cb2->setChecked(isPhysicsComponentOn);
 	cb3->setChecked(isCollisionComponentOn);
@@ -513,15 +668,41 @@ void GUIManager::updateButtons()
 	forceBoxY->setValue(gameObjectForceY);
 	forceBoxZ->setValue(gameObjectForceZ);
 
+	torqueBoxX->setValue(gameObjectTorqueX);
+	torqueBoxY->setValue(gameObjectTorqueY);
+	torqueBoxZ->setValue(gameObjectTorqueZ);
+
 	staticCheckBox->setChecked(isGameObjectStatic);
 	massBox->setValue(gameObjectMass);
+
+	cbG->setChecked(isGravityOn);
+	gravityBoxX->setValue(gameObjectGravityX);
+	gravityBoxY->setValue(gameObjectGravityY);
+	gravityBoxZ->setValue(gameObjectGravityZ);
 }
 
 void GUIManager::updateCurrentEntity()
 {
-	isRenderComponentOn = rGameObject->isEnabled();
-	isPhysicsComponentOn = pGameObject->isEnabled();
-	isCollisionComponentOn = cGameObject->isEnabled();
+	//COME BACK TO THIS
+	if (rGameObject == nullptr)
+	{
+		isRenderComponentOn = false;
+	}
+	else
+	{
+		isRenderComponentOn = rGameObject->isEnabled();
+	}
+	
+	if (cGameObject == nullptr)
+	{
+		isCollisionComponentOn = false;
+	}
+	else
+	{
+		isCollisionComponentOn = cGameObject->isEnabled();
+	}
+	
+
 
 
 	//CHANGE THESE TO THE CURENT GAMEOBJECT;
@@ -530,9 +711,9 @@ void GUIManager::updateCurrentEntity()
 	gameObjectPosY = eGameObject->translation[3][1];
 	gameObjectPosZ = eGameObject->translation[3][2];
 
-	gameObjectPosOldX = 0;
-	gameObjectPosOldY = 0;
-	gameObjectPosOldZ = 0;
+	gameObjectPosOldX = eGameObject->translation[3][0];
+	gameObjectPosOldY = eGameObject->translation[3][1];
+	gameObjectPosOldZ = eGameObject->translation[3][2];
 
 	glm::quat tmpQuat = glm::toQuat(eGameObject->rotation);
 	glm::vec3 tmp = glm::eulerAngles(tmpQuat);
@@ -540,20 +721,60 @@ void GUIManager::updateCurrentEntity()
 	gameObjectRotY = degrees(-tmp.y);
 	gameObjectRotZ = degrees(tmp.z);
 
+	
 	gameObjectScaleX = eGameObject->scale[0][0];
 	gameObjectScaleY = eGameObject->scale[1][1];
 	gameObjectScaleZ = eGameObject->scale[2][2];
 
-	glm::vec3 temp = pGameObject->getForce();
-	gameObjectForceX = temp.x;
-	gameObjectForceY = temp.y;
-	gameObjectForceZ = temp.z;
+	gameObjectScaleOldX = eGameObject->scale[0][0];
+	gameObjectScaleOldY = eGameObject->scale[1][1];
+	gameObjectScaleOldZ = eGameObject->scale[2][2];
 
-	gameObjectBounciness = pGameObject->getCoeffOfRestitution();
 
-	isGameObjectStatic = pGameObject->getIsStatic();
+	if (pGameObject == nullptr)
+	{
+		isPhysicsComponentOn = false;
+	}
+	else
+	{
+		isPhysicsComponentOn = pGameObject->isEnabled();
+		glm::vec3 temp = pGameObject->getForce();
+		gameObjectForceX = temp.x;
+		gameObjectForceY = temp.y;
+		gameObjectForceZ = temp.z;
 
-	gameObjectMass = pGameObject->getMass();
+		gameObjectBounciness = pGameObject->getCoeffOfRestitution();
+
+		isGameObjectStatic = pGameObject->getIsStatic();
+
+		gameObjectMass = pGameObject->getMass();
+
+		//FOR TORQUE
+
+		glm::vec3 tempT = pGameObject->getTorque();
+		gameObjectTorqueX = tempT.x;
+		gameObjectTorqueY = tempT.y;
+		gameObjectTorqueZ = tempT.z;
+
+
+
+	}
+
+
+	if (PhysicsEngine::getInstance()->getGravity() != glm::vec3(0, 0, 0))
+	{
+		isGravityOn = true;
+		glm::vec3 tempg = PhysicsEngine::getInstance()->getGravity();
+		gameObjectGravityX = tempg.x / 9.8;
+		gameObjectGravityY = tempg.y / 9.8;
+		gameObjectGravityZ = tempg.z / 9.8;
+	}
+	else
+	{
+		isGravityOn = false;
+	}
+
+
 
 }
 
@@ -642,35 +863,79 @@ void GUIManager::modifyCurrentEntity()
 		eGameObject->transform = eGameObject->translation * eGameObject->rotation * eGameObject->scale;
 
 		//SCALE
-		eGameObject->translation = glm::scale(eGameObject->translation, glm::vec3(gameObjectScaleX / gameObjectScaleOldX, gameObjectScaleY / gameObjectScaleOldY, gameObjectScaleZ / gameObjectScaleOldZ));
+		eGameObject->scale = glm::scale(eGameObject->scale, glm::vec3(gameObjectScaleX / gameObjectScaleOldX, gameObjectScaleY / gameObjectScaleOldY, gameObjectScaleZ / gameObjectScaleOldZ));
 		eGameObject->transform = eGameObject->translation * eGameObject->rotation * eGameObject->scale;
 		gameObjectScaleOldX = gameObjectScaleX;
 		gameObjectScaleOldY = gameObjectScaleY;
 		gameObjectScaleOldZ = gameObjectScaleZ;
 
 
-		//FORCE
-		//HOW TO STOP FORCE?
-		//FORCE KEEPS GETTING APPLIED WHEN HITTING ANY BUTTON
-		PhysicsEngine::getInstance()->addForce(pGameObject, glm::vec3(gameObjectForceX, gameObjectForceY, gameObjectForceZ), glm::vec3(gameObjectPosX, gameObjectPosY, gameObjectPosZ));
-		
+
+		if (pGameObject != nullptr)
+		{
+
+			//ISSTATIC
+			//MIGHT BE ACTING WEIRD?
+			pGameObject->setStatic(isGameObjectStatic);
+
+			//FORCE
+
+			//DOES NOT REST
+			//NEEDS FIX
+			PhysicsEngine::getInstance()->setForce(pGameObject, glm::vec3(gameObjectForceX, gameObjectForceY, gameObjectForceZ), glm::vec3(gameObjectPosX, gameObjectPosY, gameObjectPosZ));
 
 
-		//MASS
-		pGameObject->setMass(gameObjectMass);
-
-		//BOUNCINESS
-		pGameObject->setCoeffOfRestitution(gameObjectBounciness);
-
-		//ISSTATIC
-		//MIGHT BE ACTING WEIRD?
-		pGameObject->setStatic(isGameObjectStatic);
 
 
-		PhysicsEngine::getInstance()->addComponent(pGameObject);
-		
+			//TORQUE
+			//DOES NOT RESET
+			//NEEDS FIX
+			PhysicsEngine::getInstance()->setTorque(pGameObject, glm::vec3(gameObjectTorqueX, gameObjectTorqueY, gameObjectTorqueZ));
+
+
+			//MASS AND MOMENTOFINERTIA
+			pGameObject->setMomentOfInertia(PhysicsBuilder::getMomentOfInertia(0, glm::mat4(), gameObjectMass));
+			pGameObject->setMass(gameObjectMass);
+
+
+			//BOUNCINESS
+			pGameObject->setCoeffOfRestitution(gameObjectBounciness);
+
+
+			//eGameObject->addComponent(pGameObject);
+
+			PhysicsEngine::getInstance()->addComponent(pGameObject);
+
+		}
+
+
+		//GRAVITY
+	
+		if (!isGravityOn)
+		{
+			PhysicsEngine::getInstance()->setGravity(glm::vec3(1, 1, 1), 0);
+		}
+		else if (isGravityOn)
+		{
+			PhysicsEngine::getInstance()->setGravity(glm::vec3(gameObjectGravityX / 9.8, gameObjectGravityY / 9.8, gameObjectGravityZ / 9.8), 9.8);
+		}
+
+
 	}
 
+}
+
+void GUIManager::selectedGameObject()
+{
+	if (iteratorGameObject >= EntityManager::getInstance()->getEntities()->size())
+	{
+		iteratorGameObject = 0;
+	}
+	eGameObject = EntityManager::getInstance()->getEntities()->at(iteratorGameObject);
+	rGameObject = static_cast<RenderComponent*>(eGameObject->getComponent(RENDER_COMPONENT));
+	pGameObject = static_cast<PhysicsComponent*>(eGameObject->getComponent(PHYSICS_COMPONENT));
+	cGameObject = static_cast<CollisionComponent*>(eGameObject->getComponent(COLLISION_COMPONENT));
+	
 }
 
 GUIManager * GUIManager::getInstance()

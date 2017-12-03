@@ -26,6 +26,15 @@ Entity::Entity(bool _isStatic, bool _isSkybox)
 	rotation = glm::mat4(1.0f);
 	translation = glm::mat4(1.0f);
 }
+
+Entity::Entity()
+{
+	id = idCounter++;
+	transform = glm::mat4(1.0f);
+	scale = glm::mat4(1.0f);
+	rotation = glm::mat4(1.0f);
+	translation = glm::mat4(1.0f);
+}
 Entity::~Entity() {
 	//delete all components;
 }
@@ -50,6 +59,16 @@ void Entity::removeComponent(int _componentType) {
 
 const int Entity::getID() {
 	return id;
+}
+
+void Entity::setStatic(bool isstatic)
+{
+	isStaticEntity = isstatic;
+}
+
+void Entity::setShape(int shape)
+{
+	meshID = shape;
 }
 
 bool Entity::isStatic()

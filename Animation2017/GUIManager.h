@@ -14,6 +14,7 @@
 #include "CollisionEngine.h"
 #include "CollisionComponent.h"
 
+
 #include "SceneLoading.h"
 #include "EntityManager.h"
 #include <glm/gtx/quaternion.hpp>
@@ -30,6 +31,7 @@ public:
 	static void Initialize();
 	void interactWithGUI();
 	void instantiateGameObject(glm::vec3 col, int shape);
+	void initializeEmptyGameObject();
 
 	void createMainMenuWindow();
 	void createEditorWindow();
@@ -38,10 +40,14 @@ public:
 
 	void createTransformPopUpWindow();
 	void createPhysicsPopUpWindow();
+	void createGravityPopUpWindow();
 
 	void updateButtons();
 	void updateCurrentEntity();
 	void modifyCurrentEntity();
+
+	void selectedGameObject();
+
 
 	static GUIManager* getInstance();
 
@@ -77,23 +83,26 @@ private:
 	double gameObjectScaleOldZ = 1;
 
 
+	double gameObjectGravityX = 0;
+	double gameObjectGravityY = -1;
+	double gameObjectGravityZ = 0;
+
 	double gameObjectForceX = 0;
 	double gameObjectForceY = 0;
 	double gameObjectForceZ = 0;
 
-	double gameObjectOldForceX = 0;
-	double gameObjectOldForceY = 0;
-	double gameObjectOldForceZ = 0;
+	double gameObjectTorqueX = 0;
+	double gameObjectTorqueY = 0;
+	double gameObjectTorqueZ = 0;
 
 	double gameObjectMass = 1;
 	bool isGameObjectStatic = false;
-	double gameObjectBounciness = 0;
+	bool isGravityOn = false;
+	double gameObjectBounciness = 0.1f;
 
-	std::string savedSceneName = "Scene 0";
-	std::string currentGameObjectName = "GameObject 0";
-	std::string instantiatedGameObjectName = "New GameObject 0";
+	int iteratorGameObject = 0;
 
-	float mass = 1;
+	char* tempfile = "test";
 
 	//Container
 	Entity* eGameObject = nullptr;
@@ -105,6 +114,13 @@ private:
 	CheckBox *cb;
 	CheckBox *cb2;
 	CheckBox *cb3;
+	CheckBox *cbG;
+
+	//TIME
+	FloatBox<float>* timeScaleBox;
+
+	//ITERATOR
+	IntBox<int>* iteratorBox;
 
 
 	//POPUP TRANSFORM
@@ -122,6 +138,15 @@ private:
 	FloatBox<float>* scaleBoxY;
 	FloatBox<float>* scaleBoxZ;
 
+	//POPUP GRAVITY
+	PopupButton *popupBtnGravity;
+	Popup *popupG;
+
+	FloatBox<float>*  gravityBoxX;
+	FloatBox<float>*  gravityBoxY;
+	FloatBox<float>*  gravityBoxZ;
+
+
 
 	//POPUP PHYSICS
 	PopupButton *popupBtnForce;
@@ -131,6 +156,11 @@ private:
 	FloatBox<float>* forceBoxX;
 	FloatBox<float>* forceBoxY;
 	FloatBox<float>* forceBoxZ;
+
+	FloatBox<float>* torqueBoxX;
+	FloatBox<float>* torqueBoxY;
+	FloatBox<float>* torqueBoxZ;
+
 
 
 	CheckBox *staticCheckBox;
@@ -143,6 +173,10 @@ private:
 	bool isNewScene = false;
 	bool isLoadedScene = false;
 
+	//GUI BUTTONS
+	Button *bEditorPlay;
+	Button *bEditorEdit;
+
 	//GUI WINDOWS
 	Window *gameObjectInspectorWindow;
 	Window *gameObjectInstantiationWindow;
@@ -150,7 +184,6 @@ private:
 	Window *mainMenuWindow;
 
 	//GUI I/O
-	char* fileNameChar;
 	string fileNameExt;
 	string fileName;
 
