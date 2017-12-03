@@ -104,6 +104,20 @@ void InputManager::key_callback(GLFWwindow* window, int key, int scancode, int a
 
 		}
 	}
+	if ((glfwGetKey(windowManager->getWindow(), GLFW_KEY_B) == GLFW_PRESS)) {
+		std::vector<Entity*> *Entities;
+		Entities = EntityManager::getInstance()->getEntities();
+		for (int i = 0; i < Entities->size();i++) {
+			auto e = (Entities->at(i));
+			PhysicsComponent *p = (PhysicsComponent*)e->getComponent(PHYSICS_COMPONENT);
+			if (p != nullptr) {
+				glm::vec3 randForce((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float) rand() / RAND_MAX);
+				PhysicsEngine::getInstance()->addForce(p, randForce *20000.0f,glm::vec3(0));
+				p->setMomentum(glm::vec3());
+			}
+
+		}
+	}
 
 
 

@@ -32,7 +32,9 @@ private:
 	float kineticEnergy; // 1/2 mv^2
 	glm::vec3 P;		// angular velocity
 	glm::vec3 L;		// angular momentum
-
+	glm::vec3 J;
+	glm::vec3 penTrans;
+	int JCount;
 	float friction;
 	float coeffOfRestitution;
 	glm::vec3 rotationLock;
@@ -52,7 +54,9 @@ public:
 		dP		 = glm::vec3();
 		P		 = glm::vec3();
 		L		 = glm::vec3();
-
+		J		 = glm::vec3();
+		penTrans = glm::vec3();
+		JCount	 = 0;
 		angularVelocity = glm::vec3();
 		angularAcceleration = glm::vec3();
 		netTorque = glm::vec3();

@@ -76,7 +76,7 @@ void PhysicsEngine::applyPhysics() {
 	#pragma omp parallel for
 	for (int i = 0; i < targetComponents.size();i++) {
 		PhysicsComponent* component = (PhysicsComponent*)targetComponents[i];
-		if (!component->getIsStatic() || component->kineticEnergy>MIN_ENERGY) {
+		if (!component->getIsStatic() && component->kineticEnergy>MIN_ENERGY) {
 			rotate(component);
 			translate(component);
 			component->getTransform() = component->getTranslation()*component->getRotation()*component->getScale();
@@ -339,7 +339,6 @@ void PhysicsEngine::resolveCollisions2() {
 		}
 		if (abs(vRel) <= epsilon || glm::length(penVector) < 0.0025f) {
 			
-		//	std::cout << "resting " << std::endl;
 
 
 		
@@ -379,23 +378,39 @@ void PhysicsEngine::resolveCollisions2() {
 			impulse = coeffOfRestitution / (dotA + dotB + massInverseSum);
 			glm::vec3 impulseVector = impulse*glm::normalize(penVector);
 
-			physA.P += impulseVector;
-			physB.P -= impulseVector;
-		
+	//		physA.P += impulseVector;
+	//		physB.P -= impulseVector;
+			
+			physA.J += impulseVector;
+			physB.J -= impulseVector;
+
+			physA.JCount++;
+			physB.JCount++;
 		}
 
 
-		if(physA.isStatic)
-			physB.getTranslation() = glm::translate(physB.getTranslation(), -penVector);
+		if (physA.isStatic)
+			physB.penTrans = -penVector;
 		else if (physB.isStatic)
-			physA.getTranslation() = glm::translate(physA.getTranslation(), penVector);
+			physA.penTrans = penVector;
 		else {
 			glm::vec3 trans = penVector / 2.0f;
-			physA.getTranslation() = glm::translate(physA.getTranslation(), trans);
-			physB.getTranslation() = glm::translate(physB.getTranslation(), -trans);
-
+			physB.penTrans = trans;
+			physB.penTrans = -trans;
 		}
-		
+	
+	}
+#pragma omp parallel for
+	for (int i = 0; i < targetComponents.size();i++) {
+		PhysicsComponent* component = (PhysicsComponent*)targetComponents[i];
+		if (component->JCount > 0) {
+			component->P += component->J / (float)component->JCount;
+	//		component->getTranslation() = glm::translate(component->getTranslation(), component->penTrans);// / (float)component->JCount);
+
+			component->J = glm::vec3();
+			component->penTrans = glm::vec3();
+			component->JCount = 0;
+		}
 	}
 }
 
