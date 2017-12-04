@@ -86,7 +86,7 @@ void GUIManager::createEditorWindow()
 			bEditorPlay->setPushed(false);
 			bEditorEdit->setPushed(true);
 
-			selectedGameObject();	updateCurrentEntity();	updateButtons();
+			iteratorGameObject = 0;	selectedGameObject();	updateCurrentEntity();	updateButtons();
 			isNewScene = true;
 
 			isOnEdit = true;
@@ -117,7 +117,7 @@ void GUIManager::createEditorWindow()
 	//THIS RETURNS THE FILE DESTINATION OF WHERE I DECIDED TO PUT THE FILE
 	bEditorReload->setCallback([&] {
 		
-		SceneLoading::getInstance()->loadScene(fileNameExt);
+		SceneLoading::getInstance()->loadScene(fileNameExt); iteratorGameObject = 0;  selectedGameObject(); updateCurrentEntity();  updateButtons();
 
 	});
 
