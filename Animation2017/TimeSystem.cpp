@@ -13,7 +13,7 @@ float TimeSystem::physicsDeltaTime = 0;
 
 
 float TimeSystem::timeScale = 1;
-float TimeSystem::physicsTimeFactor = 0.0165 - 0.0158;
+float TimeSystem::physicsTimeFactor = 0.0165;
 
 
 int TimeSystem::fpsCounter = 0;
@@ -46,7 +46,7 @@ float TimeSystem::physicsCheck() {
 };
 
 void TimeSystem::physicsStep() {
-//	physicsDeltaTime = (elapsedTime - lastPhysicsStep)*timeScale;
+	//physicsDeltaTime = (elapsedTime - lastPhysicsStep)*timeScale;
 	//lastPhysicsStep = elapsedTime;
 	//if (physicsDeltaTime > 0.0167) {
 	//	std::cout << "PROBLEM WITH DELTA TIME: " << physicsDeltaTime << std::endl;

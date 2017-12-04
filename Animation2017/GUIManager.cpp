@@ -337,7 +337,7 @@ void GUIManager::createPhysicsPopUpWindow()
 	forceBoxZ->setFontSize(16);
 	forceBoxZ->setSpinnable(true);
 	forceBoxZ->setValueIncrement(.5);
-	forceBoxY->setCallback([&](float z) {  gameObjectForceZ = z; modifyCurrentEntity(); });
+	forceBoxZ->setCallback([&](float z) {  gameObjectForceZ = z; modifyCurrentEntity(); });
 
 	new Label(popupF, " Apply Torque X");
 	torqueBoxX = new FloatBox<float>(popupF);
@@ -620,7 +620,9 @@ void GUIManager::instantiateGameObject(glm::vec3 col, int shape)
 	pGameObject->setCoeffOfRestitution(gameObjectBounciness);
 	pGameObject->setStatic(false);
 
+	
 
+	
 	PhysicsEngine::getInstance()->addComponent(pGameObject);;
 	eGameObject->addComponent(pGameObject);
 
@@ -745,7 +747,7 @@ void GUIManager::updateCurrentEntity()
 	else
 	{
 		isPhysicsComponentOn = pGameObject->isEnabled();
-		glm::vec3 temp = pGameObject->getForce();
+		glm::vec3 temp= PhysicsEngine::getInstance()->getForce(pGameObject);
 		gameObjectForceX = temp.x;
 		gameObjectForceY = temp.y;
 		gameObjectForceZ = temp.z;
@@ -885,23 +887,18 @@ void GUIManager::modifyCurrentEntity()
 			//MIGHT BE ACTING WEIRD?
 			pGameObject->setStatic(isGameObjectStatic);
 
-			//FORCE
-
-			//DOES NOT REST
-			//NEEDS FIX
-			PhysicsEngine::getInstance()->setForce(pGameObject, glm::vec3(gameObjectForceX, gameObjectForceY, gameObjectForceZ), glm::vec3(gameObjectPosX, gameObjectPosY, gameObjectPosZ));
-
-
-
-
+			
+			//CHANGE FORCE
+			pGameObject->setMomentum(glm::vec3(gameObjectForceX, gameObjectForceY, gameObjectForceZ));
 			//TORQUE
-			//DOES NOT RESET
-			//NEEDS FIX
-			PhysicsEngine::getInstance()->setTorque(pGameObject, glm::vec3(gameObjectTorqueX, gameObjectTorqueY, gameObjectTorqueZ));
+			pGameObject->setAngularMomentum(glm::vec3(gameObjectTorqueX, gameObjectTorqueY, gameObjectTorqueZ));
+
+		
+		
 
 
 			//MASS AND MOMENTOFINERTIA
-			pGameObject->setMomentOfInertia(PhysicsBuilder::getMomentOfInertia(0, glm::mat4(), gameObjectMass));
+			pGameObject->setMomentOfInertia(PhysicsBuilder::getMomentOfInertia(eGameObject->getMeshID(), eGameObject->scale, gameObjectMass));
 			pGameObject->setMass(gameObjectMass);
 
 

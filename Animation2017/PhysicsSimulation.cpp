@@ -75,7 +75,7 @@ PhysicsSimulation::PhysicsSimulation()
 
 
 	TimeSystem::resetTime();
-	
+
 
 	screen = new Screen();
 	screen->initialize(windowManager->getWindow(), true);

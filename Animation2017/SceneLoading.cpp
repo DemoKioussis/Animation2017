@@ -184,11 +184,13 @@ void SceneLoading::Initialize() {
 
 				//p->setVelocity(force);
 				//PhysicsEngine::getInstance()->setVelocity(p);
+				//CHANGE ME
 				PhysicsEngine::getInstance()->addForce(p, force,glm::vec3());
 				if (sVec.size() > 7) {
 					torque.x = stof(sVec[5]);
 					torque.y = stof(sVec[6]);
 					torque.z = stof(sVec[7]);
+					//CHANGE ME
 					PhysicsEngine::getInstance()->addTorque(p, torque);
 
 				}
@@ -275,7 +277,7 @@ void SceneLoading::saveScene(string sceneName) {
 		scene << "rotation" << "|" << tmpQuat.x << "|" << tmpQuat.y << "|" << tmpQuat.z << "|" << tmpQuat.w << "\n";
 		for (int j = 0; j < entity->components.size(); j++) {
 			Component* component = entity->components[j];
-			std::cout << component->getType() << std::endl;
+			//std::cout << component->getType() << std::endl;
 			RenderComponent* renderComponent = nullptr;
 			PhysicsComponent* physicsComponent = nullptr;
 			//CollisionComponent* collisionComponent = nullptr;
@@ -288,8 +290,7 @@ void SceneLoading::saveScene(string sceneName) {
 				case PHYSICS_COMPONENT:
 					physicsComponent = static_cast<PhysicsComponent*>(component);
 					//cout << physicsComponent->getVeloctiy().x << "|" << physicsComponent->getVeloctiy().y << "|" << physicsComponent->getVeloctiy().z << "|" << endl;
-
-					denominator = (TimeSystem::getPhysicsTimeFactor())/physicsComponent->getMass();
+					denominator = (TimeSystem::getPhysicsTimeFactor()*2)/physicsComponent->getMass();
 					scene << "physics" << "|" << physicsComponent->getMass() << "|" << physicsComponent->getVelocity().x/ denominator << "|" << physicsComponent->getVelocity().y / denominator << "|" << physicsComponent->getVelocity().z / denominator << "|" << physicsComponent->getAngularVelocity().x / denominator << "|" << physicsComponent->getAngularVelocity().y / denominator << "|" << physicsComponent->getAngularVelocity().z / denominator << "|" << physicsComponent->getCoeffOfRestitution()<<"\n";
 					break;
 				case COLLISION_COMPONENT:
