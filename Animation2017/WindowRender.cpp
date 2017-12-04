@@ -1,4 +1,6 @@
 #include "WindowRender.h"
+#include"WindowManager.h"
+#include"Camera.h"
 
 WindowRender* WindowRender::instance = nullptr;
 
@@ -7,6 +9,7 @@ void WindowRender::Initialize()
 	if (instance)
 		return;
 	WindowRender * windowRender = new WindowRender();
+
 	instance = windowRender;
 }
 
@@ -34,8 +37,13 @@ void WindowRender::Render()
 		PhysicsSimulation::getInstance()->getWindowManager()->clearWindow();
 		PhysicsSimulation::getInstance()->getShader()->use();
 		PhysicsSimulation::getInstance()->getWindowManager()->drawMeshes();
-		PhysicsSimulation::getInstance()->getScreen()->drawContents();
-		PhysicsSimulation::getInstance()->getScreen()->drawWidgets();
+	   
+		if (!InputManager::getMode())
+		{
+			PhysicsSimulation::getInstance()->getScreen()->drawContents();
+			PhysicsSimulation::getInstance()->getScreen()->drawWidgets();
+		}
+		
 		PhysicsSimulation::getInstance()->getWindowManager()->swapBuffer();
 		glDisable(GL_DEPTH_TEST);
 		TimeSystem::frameStep();

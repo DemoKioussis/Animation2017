@@ -7,11 +7,15 @@
 #include "Entity.h"
 #include "SceneLoading.h"
 #include "EntityManager.h"
+#include "PhysicsSimulation.h"
+#include "WindowRender.h"
+
 Camera* InputManager::camera = nullptr;
 WindowManager* InputManager::windowManager = nullptr;
 GLboolean InputManager::firstMouse = false;
 GLfloat InputManager::lastX = 0;
 GLfloat InputManager::lastY = 0;
+GLboolean InputManager::isInCameraMode = false;
 
 void InputManager::initialize() {
 	if (windowManager != nullptr) {
@@ -20,7 +24,10 @@ void InputManager::initialize() {
 		glfwSetCursorPosCallback(windowManager->getWindow(), mouse_callback);
 		glfwSetScrollCallback(windowManager->getWindow(), scroll_callback);
 		glfwSetKeyCallback(windowManager->getWindow(), key_callback);
-
+		glfwSetDropCallback(windowManager->getWindow(), drop_callback);
+		glfwSetCharCallback(windowManager->getWindow(), char_callback);
+		glfwSetMouseButtonCallback(windowManager->getWindow(), mousebutton_callback);
+		
 	}
 
 	else std::cout << "cannot initialize input manager - missing window reference" << std::endl;
@@ -28,6 +35,12 @@ void InputManager::initialize() {
 }
 void InputManager::framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
+	if (!isInCameraMode)
+	{
+		PhysicsSimulation::getInstance()->getScreen()->resizeCallbackEvent(width, height);
+	}
+
+	
 	// make sure the viewport matches the new window dimensions; note that width and 
 	// height will be significantly larger than specified on retina displays.
 	windowManager->setDimensions(width, height);
@@ -35,6 +48,7 @@ void InputManager::framebuffer_size_callback(GLFWwindow* window, int width, int 
 }
 void InputManager::mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
+
 	if (firstMouse)
 	{
 		lastX = xpos;
@@ -47,20 +61,40 @@ void InputManager::mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
 	lastX = xpos;
 	lastY = ypos;
+	if (!isInCameraMode)
+	{
+		PhysicsSimulation::getInstance()->getScreen()->cursorPosCallbackEvent(xpos, ypos);
+	}
+	else
+	{
+		camera->ProcessMouseMovement(xoffset, yoffset);
+	}
 
-	camera->ProcessMouseMovement(xoffset, yoffset);
+	
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
 // ----------------------------------------------------------------------
 void InputManager::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	camera->ProcessMouseScroll(yoffset);
+
+	if (!isInCameraMode)
+	{
+		PhysicsSimulation::getInstance()->getScreen()->resizeCallbackEvent(xoffset, yoffset);
+	}
+	else
+	{
+		camera->ProcessMouseScroll(yoffset);
+		
+	}
+	
 }
 void InputManager::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	cout << "HI";
+	PhysicsSimulation::getInstance()->getScreen()->keyCallbackEvent(key, scancode, action, mods);
+
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_F1) == GLFW_PRESS) {
+		isInCameraMode = !isInCameraMode;
 		camera->ToggleFpsMode();
 	}
 
@@ -147,6 +181,36 @@ void InputManager::key_callback(GLFWwindow* window, int key, int scancode, int a
 	}
 }
 
+void InputManager::drop_callback(GLFWwindow *, int count, const char ** filenames)
+{
+	if (!isInCameraMode)
+	{
+		PhysicsSimulation::getInstance()->getScreen()->dropCallbackEvent(count, filenames);
+	}
+
+}
+
+void InputManager::char_callback(GLFWwindow *, unsigned int codepoint)
+{
+	if (!isInCameraMode)
+	{
+		PhysicsSimulation::getInstance()->getScreen()->charCallbackEvent(codepoint);
+	}
+}
+
+void InputManager::mousebutton_callback(GLFWwindow *, int button, int action, int modifiers)
+{
+	if (!isInCameraMode)
+	{
+		PhysicsSimulation::getInstance()->getScreen()->mouseButtonCallbackEvent(button, action, modifiers);
+	}
+}
+
+bool InputManager::getMode()
+{
+	return isInCameraMode;
+}
+
 void InputManager::setCamera(Camera* c) {
 	if (windowManager != nullptr) {
 		camera = c;
@@ -156,6 +220,7 @@ void InputManager::setCamera(Camera* c) {
 	}
 	else std::cout << "cannot set camera for input manager - missing window reference" << std::endl;
 }
+
 void InputManager::setWindow(WindowManager* wm) {
 	windowManager = wm;
 }
@@ -271,29 +336,29 @@ void InputManager::processCameraInput() {
 	float deltaT = TimeSystem::getFrameDeltaTime();
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_W) == GLFW_PRESS) {
 		camera->ProcessKeyboard(DIRECTION::FORWARD, deltaT);
-		//updateSkybox();
+
 	}
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_S) == GLFW_PRESS) {
 		camera->ProcessKeyboard(DIRECTION::BACKWARD, deltaT);
-		//updateSkybox();
+	
 	}
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_A) == GLFW_PRESS) {
 		camera->ProcessKeyboard(DIRECTION::LEFT, deltaT);
-		//updateSkybox();
+		
 	}
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_D) == GLFW_PRESS) {
 		camera->ProcessKeyboard(DIRECTION::RIGHT, deltaT);
-		//updateSkybox();
+		
 	}
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS) {
 		camera->ProcessKeyboard(DIRECTION::UP, deltaT);
-		//updateSkybox();
+		
 	}
 	if (glfwGetKey(windowManager->getWindow(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
 		camera->ProcessKeyboard(DIRECTION::DOWN, deltaT);
-		//updateSkybox();
+		
 	}
-	//Entities->at(0)->translation = glm::translate(Entities->at(0)->translation, camera->Position);
+
 
 }
 

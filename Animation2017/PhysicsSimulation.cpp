@@ -27,6 +27,11 @@ PhysicsSimulation::PhysicsSimulation()
 
 	EntityManager::Initialize();
 
+
+	screen = new Screen();
+	screen->initialize(windowManager->getWindow(), true);
+	GUIManager::Initialize();
+
 	InputManager::setWindow(windowManager);
 	InputManager::setCamera(camera);
 	InputManager::initialize();
@@ -77,54 +82,8 @@ PhysicsSimulation::PhysicsSimulation()
 	TimeSystem::resetTime();
 
 
-	screen = new Screen();
-	screen->initialize(windowManager->getWindow(), true);
-	GUIManager::Initialize();
 
 
-
-	//MOVE THESE
-	glfwSetCursorPosCallback(windowManager->getWindow(),
-		[](GLFWwindow *, double x, double y) {
-		screen->cursorPosCallbackEvent(x, y);
-	}
-	);
-
-	glfwSetMouseButtonCallback(windowManager->getWindow(),
-		[](GLFWwindow *, int button, int action, int modifiers) {
-		screen->mouseButtonCallbackEvent(button, action, modifiers);
-	}
-	);
-
-	glfwSetKeyCallback(windowManager->getWindow(),
-		[](GLFWwindow *, int key, int scancode, int action, int mods) {
-		screen->keyCallbackEvent(key, scancode, action, mods);
-	}
-	);
-
-	glfwSetCharCallback(windowManager->getWindow(),
-		[](GLFWwindow *, unsigned int codepoint) {
-		screen->charCallbackEvent(codepoint);
-	}
-	);
-
-	glfwSetDropCallback(windowManager->getWindow(),
-		[](GLFWwindow *, int count, const char **filenames) {
-		screen->dropCallbackEvent(count, filenames);
-	}
-	);
-
-	glfwSetScrollCallback(windowManager->getWindow(),
-		[](GLFWwindow *, double x, double y) {
-		screen->scrollCallbackEvent(x, y);
-	}
-	);
-
-	glfwSetFramebufferSizeCallback(windowManager->getWindow(),
-		[](GLFWwindow *, int width, int height) {
-		screen->resizeCallbackEvent(width, height);
-	}
-	);
 
 
 

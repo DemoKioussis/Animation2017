@@ -13,6 +13,7 @@ public:
 	static WindowRender* getInstance();
 
 
+
 private:
 	static WindowRender* instance;
 };

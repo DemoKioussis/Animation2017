@@ -186,6 +186,8 @@ void GUIManager::createTransformPopUpWindow()
 		Alignment::Middle, 15, 6));
 	popupT->setTooltip("Change the Position, Rotation and Scale of the current GameObject.");
 
+	
+
 	new Label(popupT, " Translate X");
 	translateBoxX = new FloatBox<float>(popupT);
 	translateBoxX->setEditable(true);
@@ -221,6 +223,7 @@ void GUIManager::createTransformPopUpWindow()
 	translateBoxZ->setCallback([&](float z) {  gameObjectPosZ = z; modifyCurrentEntity(); });
 
 
+	
 
 	new Label(popupT, " Rotate X");
 	rotateBoxX = new FloatBox<float>(popupT);
@@ -483,12 +486,22 @@ void GUIManager::createInspectorWindow()
 	iteratorBox->setEditable(true);
 	iteratorBox->setFixedSize(Vector2i(100, 20));
 	iteratorBox->setValue(0);
+	iteratorBox->setDefaultValue("0");
 	iteratorBox->setFontSize(16);
 	iteratorBox->setSpinnable(true);
-	iteratorBox->setMinValue(0.1);
+	iteratorBox->setMinValue(0);
 	iteratorBox->setFormat("[0-9]*\\.?[0-9]+");
 	iteratorBox->setValueIncrement(1);
-	iteratorBox->setCallback([&](int i) {  iteratorGameObject = i; selectedGameObject();	updateCurrentEntity();	updateButtons(); });
+	iteratorBox->setCallback([&](int i) {  if (EntityManager::getInstance()->getEntities()->size() != 0)
+	{
+		
+		iteratorGameObject = i; selectedGameObject();	updateCurrentEntity();	updateButtons();
+	}
+	else
+	{
+		i = 0;
+	}
+		 });
 
 	new Label(gameObjectInspectorWindow, "Render Properties", "sans");
 	cb = new CheckBox(gameObjectInspectorWindow, "Render Component");
@@ -542,7 +555,12 @@ void GUIManager::createInspectorWindow()
 
 	Button *b = gameObjectInspectorWindow->add<Button>("Next GameObject", ENTYPO_ICON_ARROW_RIGHT);
 	b->setBackgroundColor(Color(0, 255, 0, 25));
-	b->setCallback([&] {iteratorGameObject++; selectedGameObject();	updateCurrentEntity();	updateButtons(); });
+	b->setCallback([&] {
+		if (EntityManager::getInstance()->getEntities()->size() != 0)
+		{
+			iteratorGameObject++; selectedGameObject();	updateCurrentEntity();	updateButtons();
+		}
+		});
 	b->setTooltip("Iterates to the next gameobject in the scene.");
 
 	gameObjectInspectorWindow->setVisible(false);
@@ -747,7 +765,7 @@ void GUIManager::updateCurrentEntity()
 	else
 	{
 		isPhysicsComponentOn = pGameObject->isEnabled();
-		glm::vec3 temp= PhysicsEngine::getInstance()->getForce(pGameObject);
+		glm::vec3 temp = pGameObject->getMomentum();
 		gameObjectForceX = temp.x;
 		gameObjectForceY = temp.y;
 		gameObjectForceZ = temp.z;
@@ -760,7 +778,7 @@ void GUIManager::updateCurrentEntity()
 
 		//FOR TORQUE
 
-		glm::vec3 tempT = pGameObject->getTorque();
+		glm::vec3 tempT = pGameObject->getAngularMomentum();
 		gameObjectTorqueX = tempT.x;
 		gameObjectTorqueY = tempT.y;
 		gameObjectTorqueZ = tempT.z;

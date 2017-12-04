@@ -55,9 +55,6 @@
     <Filter Include="Header Files\Builders">
       <UniqueIdentifier>{f1addbfe-a820-4d00-9d3e-0b8abd89becb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Window Render">
-      <UniqueIdentifier>{414d2ee2-44ce-456b-b954-bf6fda7fd7ad}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GUI">
       <UniqueIdentifier>{3a63fa72-b598-42fa-8a4e-416d23d0d940}</UniqueIdentifier>
     </Filter>
@@ -66,6 +63,9 @@
     </Filter>
     <Filter Include="Source Files\GUI">
       <UniqueIdentifier>{c367063f-2abb-4e13-ab83-7a17cc96912e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Window Render">
+      <UniqueIdentifier>{414d2ee2-44ce-456b-b954-bf6fda7fd7ad}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -216,7 +216,7 @@
       <Filter>Header Files\Entity-Component</Filter>
     </ClInclude>
     <ClInclude Include="WindowRender.h">
-      <Filter>Window Render</Filter>
+      <Filter>Header Files\Window Render</Filter>
     </ClInclude>
     <ClInclude Include="GUIManager.h">
       <Filter>GUI</Filter>
