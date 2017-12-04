@@ -377,7 +377,7 @@ void PhysicsEngine::resolveCollisions2() {
 		PhysicsComponent* component = (PhysicsComponent*)targetComponents[i];
 		if (component->JCount > 0 && component->isEnabled()) {
 			component->P += component->J / (float)component->JCount;
-	//		component->getTranslation() = glm::translate(component->getTranslation(), component->penTrans);// / (float)component->JCount);
+		//	component->getTranslation() = glm::translate(component->getTranslation(), component->penTrans);// / (float)component->JCount);
 
 			component->J = glm::vec3();
 			component->penTrans = glm::vec3();

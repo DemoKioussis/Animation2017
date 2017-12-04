@@ -53,6 +53,8 @@ public:
 	void modifyCurrentEntity();
 
 	void selectedGameObject();
+	void instantiateDot();
+	void showDot();
 
 	
 	static GUIManager* getInstance();
@@ -114,6 +116,12 @@ private:
 	RenderComponent* rGameObject = nullptr;
 	PhysicsComponent* pGameObject = nullptr;
 	CollisionComponent* cGameObject = nullptr;
+
+	//Container for dot
+	Entity* eGameObjectC = nullptr;
+	RenderComponent* rGameObjectC = nullptr;
+	
+
 
 	//GUI
 	CheckBox *cb;

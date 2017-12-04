@@ -46,16 +46,16 @@ float TimeSystem::physicsCheck() {
 };
 
 void TimeSystem::physicsStep() {
-	//physicsDeltaTime = (elapsedTime - lastPhysicsStep)*timeScale;
+	//physicsDeltaTime =(physicsDeltaTime + (elapsedTime - lastPhysicsStep)) /2.0f;
 	//lastPhysicsStep = elapsedTime;
-	//if (physicsDeltaTime > 0.0167) {
+//	if (physicsDeltaTime > 0.0167) {
 	//	std::cout << "PROBLEM WITH DELTA TIME: " << physicsDeltaTime << std::endl;
 
-		//physicsDeltaTime = 0.00165*timeScale;
-	//}
+		physicsDeltaTime = 0.00165*timeScale;
+//	}
 
-	 physicsDeltaTime = physicsTimeFactor*timeScale;
-	//}
+	 //physicsDeltaTime = physicsTimeFactor*timeScale;
+//	}
 
 };
 float TimeSystem::getPhysicsTimeFactor() {

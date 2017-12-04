@@ -30,8 +30,7 @@ PhysicsSimulation::PhysicsSimulation()
 
 	screen = new Screen();
 	screen->initialize(windowManager->getWindow(), true);
-	GUIManager::Initialize();
-
+	
 	InputManager::setWindow(windowManager);
 	InputManager::setCamera(camera);
 	InputManager::initialize();
@@ -46,6 +45,7 @@ PhysicsSimulation::PhysicsSimulation()
 	CollisionEngine::Initialize();
 
 	SceneLoading::Initialize();
+	GUIManager::Initialize();
 
 	cubemapTexture = loadSkybox(faces);
 	Mesh::cubemapTexture = cubemapTexture;

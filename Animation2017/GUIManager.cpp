@@ -31,7 +31,7 @@ void GUIManager::createMainMenuWindow()
 
 		if (fileNameExt != "")
 		{
-			selectedGameObject();	updateCurrentEntity();	updateButtons();
+			selectedGameObject();	updateCurrentEntity();	updateButtons();  instantiateDot(); showDot();
 			isNewScene = true;
 
 			isOnEdit = true;
@@ -59,7 +59,6 @@ void GUIManager::createEditorWindow()
 	bEditorPlay = new Button(engineEditorWindow, "Play", ENTYPO_ICON_CONTROLLER_PLAY);
 	bEditorPlay->setFlags(Button::RadioButton);
 	bEditorPlay->setCallback([&] {
-		
 		isOnEdit = false;
 
 		TimeSystem::resetTime();
@@ -68,7 +67,6 @@ void GUIManager::createEditorWindow()
 	bEditorEdit->setFlags(Button::RadioButton);
 	bEditorEdit->setPushed(true);
 	bEditorEdit->setCallback([&] {
-	
 		isOnEdit = true;
 
 	});
@@ -86,7 +84,7 @@ void GUIManager::createEditorWindow()
 			bEditorPlay->setPushed(false);
 			bEditorEdit->setPushed(true);
 
-			iteratorGameObject = 0;	selectedGameObject();	updateCurrentEntity();	updateButtons();
+			iteratorGameObject = 0;	selectedGameObject();	updateCurrentEntity();	updateButtons();  instantiateDot(); showDot();
 			isNewScene = true;
 
 			isOnEdit = true;
@@ -114,10 +112,10 @@ void GUIManager::createEditorWindow()
 
 	});
 	bEditorReload = new Button(engineEditorWindow, "Reload Scene Completely", ENTYPO_ICON_CW);
-	//THIS RETURNS THE FILE DESTINATION OF WHERE I DECIDED TO PUT THE FILE
+
 	bEditorReload->setCallback([&] {
 		
-		SceneLoading::getInstance()->loadScene(fileNameExt); iteratorGameObject = 0;  selectedGameObject(); updateCurrentEntity();  updateButtons();
+		SceneLoading::getInstance()->loadScene(fileNameExt); iteratorGameObject = 0;  selectedGameObject(); updateCurrentEntity();  updateButtons();  instantiateDot(); showDot();
 
 	});
 
@@ -571,7 +569,8 @@ void GUIManager::createInspectorWindow()
 
 GUIManager::GUIManager()
 {
-
+	
+	instantiateDot();
 	createMainMenuWindow();
 	createEditorWindow();
 	createInstantiationWindow();
@@ -592,7 +591,7 @@ void GUIManager::interactWithGUI()
 		gameObjectInspectorWindow->setVisible(true);
 		PhysicsEngine::getInstance()->disable();
 		popupBtnGravity->setVisible(isGravityOn);
-
+		rGameObjectC->enable();
 	}
 	else if (!isOnEdit)
 	{
@@ -600,7 +599,8 @@ void GUIManager::interactWithGUI()
 		gameObjectInspectorWindow->setVisible(false);
 
 		PhysicsEngine::getInstance()->enable();
-
+	
+		rGameObjectC->disable();
 
 	}
 
@@ -652,13 +652,13 @@ void GUIManager::instantiateGameObject(glm::vec3 col, int shape)
 	eGameObject->addComponent(cGameObject);
 	CollisionEngine::getInstance()->updateAllBoundingBoxes();
 
-
+	
 
 	//Add To EntityManager;
 	EntityManager::getInstance()->add(eGameObject);
 	iteratorGameObject = EntityManager::getInstance()->getEntities()->size() -1;
 
-
+	
 
 }
 
@@ -707,11 +707,13 @@ void GUIManager::updateButtons()
 	gravityBoxX->setValue(gameObjectGravityX);
 	gravityBoxY->setValue(gameObjectGravityY);
 	gravityBoxZ->setValue(gameObjectGravityZ);
+
+
 }
 
 void GUIManager::updateCurrentEntity()
 {
-	//COME BACK TO THIS
+	
 	if (rGameObject == nullptr)
 	{
 		isRenderComponentOn = false;
@@ -801,7 +803,7 @@ void GUIManager::updateCurrentEntity()
 	{
 		isGravityOn = false;
 	}
-
+	showDot();
 
 
 }
@@ -809,46 +811,8 @@ void GUIManager::updateCurrentEntity()
 void GUIManager::modifyCurrentEntity()
 {
 
-	//RENDERING
-	if (rGameObject != nullptr)
-	{
-		if (isRenderComponentOn)
-		{
-			rGameObject->enable();
-		}
-		else if (!isRenderComponentOn)
-		{
-			rGameObject->disable();
-		}
-	}
-
-	//PHYSICS
-	if (pGameObject != nullptr)
-	{
-		if (isPhysicsComponentOn)
-		{
-			pGameObject->enable();
-
-		}
-		else if (!isPhysicsComponentOn)
-		{
-			pGameObject->disable();
-		}
-	}
-
-	//COLLISION
-	if (cGameObject != nullptr)
-	{
-		if (isCollisionComponentOn)
-		{
-			cGameObject->enable();
-
-		}
-		else if (!isCollisionComponentOn)
-		{
-			cGameObject->disable();
-		}
-	}
+	
+	
 
 	if (eGameObject != nullptr)
 	{
@@ -898,6 +862,34 @@ void GUIManager::modifyCurrentEntity()
 		gameObjectScaleOldZ = gameObjectScaleZ;
 
 
+		//RENDERING
+		if (rGameObject != nullptr)
+		{
+			if (isRenderComponentOn)
+			{
+				rGameObject->enable();
+			}
+			else if (!isRenderComponentOn)
+			{
+				rGameObject->disable();
+			}
+		}
+
+		//PHYSICS
+		if (pGameObject != nullptr)
+		{
+			if (isPhysicsComponentOn)
+			{
+				pGameObject->enable();
+
+			}
+			else if (!isPhysicsComponentOn)
+			{
+				pGameObject->disable();
+			}
+		}
+
+
 
 		if (pGameObject != nullptr)
 		{
@@ -943,8 +935,25 @@ void GUIManager::modifyCurrentEntity()
 			PhysicsEngine::getInstance()->setGravity(glm::vec3(gameObjectGravityX / 9.8, gameObjectGravityY / 9.8, gameObjectGravityZ / 9.8), 9.8);
 		}
 
+		//COLLISION
+		if (cGameObject != nullptr)
+		{
+			if (isCollisionComponentOn)
+			{
+				cGameObject->enable();
+
+			}
+			else if (!isCollisionComponentOn)
+			{
+				cGameObject->disable();
+			}
+			cGameObject->updateBoundingShapes();
+		}
+		
 
 	}
+	
+	showDot();
 
 }
 
@@ -958,7 +967,33 @@ void GUIManager::selectedGameObject()
 	rGameObject = static_cast<RenderComponent*>(eGameObject->getComponent(RENDER_COMPONENT));
 	pGameObject = static_cast<PhysicsComponent*>(eGameObject->getComponent(PHYSICS_COMPONENT));
 	cGameObject = static_cast<CollisionComponent*>(eGameObject->getComponent(COLLISION_COMPONENT));
+
 	
+}
+
+void GUIManager::instantiateDot()
+{
+	eGameObjectC = new Entity();
+	eGameObjectC->setShape(3);
+	eGameObjectC->setStatic(false);
+
+	rGameObjectC = new RenderComponent();
+
+	rGameObjectC->setColor(glm::vec3(-1, -1, -1));
+	rGameObjectC->disable();
+	rGameObjectC->setMeshID(3);
+	RenderEngine::getInstance()->addComponent(rGameObjectC);
+	eGameObjectC->addComponent(rGameObjectC);
+	
+}
+
+void GUIManager::showDot()
+{
+	
+	mat4 trans = eGameObject->translation;
+	trans[3][1] += 2;
+	trans[3][1] *= eGameObject->scale[1][1];
+	eGameObjectC->transform = trans * eGameObject->scale;
 }
 
 GUIManager * GUIManager::getInstance()
