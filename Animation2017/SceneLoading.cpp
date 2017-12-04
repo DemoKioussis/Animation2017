@@ -188,13 +188,14 @@ void SceneLoading::Initialize() {
 
 				//p->setVelocity(force);
 				//PhysicsEngine::getInstance()->setVelocity(p);
-				PhysicsEngine::getInstance()->addForce(p, force,glm::vec3());
+				//PhysicsEngine::getInstance()->addForce(p, force,glm::vec3());
+				p->setMomentum(force);
 				if (sVec.size() > 7) {
 					torque.x = stof(sVec[5]);
 					torque.y = stof(sVec[6]);
 					torque.z = stof(sVec[7]);
-					PhysicsEngine::getInstance()->addTorque(p, torque);
-
+					//PhysicsEngine::getInstance()->addTorque(p, torque);
+					p->setAngularMomentum(torque);
 				}
 				if (sVec.size() == 9) { //bouciness
 					p->setCoeffOfRestitution(stof(sVec[8]));
@@ -294,8 +295,9 @@ void SceneLoading::saveScene(char * sceneName) {
 					physicsComponent = static_cast<PhysicsComponent*>(component);
 					//cout << physicsComponent->getVeloctiy().x << "|" << physicsComponent->getVeloctiy().y << "|" << physicsComponent->getVeloctiy().z << "|" << endl;
 
-					denominator = (TimeSystem::getPhysicsTimeFactor())/physicsComponent->getMass();
-					scene << "physics" << "|" << physicsComponent->getMass() << "|" << physicsComponent->getVeloctiy().x/ denominator << "|" << physicsComponent->getVeloctiy().y / denominator << "|" << physicsComponent->getVeloctiy().z / denominator << "|" << physicsComponent->getAngularVelocity().x / denominator << "|" << physicsComponent->getAngularVelocity().y / denominator << "|" << physicsComponent->getAngularVelocity().z / denominator << "|" << physicsComponent->getCoeffOfRestitution()<<"\n";
+					//denominator = (TimeSystem::getPhysicsTimeFactor())/physicsComponent->getMass();
+					//scene << "physics" << "|" << physicsComponent->getMass() << "|" << physicsComponent->getVeloctiy().x / denominator << "|" << physicsComponent->getVeloctiy().y / denominator << "|" << physicsComponent->getVeloctiy().z / denominator << "|" << physicsComponent->getAngularVelocity().x / denominator << "|" << physicsComponent->getAngularVelocity().y / denominator << "|" << physicsComponent->getAngularVelocity().z / denominator << "|" << physicsComponent->getCoeffOfRestitution() << "\n";
+					scene << "physics" << "|" << physicsComponent->getMass() << "|" << physicsComponent->getMomentum().x<< "|" << physicsComponent->getMomentum().y << "|" << physicsComponent->getMomentum().z << "|" << physicsComponent->getAngularMomentum().x << "|" << physicsComponent->getAngularMomentum().y<< "|" << physicsComponent->getAngularMomentum().z<< "|" << physicsComponent->getCoeffOfRestitution()<<"\n";
 					break;
 				case COLLISION_COMPONENT:
 					scene << "collider" << "\n";

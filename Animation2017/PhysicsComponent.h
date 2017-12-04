@@ -118,8 +118,16 @@ public:
 	void setAngularMomentum(glm::vec3 m) {
 		L = m;
 	}
+
+	glm::vec3 getAngularMomentum() {
+		return L;
+	}
 	void setMomentum(glm::vec3 m) {
 		P = m;
+	}
+
+	glm::vec3  getMomentum() {
+		return P;
 	}
 	void setStatic(bool _static) {
 		isStatic = _static;

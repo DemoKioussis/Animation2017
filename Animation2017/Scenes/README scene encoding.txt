@@ -13,8 +13,8 @@ position|x|y|z (always before physics)
 scale|x|y|z
 rotation|quaternion.x|quaternion.y|quaternion.z|quaternion.w
 render|r|g|b
-physics|mass|forcex|forcey|forcez
-physics|mass|forcex|forcey|forcez|coefficient of Resistution
-physics|mass|forcex|forcey|forcez|torque.x|torque.y|torque.z|coefficient of Resistution
+physics|mass|momentumx|momentumy|momentumz
+physics|mass|momentumx|momentumy|momentumz|coefficient of Resistution
+physics|mass|momentumx|momentumy|momentumz|angularMomentum.x|angularMomentum.y|angularMomentum.z|coefficient of Resistution
 collider
 
