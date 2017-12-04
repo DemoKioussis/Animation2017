@@ -622,6 +622,7 @@ void GUIManager::instantiateGameObject(glm::vec3 col, int shape)
 	eGameObject->setStatic(false);
 	
 	rGameObject = new RenderComponent();
+
 	rGameObject->setColor(col);
 	rGameObject->enable();
 	rGameObject->setMeshID(shape);

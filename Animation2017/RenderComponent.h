@@ -10,6 +10,7 @@ public:
 	RenderComponent(glm::vec3 c = glm::vec3(0.5f,0.5f,0.5f)) {
 		componentType = RENDER_COMPONENT;
 		color = c;
+		enable();
 	};
 	~RenderComponent() {};
 

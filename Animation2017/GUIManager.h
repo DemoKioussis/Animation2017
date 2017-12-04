@@ -21,6 +21,11 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/euler_angles.hpp>
 
+#include "nanovg/nanovg_gl.h"
+#include "nanovg/perf.h"
+
+
+
 using namespace nanogui;
 
 
@@ -55,7 +60,6 @@ public:
 private:
 	static GUIManager* instance;
 	GUIManager();
-
 
 	//GUI INSPECTOR VALUES
 	bool isRenderComponentOn = true;

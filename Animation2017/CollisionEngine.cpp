@@ -71,6 +71,11 @@ void CollisionEngine::createVonNeumannGrid()
 {	
 	for (Component* c : targetComponents)
 	{
+		if (!c->isEnabled())
+		{
+			continue;
+		}
+
 		CollisionComponent* cc = (CollisionComponent*)c;
 
 		if (c->entity->isStatic())
@@ -107,6 +112,11 @@ void CollisionEngine::checkCollisionsVonNeumannGrid()
 	for (int dynamicComponentIndex = 0; dynamicComponentIndex < targetComponents.size(); dynamicComponentIndex++)
 	{
 		CollisionComponent* cc = (CollisionComponent*)targetComponents[dynamicComponentIndex];
+
+		if (!cc->isEnabled())
+		{
+			continue;
+		}
 
 		if (cc->entity->isStatic())
 		{
@@ -189,6 +199,11 @@ void CollisionEngine::checkStaticCollisions()
 	{
 		CollisionComponent* sc = (CollisionComponent*)targetComponents[staticComponentIndex];
 
+		if (!sc->isEnabled())
+		{
+			continue;
+		}
+
 		if (!sc->entity->isStatic())
 		{
 			continue;
@@ -197,6 +212,11 @@ void CollisionEngine::checkStaticCollisions()
 		for (int dynamicComponentIndex = 0; dynamicComponentIndex < targetComponents.size(); dynamicComponentIndex++)
 		{
 			CollisionComponent* dc = (CollisionComponent*)targetComponents[dynamicComponentIndex];
+
+			if (!dc->isEnabled())
+			{
+				continue;
+			}
 
 			if (dc->entity->isStatic())
 			{

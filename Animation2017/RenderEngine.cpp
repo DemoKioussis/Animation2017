@@ -1,7 +1,8 @@
 #include "RenderEngine.h"
 #include "Mesh.h"
 #include "RenderComponent.h"
-
+#include <glm\gtx\matrix_operation.hpp>
+#include <glm\gtc\matrix_transform.hpp>
 //bool RenderEngine::enabled = true;
 
 RenderEngine* RenderEngine::instance = 0;
@@ -74,9 +75,15 @@ void RenderEngine::drawRenderComponents() {
 		
 		vector<glm::mat4> data;
 		for (int j = 0; j < sortedRenderCompoents[i]->size();j++) {
-		
-			glm::mat4 & trans = sortedRenderCompoents[i]->at(j)->getTransform();
+			if (sortedRenderCompoents[i]->at(j)->isEnabled()) {
+				glm::mat4 & trans = sortedRenderCompoents[i]->at(j)->getTransform();
 				data.push_back(trans);
+			}
+			else {
+				glm::vec3 trans(100000.0f, 100000.0f, 100000.0f);
+				glm::mat4 transMat = glm::translate(glm::mat4(1.0f), trans);
+				data.push_back(transMat);
+			}
 		}
 
 		renderReferences[i]->setBufferData(data);

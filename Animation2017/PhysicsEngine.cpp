@@ -62,7 +62,7 @@ void PhysicsEngine::updatePhysics() {
 	for (int i = 0; i < targetComponents.size();i++) {
 
 		PhysicsComponent* component = (PhysicsComponent*)targetComponents[i];
-		if (!component->getIsStatic()) {
+		if (!component->getIsStatic() && component->isEnabled()) {
 			addGravity(component);
 			setAcceleration(component);
 			setMomentum(component);
@@ -76,7 +76,7 @@ void PhysicsEngine::applyPhysics() {
 	#pragma omp parallel for
 	for (int i = 0; i < targetComponents.size();i++) {
 		PhysicsComponent* component = (PhysicsComponent*)targetComponents[i];
-		if (!component->getIsStatic() && component->kineticEnergy>MIN_ENERGY) {
+		if (!component->getIsStatic() && component->isEnabled()) {
 			rotate(component);
 			translate(component);
 			component->getTransform() = component->getTranslation()*component->getRotation()*component->getScale();
@@ -251,35 +251,7 @@ void PhysicsEngine::resolveCollisions() {
 				impulses[k+ collision.points1LC.size()] = getImpulse(rA, rB, vRel, physA, physB, massInverseSum, penVector, normalizedPenVector, coeffOfRestitution, 1);
 			}
 
-			//printf("\nB %d/%d - vrel%f:\n", k + 1, collision.points2LC.size(), vRel);
-			//printf("vA: %f , %f, %f\n", velA.x, velA.y, velA.z);
-			//printf("vB: %f , %f, %f\n", velB.x, velB.y, velB.z);
-			//
-			//printf("posA: %f , %f, %f\n", rA.x, rA.y, rA.z);
-			//printf("posB: %f , %f, %f\n", rB.x, rB.y, rB.z);
-			//
-			//printf("World pos: %f , %f, %f\n\n", worldPos.x, worldPos.y, worldPos.z);
 		}
-
-
-	//	for (int i = 0; i < impulses.size();i++) {
-	//		netImpulse += impulses[i];
-	//	}
-		//netImpulse /= TimeSystem::getPhysicsDeltaTime();
-		//physA.P += netImpulse;
-	//	physB.P -= netImpulse;
-
-	/*	if(physA.isStatic)
-			physB.getTranslation() = glm::translate(physA.getTranslation(), -penVector);
-		else if (physB.isStatic)
-			physA.getTranslation() = glm::translate(physA.getTranslation(), penVector);
-		else {
-			glm::vec3 trans = penVector / 2.0f;
-			physA.getTranslation() = glm::translate(physA.getTranslation(), trans);
-			physB.getTranslation() = glm::translate(physA.getTranslation(), -trans);
-
-		}
-		*/
 			
 	}
 
@@ -309,8 +281,8 @@ glm::vec3 PhysicsEngine::getImpulse(glm::vec3 &rA, glm::vec3 &rB, float vRel, Ph
 	impulse = -(coeffOfRestitution)*vRel / (dotA + dotB + massInverseSum);
 	glm::vec3 impulseVector = impulse*glm::normalize(penVector) / TimeSystem::getPhysicsDeltaTime();
 
-	physA.L += glm::cross(rA, impulseVector);
-	physB.L -= glm::cross(rB, impulseVector);
+	if (physA.isEnabled())physA.L += glm::cross(rA, impulseVector);
+	if (physB.isEnabled())physB.L -= glm::cross(rB, impulseVector);
 
 	return impulseVector;
 }
@@ -389,21 +361,21 @@ void PhysicsEngine::resolveCollisions2() {
 		}
 
 
-		if (physA.isStatic)
+		if (physA.isStatic && physB.isEnabled())
 			physB.penTrans = -penVector;
-		else if (physB.isStatic)
+		else if (physB.isStatic && physA.isEnabled())
 			physA.penTrans = penVector;
 		else {
 			glm::vec3 trans = penVector / 2.0f;
-			physB.penTrans = trans;
-			physB.penTrans = -trans;
+			if (physB.isEnabled()) physB.penTrans = trans;
+			if (physA.isEnabled()) 	physA.penTrans = -trans;
 		}
 	
 	}
 #pragma omp parallel for
 	for (int i = 0; i < targetComponents.size();i++) {
 		PhysicsComponent* component = (PhysicsComponent*)targetComponents[i];
-		if (component->JCount > 0) {
+		if (component->JCount > 0 && component->isEnabled()) {
 			component->P += component->J / (float)component->JCount;
 	//		component->getTranslation() = glm::translate(component->getTranslation(), component->penTrans);// / (float)component->JCount);
 

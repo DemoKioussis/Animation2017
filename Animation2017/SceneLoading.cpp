@@ -172,6 +172,7 @@ void SceneLoading::Initialize() {
 				//std::cout << "physics" << std::endl;
 				PhysicsComponent* p = new PhysicsComponent();
 				float mass = stof(sVec[1]);
+				p->enable();
 				p->setMomentOfInertia(PhysicsBuilder::getMomentOfInertia(currentMeshIndex, glm::mat4(),mass));
 				p->setMass(mass);
 				p->setStatic(isStatic);
@@ -217,6 +218,7 @@ void SceneLoading::Initialize() {
 			if (sVec[0] == "collider") {
 				//std::cout << "collider" << std::endl;
 				CollisionComponent* c = new CollisionComponent();
+				c->enable();
 				c->setMeshID(currentMeshIndex);
 				
 				e->addComponent(c);
