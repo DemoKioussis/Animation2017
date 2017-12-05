@@ -284,22 +284,31 @@ void SceneLoading::saveScene(string sceneName) {
 			//std::cout << component->getType() << std::endl;
 			RenderComponent* renderComponent = nullptr;
 			PhysicsComponent* physicsComponent = nullptr;
-			//CollisionComponent* collisionComponent = nullptr;
+			CollisionComponent* collisionComponent = nullptr;
 			float denominator;
 			switch (component->getType()) {
 				case RENDER_COMPONENT:
 					renderComponent = static_cast<RenderComponent*>(component);
+					if (!renderComponent->isEnabled())
+					{
+						continue;
+					}
 					scene << "render" << "|" << renderComponent->getColor().x << "|" << renderComponent->getColor().y << "|" << renderComponent->getColor().z << "\n";
 					break;
 				case PHYSICS_COMPONENT:
 					physicsComponent = static_cast<PhysicsComponent*>(component);
-					//cout << physicsComponent->getVeloctiy().x << "|" << physicsComponent->getVeloctiy().y << "|" << physicsComponent->getVeloctiy().z << "|" << endl;
-
-					//denominator = (TimeSystem::getPhysicsTimeFactor())/physicsComponent->getMass();
-					//scene << "physics" << "|" << physicsComponent->getMass() << "|" << physicsComponent->getVeloctiy().x / denominator << "|" << physicsComponent->getVeloctiy().y / denominator << "|" << physicsComponent->getVeloctiy().z / denominator << "|" << physicsComponent->getAngularVelocity().x / denominator << "|" << physicsComponent->getAngularVelocity().y / denominator << "|" << physicsComponent->getAngularVelocity().z / denominator << "|" << physicsComponent->getCoeffOfRestitution() << "\n";
+					if (!physicsComponent->isEnabled())
+					{
+						continue;
+					}
 					scene << "physics" << "|" << physicsComponent->getMass() << "|" << physicsComponent->getMomentum().x<< "|" << physicsComponent->getMomentum().y << "|" << physicsComponent->getMomentum().z << "|" << physicsComponent->getAngularMomentum().x << "|" << physicsComponent->getAngularMomentum().y<< "|" << physicsComponent->getAngularMomentum().z<< "|" << physicsComponent->getCoeffOfRestitution()<<"\n";
 					break;
 				case COLLISION_COMPONENT:
+					collisionComponent = static_cast<CollisionComponent*>(component);
+					if (!collisionComponent->isEnabled())
+					{
+						continue;
+					}
 					scene << "collider" << "\n";
 					break;
 			}

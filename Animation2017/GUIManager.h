@@ -120,6 +120,9 @@ private:
 	//Container for dot
 	Entity* eGameObjectC = nullptr;
 	RenderComponent* rGameObjectC = nullptr;
+
+	//TempColor
+	glm::vec3 colorEdit = glm::vec3(-1,-1,-1);
 	
 
 

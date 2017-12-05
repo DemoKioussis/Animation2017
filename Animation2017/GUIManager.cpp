@@ -115,7 +115,11 @@ void GUIManager::createEditorWindow()
 
 	bEditorReload->setCallback([&] {
 		
-		SceneLoading::getInstance()->loadScene(fileNameExt); iteratorGameObject = 0;  selectedGameObject(); updateCurrentEntity();  updateButtons();  instantiateDot(); showDot();
+		SceneLoading::getInstance()->loadScene(fileNameExt);  
+		if (fileNameExt != "")
+		{
+			iteratorGameObject = 0;  selectedGameObject(); updateCurrentEntity();  updateButtons();  instantiateDot(); showDot();
+		}
 
 	});
 
@@ -702,6 +706,7 @@ void GUIManager::updateButtons()
 
 	staticCheckBox->setChecked(isGameObjectStatic);
 	massBox->setValue(gameObjectMass);
+	bouncinessBox->setValue(gameObjectBounciness);
 
 	cbG->setChecked(isGravityOn);
 	gravityBoxX->setValue(gameObjectGravityX);
@@ -897,7 +902,7 @@ void GUIManager::modifyCurrentEntity()
 			//ISSTATIC
 			//MIGHT BE ACTING WEIRD?
 			pGameObject->setStatic(isGameObjectStatic);
-
+			eGameObject->setStatic(isGameObjectStatic);
 			
 			//CHANGE FORCE
 			pGameObject->setMomentum(glm::vec3(gameObjectForceX, gameObjectForceY, gameObjectForceZ));
@@ -991,8 +996,9 @@ void GUIManager::showDot()
 {
 	
 	mat4 trans = eGameObject->translation;
-	trans[3][1] += 2;
-	trans[3][1] *= eGameObject->scale[1][1];
+	//trans[3][1]
+	trans[3][1] += 2* eGameObject->scale[1][1];
+	cout << trans[3][1];
 	eGameObjectC->transform = trans * eGameObject->scale;
 }
 
