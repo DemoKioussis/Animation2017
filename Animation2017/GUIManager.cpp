@@ -153,7 +153,7 @@ void GUIManager::createInstantiationWindow()
 		Alignment::Middle, 15, 6));
 	new Label(gameObjectInstantiationWindow, "GameObject Shape ", "sans");
 	ComboBox *cobo =
-		new ComboBox(gameObjectInstantiationWindow, { "Cube", "Cylinder","Ellipsoid","Sphere" });
+		new ComboBox(gameObjectInstantiationWindow, { "Cube", "Cylinder","Ellipsoid","Sphere","Icosphere"});
 	cobo->setCallback([&](int shape) {instantiatedShape = shape; });
 	cobo->setSide(Popup::Side::Left);
 	cobo->setFontSize(16);
